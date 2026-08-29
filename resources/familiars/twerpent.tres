@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://bgocjaty20glq"]
+
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_femnv"]
+[ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="2_v3lvr"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="3_jfx6b"]
+[ext_resource type="Resource" uid="uid://5uker742q0el" path="res://resources/techniques/venom_strike.tres" id="4_tpyti"]
+[ext_resource type="Resource" uid="uid://dnuicifi5lm2y" path="res://resources/techniques/attack.tres" id="5_tpyti"]
+[ext_resource type="Resource" uid="uid://brxlyxy0tm1pq" path="res://resources/techniques/defend.tres" id="6_5uf1g"]
+[ext_resource type="Resource" uid="uid://bvg7gi5bow1ja" path="res://resources/techniques/searing_spit.tres" id="7_arq6n"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a12nh"]
+atlas = ExtResource("2_v3lvr")
+region = Rect2(32, 48, 16, 16)
+
+[resource]
+script = ExtResource("1_femnv")
+familiar_name = "Twerpent"
+sprite = SubResource("AtlasTexture_a12nh")
+max_hp = 75
+power = 12
+defense = 8
+speed = 12
+focus = 9
+techniques = Array[ExtResource("3_jfx6b")]([ExtResource("5_tpyti"), ExtResource("6_5uf1g"), ExtResource("4_tpyti"), ExtResource("7_arq6n")])

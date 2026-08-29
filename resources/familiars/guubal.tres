@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://cgi3li0cihksq"]
+
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_00pm7"]
+[ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="2_iskl7"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="3_kn4wb"]
+[ext_resource type="Resource" uid="uid://dk2il2vavbbkq" path="res://resources/techniques/acid_bath.tres" id="4_00pm7"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m4hsq"]
+atlas = ExtResource("2_iskl7")
+region = Rect2(16, 0, 16, 16)
+
+[resource]
+script = ExtResource("1_00pm7")
+familiar_name = "Guubal"
+sprite = SubResource("AtlasTexture_m4hsq")
+max_hp = 100
+power = 18
+defense = 4
+speed = 6
+focus = 6
+techniques = Array[ExtResource("3_kn4wb")]([ExtResource("4_00pm7")])
+metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

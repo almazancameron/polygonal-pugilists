@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="DefendTechnique" format=3 uid="uid://brxlyxy0tm1pq"]
+
+[ext_resource type="Script" uid="uid://bp6e5mh74e3d3" path="res://scripts/defend_technique.gd" id="1_kvbkx"]
+
+[resource]
+script = ExtResource("1_kvbkx")
+technique_name = "Defend"
+metadata/_custom_type_script = "uid://bp6e5mh74e3d3"

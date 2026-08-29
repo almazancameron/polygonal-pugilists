@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://5uker742q0el"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+technique_name = "Venom Strike"
+power_multiplier = 0.667
+status_effect = 1
+status_stacks = 2
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

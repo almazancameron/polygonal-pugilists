@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://dnuicifi5lm2y"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="1_3lwdb"]
+
+[resource]
+script = ExtResource("1_3lwdb")
+technique_name = "Attack"
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

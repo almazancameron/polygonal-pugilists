@@ -1,14 +1,13 @@
 [gd_scene format=3 uid="uid://dgnd4w5q8qf4g"]
 
 [ext_resource type="Script" uid="uid://bm15uleb46vhy" path="res://scripts/battle_controller.gd" id="1_battle"]
-[ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/twerpent.tres" id="2_6vh42"]
+[ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/familiars/twerpent.tres" id="2_6vh42"]
 [ext_resource type="Script" uid="uid://cy44cok5wjn5a" path="res://scripts/combat_log.gd" id="2_log"]
-[ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/guubal.tres" id="3_4k1nj"]
+[ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="3_4k1nj"]
 [ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
 [ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
 [ext_resource type="FontFile" uid="uid://bq75qhujojfju" path="res://assets/fonts/BoldPixels.ttf" id="5_4k1nj"]
 [ext_resource type="PackedScene" uid="uid://wqprgejhrrw5" path="res://scenes/status_row.tscn" id="7_yahae"]
-[ext_resource type="Theme" uid="uid://hkf2bxrjlau4" path="res://assets/themes/button_font.tres" id="8_f4pi3"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
 
@@ -146,39 +145,3 @@ offset_top = 600.0
 offset_right = -16.0
 offset_bottom = 640.0
 grow_horizontal = 2
-
-[node name="AttackButton" type="Button" parent="ActionPanel" unique_id=575428710]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("8_f4pi3")
-text = "Attack"
-
-[node name="BurnButton" type="Button" parent="ActionPanel" unique_id=1564746509]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("8_f4pi3")
-text = "Searing Spit"
-
-[node name="PoisonButton" type="Button" parent="ActionPanel" unique_id=885216205]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("8_f4pi3")
-text = "Venom Strike"
-
-[node name="AcidButton" type="Button" parent="ActionPanel" unique_id=1751994802]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("8_f4pi3")
-text = "Acid Bath"
-
-[node name="DefendButton" type="Button" parent="ActionPanel" unique_id=2050878839]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("8_f4pi3")
-text = "Defend"
-
-[connection signal="pressed" from="ActionPanel/AttackButton" to="." method="_on_attack_button_pressed"]
-[connection signal="pressed" from="ActionPanel/BurnButton" to="." method="_on_burn_button_pressed"]
-[connection signal="pressed" from="ActionPanel/PoisonButton" to="." method="_on_poison_button_pressed"]
-[connection signal="pressed" from="ActionPanel/AcidButton" to="." method="_on_acid_button_pressed"]
-[connection signal="pressed" from="ActionPanel/DefendButton" to="." method="_on_defend_button_pressed"]

@@ -1,12 +1,13 @@
 extends Control
 
 ## Drives one 1v1 battle: builds both Combatants, alternates turns, resolves
-## Attack/Defend, and ends the battle on victory or defeat.
+## whichever Technique the player or enemy uses, and ends the battle on
+## victory or defeat.
 ##
-## Wiring this scene requires two manual steps in the editor (see
-## LEARNING_ROADMAP.md / the exercise notes): assign player_familiar_data and
-## enemy_familiar_data below, and connect AttackButton/DefendButton's
-## pressed signal to _on_attack_button_pressed / _on_defend_button_pressed.
+## Wiring this scene requires one manual step in the editor: assign
+## player_familiar_data and enemy_familiar_data below. ActionPanel's buttons
+## are generated at runtime from player_familiar_data.techniques (see
+## populate_action_buttons()), not hand-wired in the scene.
 
 enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 
@@ -26,11 +27,9 @@ enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 @onready var player_portrait: TextureRect = $Panels/PlayerPanel/Portrait
 @onready var enemy_portrait: TextureRect = $Panels/EnemyPanel/Portrait
 
-@onready var attack_button: Button = $ActionPanel/AttackButton
-@onready var defend_button: Button = $ActionPanel/DefendButton
-@onready var poison_button: Button = $ActionPanel/PoisonButton
-@onready var burn_button: Button = $ActionPanel/BurnButton
-@onready var acid_button: Button = $ActionPanel/AcidButton
+@onready var action_panel: HBoxContainer = $ActionPanel
+
+var action_buttons: Array[Button] = []
 
 var player: Combatant
 var enemy: Combatant
@@ -50,93 +49,37 @@ func _ready() -> void:
 	player_portrait.texture = player.familiar.sprite
 	enemy_portrait.texture = enemy.familiar.sprite
 
+	populate_action_buttons()
+
 	combat_log.add_entry("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 	phase = Phase.PLAYER_TURN
 
-func _on_attack_button_pressed() -> void:
+## Builds one button per technique in the player's movepool, replacing the
+## fixed five-button layout the manual test harness used previously. Each
+## button calls the same handler, bound with the specific technique it
+## represents -- the handler never needs to know which technique that is.
+func populate_action_buttons() -> void:
+	for technique in player_familiar_data.techniques:
+		var button := Button.new()
+		button.text = technique.technique_name
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.theme = preload("res://assets/themes/button_font.tres")
+		button.pressed.connect(_on_technique_button_pressed.bind(technique))
+
+		action_panel.add_child(button)
+		action_buttons.append(button)
+
+func _on_technique_button_pressed(technique: Technique) -> void:
 	if phase != Phase.PLAYER_TURN:
 		return
 
-	resolve_attack(player, enemy)
+	var message: String = technique.execute(player, enemy)
 
-	await advance_turn()
-
-func _on_defend_button_pressed() -> void:
-	if phase != Phase.PLAYER_TURN:
-		return
-
-	player.is_defending = true
-	
-	combat_log.add_entry("%s braces to defend." % player.familiar.familiar_name, CombatLog.Source.PLAYER)
-
-	await advance_turn()
-
-func _on_poison_button_pressed() -> void:
-	if phase != Phase.PLAYER_TURN:
-		return
-
-	var damage: int = max(player.familiar.power / 1.5 - enemy.effective_defense(), 1)
-
-	combat_log.add_entry(
-		"%s strikes %s with venom for %d damage, applying 2 stacks of poison!" % [player.familiar.familiar_name, enemy.familiar.familiar_name, damage],
-		CombatLog.Source.PLAYER
-	)
-
-	enemy.take_damage(damage)
-
-	apply_status(enemy, PoisonStatus.new(2))
+	combat_log.add_entry(message, CombatLog.Source.PLAYER)
 
 	update_hp_display(enemy)
 
 	await advance_turn()
-
-
-func _on_burn_button_pressed() -> void: 
-	if phase != Phase.PLAYER_TURN:
-		return
-
-	var damage: int = max(player.familiar.power / 1.5 - enemy.effective_defense(), 1)
-
-	combat_log.add_entry(
-		"%s spits fire at %s, dealing %d damage and applying a 5-turn burn!" % [player.familiar.familiar_name, enemy.familiar.familiar_name, damage],
-		CombatLog.Source.PLAYER
-	)
-
-	enemy.take_damage(damage)
-
-	apply_status(enemy, BurnStatus.new(5))
-
-	update_hp_display(enemy)
-
-	await advance_turn()
-
-
-func _on_acid_button_pressed() -> void:
-	if phase != Phase.PLAYER_TURN:
-		return
-
-	var damage: int = max(player.familiar.power / 1.5 - enemy.effective_defense(), 1)
-
-	combat_log.add_entry(
-		"%s soaks %s in acid, dealing %d damage and applying a stack of acid!" % [player.familiar.familiar_name, enemy.familiar.familiar_name, damage],
-		CombatLog.Source.PLAYER
-	)
-
-	enemy.take_damage(damage)
-
-	apply_status(enemy, AcidStatus.new(1))
-
-	update_hp_display(enemy)
-
-	await advance_turn()
-
-
-func apply_status(combatant: Combatant, status: Status) -> void:
-	var message: String = combatant.add_status(status)
-	var source: CombatLog.Source = CombatLog.Source.ENEMY if combatant == player else CombatLog.Source.PLAYER
-	if message != "":
-		combat_log.add_entry(message, source)
-		update_hp_display(combatant)
 
 ## The one path for updating what a combatant's HPBar shows. The fill and
 ## the status-damage preview must always move together -- the preview's
@@ -167,24 +110,6 @@ func refresh_status_preview(combatant: Combatant, hp_bar: HPBar, status_row: Sta
 
 	hp_bar.set_status_preview_segments(segments)
 	status_row.set_status_icons(segments)
-
-func resolve_attack(attacker: Combatant, defender: Combatant) -> void:
-	var mitigation: int = defender.effective_defense() * (2 if defender.is_defending else 1)
-	var damage: int = max(attacker.familiar.power - mitigation, 1)
-
-	defender.is_defending = false
-	defender.take_damage(damage)
-
-	var source: CombatLog.Source = CombatLog.Source.PLAYER if attacker == player else CombatLog.Source.ENEMY
-	combat_log.add_entry(
-		"%s attacks %s for %d damage!" % [attacker.familiar.familiar_name, defender.familiar.familiar_name, damage],
-		source
-	)
-
-	if defender == player:
-		update_hp_display(player)
-	else:
-		update_hp_display(enemy)
 
 func advance_turn() -> void:
 	if await check_victory():
@@ -234,17 +159,12 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 func enemy_turn() -> void:
 	await get_tree().create_timer(0.6).timeout
 
-	# acid based attack mirroring the player's acid button, for now. Later we'll add a more interesting AI.
-	var damage: int = max(enemy.familiar.power / 1.5 - (player.effective_defense() * (2 if player.is_defending else 1)), 1)
+	# Guubal deliberately has just one technique in its movepool -- still
+	# zero decision-making, per the enemy-behavior convention.
+	var technique: Technique = enemy_familiar_data.techniques[0]
+	var message: String = technique.execute(enemy, player)
 
-	combat_log.add_entry(
-		"%s soaks %s in acid, dealing %d damage and applying a stack of acid!" % [enemy.familiar.familiar_name, player.familiar.familiar_name, damage],
-		CombatLog.Source.ENEMY
-	)
-
-	player.take_damage(damage)
-
-	apply_status(player, AcidStatus.new(1))
+	combat_log.add_entry(message, CombatLog.Source.ENEMY)
 
 	update_hp_display(player)
 
@@ -282,8 +202,5 @@ func check_victory() -> bool:
 	return false
 
 func set_action_buttons_enabled(enabled: bool) -> void:
-	attack_button.disabled = not enabled
-	defend_button.disabled = not enabled
-	poison_button.disabled = not enabled
-	burn_button.disabled = not enabled
-	acid_button.disabled = not enabled
+	for button in action_buttons:
+		button.disabled = not enabled

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://bvg7gi5bow1ja"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="1_r3vqp"]
+
+[resource]
+script = ExtResource("1_r3vqp")
+technique_name = "Searing Spit"
+power_multiplier = 0.667
+status_effect = 2
+status_stacks = 5
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"
