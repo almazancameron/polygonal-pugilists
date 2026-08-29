@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjdfewh1r8ulq"
-path="res://.godot/imported/SpriteSheet.png-568a08ebaca452eaf32353af06dfa155.ctex"
+uid="uid://cde5bu4vw1y23"
+path="res://.godot/imported/Icons_Emoji.png-a7f8cc8c9bae1634283ab65634637200.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/SpriteSheet.png"
-dest_files=["res://.godot/imported/SpriteSheet.png-568a08ebaca452eaf32353af06dfa155.ctex"]
+source_file="res://assets/sprites/icons/Icons_Emoji.png"
+dest_files=["res://.godot/imported/Icons_Emoji.png-a7f8cc8c9bae1634283ab65634637200.ctex"]
 
 [params]
 

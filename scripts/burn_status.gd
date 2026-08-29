@@ -30,3 +30,6 @@ func on_reapply(target: Combatant) -> String:
     target.take_damage(flare_damage)
 
     return "%s's burn flares, dealing %d bonus damage!" % [target.familiar.familiar_name, flare_damage]
+
+func icon() -> Texture2D:
+    return preload("res://assets/sprites/icons/burn_icon.tres")

@@ -18,3 +18,6 @@ func on_tick(target: Combatant) -> String:
 	target.take_damage(damage)
 	stacks -= 1
 	return "%s suffers %d poison damage. (%d stacks remain)" % [target.familiar.familiar_name, damage, stacks]
+
+func icon() -> Texture2D:
+	return preload("res://assets/sprites/icons/poison_icon.tres")

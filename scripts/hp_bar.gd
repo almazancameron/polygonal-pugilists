@@ -29,7 +29,7 @@ func set_hp(current: int, max_hp: int) -> void:
 	label.text = "%d / %d" % [current, max_hp]
 
 
-## segments: each {"color": Color, "amount": int}, drawn back-to-back eating
+## segments: each {"color": Color, "damage": int}, drawn back-to-back eating
 ## into the current fill's right edge -- one chunk per active status, sized
 ## to the damage it'll deal on its next tick. Purely visual: this function
 ## has no idea what a "status" is, it just draws colored amounts.
@@ -44,7 +44,7 @@ func set_status_preview_segments(segments: Array[Dictionary]) -> void:
 	var remaining_edge_hp: float = bar.value
 
 	for segment in segments:
-		var seg_hp: float = clamp(float(segment.get("amount", 0)), 0.0, remaining_edge_hp)
+		var seg_hp: float = clamp(float(segment.get("damage", 0)), 0.0, remaining_edge_hp)
 		if seg_hp <= 0.0:
 			continue
 		remaining_edge_hp -= seg_hp

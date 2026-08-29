@@ -6,8 +6,15 @@
 [ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/guubal.tres" id="3_4k1nj"]
 [ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
 [ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
+[ext_resource type="FontFile" uid="uid://bq75qhujojfju" path="res://assets/fonts/BoldPixels.ttf" id="5_4k1nj"]
+[ext_resource type="PackedScene" uid="uid://wqprgejhrrw5" path="res://scenes/status_row.tscn" id="7_yahae"]
+[ext_resource type="Theme" uid="uid://hkf2bxrjlau4" path="res://assets/themes/button_font.tres" id="8_f4pi3"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
+
+[sub_resource type="Theme" id="Theme_n6c5v"]
+default_font = ExtResource("5_4k1nj")
+default_font_size = 16
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v7i3o"]
 bg_color = Color(0.74509805, 0, 0, 1)
@@ -17,11 +24,19 @@ bg_color = Color(0, 0.74509805, 0, 1)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_4k1nj"]
 
+[sub_resource type="Theme" id="Theme_orx5a"]
+default_font = ExtResource("5_4k1nj")
+default_font_size = 16
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yahae"]
 bg_color = Color(0.74509805, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4pi3"]
 bg_color = Color(0, 0.74509805, 0, 1)
+
+[sub_resource type="Theme" id="Theme_lf7me"]
+default_font = ExtResource("5_4k1nj")
+default_font_size = 24
 
 [node name="Battle" type="Control" unique_id=2096182010]
 layout_mode = 3
@@ -60,12 +75,20 @@ stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="Panels/PlayerPanel" unique_id=2079228690]
 layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_4k1nj")
+theme_override_font_sizes/font_size = 24
 text = "Player"
 
 [node name="HPBar" parent="Panels/PlayerPanel" unique_id=1552056502 instance=ExtResource("3_hpbar")]
 layout_mode = 2
+theme = SubResource("Theme_n6c5v")
 bar_background_style = SubResource("StyleBoxFlat_v7i3o")
 bar_fill_style = SubResource("StyleBoxFlat_66ngm")
+
+[node name="StatusRow" parent="Panels/PlayerPanel" unique_id=42082652 instance=ExtResource("7_yahae")]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
 
 [node name="EnemyPanel" type="VBoxContainer" parent="Panels" unique_id=1684935374]
 layout_mode = 2
@@ -80,12 +103,21 @@ stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="Panels/EnemyPanel" unique_id=849283833]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 0.3019608, 0.3019608, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("5_4k1nj")
+theme_override_font_sizes/font_size = 24
 text = "Enemy"
 
 [node name="HPBar" parent="Panels/EnemyPanel" unique_id=715558566 instance=ExtResource("3_hpbar")]
 layout_mode = 2
+theme = SubResource("Theme_orx5a")
 bar_background_style = SubResource("StyleBoxFlat_yahae")
 bar_fill_style = SubResource("StyleBoxFlat_f4pi3")
+
+[node name="StatusRow" parent="Panels/EnemyPanel" unique_id=1299416147 instance=ExtResource("7_yahae")]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
 
 [node name="LogScroll" type="ScrollContainer" parent="." unique_id=2139746670]
 layout_mode = 1
@@ -93,7 +125,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 16.0
-offset_top = 178.0
+offset_top = 191.0
 offset_right = -16.0
 offset_bottom = -57.0
 grow_horizontal = 2
@@ -102,6 +134,7 @@ grow_vertical = 2
 [node name="LogView" type="VBoxContainer" parent="LogScroll" unique_id=88184573]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = SubResource("Theme_lf7me")
 script = ExtResource("4_logview")
 
 [node name="ActionPanel" type="HBoxContainer" parent="." unique_id=1655570240]
@@ -117,26 +150,31 @@ grow_horizontal = 2
 [node name="AttackButton" type="Button" parent="ActionPanel" unique_id=575428710]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("8_f4pi3")
 text = "Attack"
 
 [node name="BurnButton" type="Button" parent="ActionPanel" unique_id=1564746509]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("8_f4pi3")
 text = "Searing Spit"
 
 [node name="PoisonButton" type="Button" parent="ActionPanel" unique_id=885216205]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("8_f4pi3")
 text = "Venom Strike"
 
 [node name="AcidButton" type="Button" parent="ActionPanel" unique_id=1751994802]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("8_f4pi3")
 text = "Acid Bath"
 
 [node name="DefendButton" type="Button" parent="ActionPanel" unique_id=2050878839]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("8_f4pi3")
 text = "Defend"
 
 [connection signal="pressed" from="ActionPanel/AttackButton" to="." method="_on_attack_button_pressed"]

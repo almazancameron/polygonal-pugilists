@@ -20,6 +20,8 @@ enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 
 @onready var player_hp_bar: HPBar = $Panels/PlayerPanel/HPBar
 @onready var enemy_hp_bar: HPBar = $Panels/EnemyPanel/HPBar
+@onready var player_status_row: StatusRow = $Panels/PlayerPanel/StatusRow
+@onready var enemy_status_row: StatusRow = $Panels/EnemyPanel/StatusRow
 
 @onready var player_portrait: TextureRect = $Panels/PlayerPanel/Portrait
 @onready var enemy_portrait: TextureRect = $Panels/EnemyPanel/Portrait
@@ -42,8 +44,8 @@ func _ready() -> void:
 	player_name_label.text = player.familiar.familiar_name
 	enemy_name_label.text = enemy.familiar.familiar_name
 
-	update_hp_display(player, player_hp_bar)
-	update_hp_display(enemy, enemy_hp_bar)
+	update_hp_display(player)
+	update_hp_display(enemy)
 
 	player_portrait.texture = player.familiar.sprite
 	enemy_portrait.texture = enemy.familiar.sprite
@@ -84,7 +86,7 @@ func _on_poison_button_pressed() -> void:
 
 	apply_status(enemy, PoisonStatus.new(2))
 
-	update_hp_display(enemy, enemy_hp_bar)
+	update_hp_display(enemy)
 
 	await advance_turn()
 
@@ -104,7 +106,7 @@ func _on_burn_button_pressed() -> void:
 
 	apply_status(enemy, BurnStatus.new(5))
 
-	update_hp_display(enemy, enemy_hp_bar)
+	update_hp_display(enemy)
 
 	await advance_turn()
 
@@ -124,7 +126,7 @@ func _on_acid_button_pressed() -> void:
 
 	apply_status(enemy, AcidStatus.new(1))
 
-	update_hp_display(enemy, enemy_hp_bar)
+	update_hp_display(enemy)
 
 	await advance_turn()
 
@@ -134,7 +136,7 @@ func apply_status(combatant: Combatant, status: Status) -> void:
 	var source: CombatLog.Source = CombatLog.Source.ENEMY if combatant == player else CombatLog.Source.PLAYER
 	if message != "":
 		combat_log.add_entry(message, source)
-		update_hp_display(combatant, player_hp_bar if combatant == player else enemy_hp_bar)
+		update_hp_display(combatant)
 
 ## The one path for updating what a combatant's HPBar shows. The fill and
 ## the status-damage preview must always move together -- the preview's
@@ -143,23 +145,28 @@ func apply_status(combatant: Combatant, status: Status) -> void:
 ## old fill edge until something else happens to refresh it. Routing every
 ## HP change through here (instead of calling hp_bar.set_hp() directly)
 ## makes that impossible rather than relying on remembering to pair them.
-func update_hp_display(combatant: Combatant, hp_bar: HPBar) -> void:
+func update_hp_display(combatant: Combatant) -> void:
+	var hp_bar: HPBar = player_hp_bar if combatant == player else enemy_hp_bar
+	var status_row: StatusRow = player_status_row if combatant == player else enemy_status_row
+
 	hp_bar.set_hp(combatant.current_hp, combatant.familiar.max_hp)
 
-	refresh_status_preview(combatant, hp_bar)
+	refresh_status_preview(combatant, hp_bar, status_row)
 
 ## Translates a Combatant's active statuses into the plain {color, amount}
 ## shape HPBar knows how to draw -- HPBar never needs to know what a
 ## Status or Combatant is.
-func refresh_status_preview(combatant: Combatant, hp_bar: HPBar) -> void:
+func refresh_status_preview(combatant: Combatant, hp_bar: HPBar, status_row: StatusRow) -> void:
 	var segments: Array[Dictionary] = []
 
 	for status in combatant.statuses:
-		var amount: int = status.next_tick_damage()
-		if amount > 0:
-			segments.append({"color": status.preview_color(), "amount": amount})
+		var damage: int = status.next_tick_damage()
+		var stacks: int = status.stacks
+		if stacks > 0:
+			segments.append({"color": status.preview_color(), "stacks": stacks, "damage": damage, "icon": status.icon()})
 
 	hp_bar.set_status_preview_segments(segments)
+	status_row.set_status_icons(segments)
 
 func resolve_attack(attacker: Combatant, defender: Combatant) -> void:
 	var mitigation: int = defender.effective_defense() * (2 if defender.is_defending else 1)
@@ -175,9 +182,9 @@ func resolve_attack(attacker: Combatant, defender: Combatant) -> void:
 	)
 
 	if defender == player:
-		update_hp_display(player, player_hp_bar)
+		update_hp_display(player)
 	else:
-		update_hp_display(enemy, enemy_hp_bar)
+		update_hp_display(enemy)
 
 func advance_turn() -> void:
 	if await check_victory():
@@ -220,7 +227,7 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 		if status.is_expired():
 			combatant.statuses.erase(status)
 
-	update_hp_display(combatant, hp_bar)
+	update_hp_display(combatant)
 
 	await check_victory()
 
@@ -239,7 +246,7 @@ func enemy_turn() -> void:
 
 	apply_status(player, AcidStatus.new(1))
 
-	update_hp_display(player, player_hp_bar)
+	update_hp_display(player)
 
 	await advance_turn()
 

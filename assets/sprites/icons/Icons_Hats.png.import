@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://m5py7ninfxc8"
-path="res://.godot/imported/SpriteSheet2.png-74ca9b4ec2245f29abeec85cbe064c0d.ctex"
+uid="uid://dad11hnuawwpd"
+path="res://.godot/imported/Icons_Hats.png-2e5ca76a6933af90106dd77940de2a5f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/SpriteSheet2.png"
-dest_files=["res://.godot/imported/SpriteSheet2.png-74ca9b4ec2245f29abeec85cbe064c0d.ctex"]
+source_file="res://assets/sprites/icons/Icons_Hats.png"
+dest_files=["res://.godot/imported/Icons_Hats.png-2e5ca76a6933af90106dd77940de2a5f.ctex"]
 
 [params]
 

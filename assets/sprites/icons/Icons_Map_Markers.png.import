@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bvyyeq5ei0phu"
-path="res://.godot/imported/Items.png-368f82c54e209e22a2788d3d6b3e71d2.ctex"
+uid="uid://13onfkd0ghsq"
+path="res://.godot/imported/Icons_Map_Markers.png-76eed8dcb6ec305131a3cfdc6c96f464.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/Items.png"
-dest_files=["res://.godot/imported/Items.png-368f82c54e209e22a2788d3d6b3e71d2.ctex"]
+source_file="res://assets/sprites/icons/Icons_Map_Markers.png"
+dest_files=["res://.godot/imported/Icons_Map_Markers.png-76eed8dcb6ec305131a3cfdc6c96f464.ctex"]
 
 [params]
 

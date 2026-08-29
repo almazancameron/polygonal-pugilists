@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjsvca4iapmxd"
-path="res://.godot/imported/SpriteSheet3.png-372a9b43ecc5b2f82cfa22422ffad475.ctex"
+uid="uid://dt1k3eouu6u0g"
+path="res://.godot/imported/Fire Effect and Bullet 16x16.png-4b7a71c3a9d48f2a9715978c03a58809.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/SpriteSheet3.png"
-dest_files=["res://.godot/imported/SpriteSheet3.png-372a9b43ecc5b2f82cfa22422ffad475.ctex"]
+source_file="res://assets/sprites/effects/Fire Effect and Bullet 16x16.png"
+dest_files=["res://.godot/imported/Fire Effect and Bullet 16x16.png-4b7a71c3a9d48f2a9715978c03a58809.ctex"]
 
 [params]
 

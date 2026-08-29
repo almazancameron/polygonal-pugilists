@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dws2vld8hmo01"
-path="res://.godot/imported/8bitMonsterSpriteSheet.png-cb85aa4f9fd9060d635e1b9416364aea.ctex"
+uid="uid://c4sinx2mxfxfs"
+path="res://.godot/imported/Icons_Software.png-54931516bb35d18d501759f79e9bb663.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/8bitMonsterSpriteSheet.png"
-dest_files=["res://.godot/imported/8bitMonsterSpriteSheet.png-cb85aa4f9fd9060d635e1b9416364aea.ctex"]
+source_file="res://assets/sprites/icons/Icons_Software.png"
+dest_files=["res://.godot/imported/Icons_Software.png-54931516bb35d18d501759f79e9bb663.ctex"]
 
 [params]
 

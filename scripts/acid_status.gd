@@ -14,3 +14,9 @@ func stack_with(other: Status) -> void:
 func modify_defense(base_defense: int) -> int:
     var reduction: float = 0.1 * stacks
     return int(base_defense * (1.0 - reduction))
+
+func icon() -> Texture2D:
+    return preload("res://assets/sprites/icons/acid_icon.tres")
+
+func preview_color() -> Color:
+    return Color(0.0, 1.0, 0.5, 1.0)

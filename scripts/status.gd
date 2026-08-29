@@ -39,3 +39,6 @@ func preview_color() -> Color:
 
 func modify_defense(base_defense: int) -> int:
 	return base_defense
+
+func icon() -> Texture2D:
+	return null
