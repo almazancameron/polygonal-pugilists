@@ -1,0 +1,146 @@
+[gd_scene format=3 uid="uid://dgnd4w5q8qf4g"]
+
+[ext_resource type="Script" uid="uid://bm15uleb46vhy" path="res://scripts/battle_controller.gd" id="1_battle"]
+[ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/twerpent.tres" id="2_6vh42"]
+[ext_resource type="Script" uid="uid://cy44cok5wjn5a" path="res://scripts/combat_log.gd" id="2_log"]
+[ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/guubal.tres" id="3_4k1nj"]
+[ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
+[ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v7i3o"]
+bg_color = Color(0.74509805, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_66ngm"]
+bg_color = Color(0, 0.74509805, 0, 1)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_4k1nj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yahae"]
+bg_color = Color(0.74509805, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4pi3"]
+bg_color = Color(0, 0.74509805, 0, 1)
+
+[node name="Battle" type="Control" unique_id=2096182010]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_battle")
+player_familiar_data = ExtResource("2_6vh42")
+enemy_familiar_data = ExtResource("3_4k1nj")
+
+[node name="CombatLog" type="Node" parent="." unique_id=1861618585]
+script = ExtResource("2_log")
+
+[node name="Panels" type="HBoxContainer" parent="." unique_id=144834208]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 140.0
+grow_horizontal = 2
+
+[node name="PlayerPanel" type="VBoxContainer" parent="Panels" unique_id=2074211053]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Portrait" type="TextureRect" parent="Panels/PlayerPanel" unique_id=1830652992]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_6vh42")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Panels/PlayerPanel" unique_id=2079228690]
+layout_mode = 2
+text = "Player"
+
+[node name="HPBar" parent="Panels/PlayerPanel" unique_id=1552056502 instance=ExtResource("3_hpbar")]
+layout_mode = 2
+bar_background_style = SubResource("StyleBoxFlat_v7i3o")
+bar_fill_style = SubResource("StyleBoxFlat_66ngm")
+
+[node name="EnemyPanel" type="VBoxContainer" parent="Panels" unique_id=1684935374]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Portrait" type="TextureRect" parent="Panels/EnemyPanel" unique_id=382211985]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_4k1nj")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Panels/EnemyPanel" unique_id=849283833]
+layout_mode = 2
+text = "Enemy"
+
+[node name="HPBar" parent="Panels/EnemyPanel" unique_id=715558566 instance=ExtResource("3_hpbar")]
+layout_mode = 2
+bar_background_style = SubResource("StyleBoxFlat_yahae")
+bar_fill_style = SubResource("StyleBoxFlat_f4pi3")
+
+[node name="LogScroll" type="ScrollContainer" parent="." unique_id=2139746670]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 178.0
+offset_right = -16.0
+offset_bottom = -57.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LogView" type="VBoxContainer" parent="LogScroll" unique_id=88184573]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("4_logview")
+
+[node name="ActionPanel" type="HBoxContainer" parent="." unique_id=1655570240]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 600.0
+offset_right = -16.0
+offset_bottom = 640.0
+grow_horizontal = 2
+
+[node name="AttackButton" type="Button" parent="ActionPanel" unique_id=575428710]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Attack"
+
+[node name="BurnButton" type="Button" parent="ActionPanel" unique_id=1564746509]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Searing Spit"
+
+[node name="PoisonButton" type="Button" parent="ActionPanel" unique_id=885216205]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Venom Strike"
+
+[node name="AcidButton" type="Button" parent="ActionPanel" unique_id=1751994802]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Acid Bath"
+
+[node name="DefendButton" type="Button" parent="ActionPanel" unique_id=2050878839]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Defend"
+
+[connection signal="pressed" from="ActionPanel/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="ActionPanel/BurnButton" to="." method="_on_burn_button_pressed"]
+[connection signal="pressed" from="ActionPanel/PoisonButton" to="." method="_on_poison_button_pressed"]
+[connection signal="pressed" from="ActionPanel/AcidButton" to="." method="_on_acid_button_pressed"]
+[connection signal="pressed" from="ActionPanel/DefendButton" to="." method="_on_defend_button_pressed"]

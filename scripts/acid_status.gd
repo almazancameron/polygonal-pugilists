@@ -1,0 +1,16 @@
+class_name AcidStatus
+extends Status
+
+## Infinite duration stacking debuff that reduces the target's 
+## defense by 10% per stack. Stacks are additive and cap at 5 by default,
+## reducing the target's defense by 50% at max stacks.
+
+func status_id() -> StringName:
+    return &"acid"
+
+func stack_with(other: Status) -> void:
+    stacks = min(stacks + other.stacks, 5)
+
+func modify_defense(base_defense: int) -> int:
+    var reduction: float = 0.1 * stacks
+    return int(base_defense * (1.0 - reduction))

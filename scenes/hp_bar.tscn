@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://dt3tc1j68we4u"]
+
+[ext_resource type="Script" uid="uid://dwakehx5im0ia" path="res://scripts/hp_bar.gd" id="1_hpbar"]
+
+[node name="HPBar" type="Control" unique_id=930502251]
+custom_minimum_size = Vector2(200, 24)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 201.0
+offset_bottom = 25.0
+script = ExtResource("1_hpbar")
+
+[node name="Bar" type="ProgressBar" parent="." unique_id=1701203676]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+value = 100.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="Bar" unique_id=816407654]
+z_index = 15
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "0 / 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatusPreview" type="Control" parent="." unique_id=1757921720]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

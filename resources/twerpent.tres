@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://bgocjaty20glq"]
+
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_mxxyc"]
+[ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/SpriteSheet2.png" id="2_oqbc5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a12nh"]
+atlas = ExtResource("2_oqbc5")
+region = Rect2(32, 48, 16, 16)
+
+[resource]
+script = ExtResource("1_mxxyc")
+familiar_name = "Twerpent"
+sprite = SubResource("AtlasTexture_a12nh")
+max_hp = 75
+power = 12
+defense = 6
+speed = 12
+focus = 9
