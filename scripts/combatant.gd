@@ -3,11 +3,12 @@ extends RefCounted
 
 ## Per-battle runtime state for one side of a fight. Wraps a Familiar's
 ## static stats with the things that change during combat (current_hp,
-## is_defending). Created fresh each battle, never saved or edited directly.
+## is_stunned, statuses). Created fresh each battle, never saved or edited
+## directly.
 
 var familiar: Familiar
 var current_hp: int
-var is_defending: bool = false
+var is_stunned: bool = false
 var statuses: Array[Status] = []
 
 func _init(f: Familiar) -> void:
@@ -20,18 +21,32 @@ func take_damage(amount: int) -> void:
 func is_defeated() -> bool:
 	return current_hp <= 0
 
-## Re-applying an already-active status stacks onto it instead of tracking
-## a second independent instance. Also trigger the status's on_reapply() callback, which can do things like refresh
-## duration or trigger a bonus effect. Returns the combat log message from on_reapply(), or "" if nothing happened.
+## Re-applying an already-active status merges into it instead of tracking a
+## second instance: on_reapply() runs first, then on_applied() -- skipped if
+## on_reapply() already left it expired -- and either path removes it once
+## it's expired. Returns their combined message, or "" if nothing happened.
 func add_status(new_status: Status) -> String:
 	for existing in statuses:
 		if existing.status_id() == new_status.status_id():
-			var message: String = existing.on_reapply(self)
+			var reapply_message: String = existing.on_reapply(self)
 			existing.stack_with(new_status)
-			return message
+			return _combine_messages(reapply_message, _settle_status(existing))
 
 	statuses.append(new_status)
-	return ""
+	return _settle_status(new_status)
+
+## Fires on_hit() on every active status, mirroring how run_upkeep() fires
+## on_tick(). Returns every triggered message joined together, or "" if
+## nothing had anything to say.
+func trigger_on_hit() -> String:
+	var message: String = ""
+
+	for status in statuses.duplicate():
+		message = _combine_messages(message, status.on_hit(self))
+		if status.is_expired():
+			statuses.erase(status)
+
+	return message
 
 func effective_defense() -> int:
 	var modified_defense: int = familiar.defense
@@ -64,3 +79,18 @@ func choose_technique(target: Combatant) -> Dictionary:
 		skip_reasons.append("%s skipped (condition not met: %s)" % [rule.technique.technique_name, failed_condition.describe()])
 
 	return {"technique": null, "skip_reasons": skip_reasons}
+
+## Runs on_applied() unless the status is already expired, then removes it
+## from statuses if it's expired either way -- before or after on_applied().
+func _settle_status(status: Status) -> String:
+	var message: String = "" if status.is_expired() else status.on_applied(self)
+	if status.is_expired():
+		statuses.erase(status)
+	return message
+
+static func _combine_messages(a: String, b: String) -> String:
+	if a == "":
+		return b
+	if b == "":
+		return a
+	return "%s %s" % [a, b]

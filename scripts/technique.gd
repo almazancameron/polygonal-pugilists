@@ -14,15 +14,18 @@ extends Resource
 ## returns, if any. Override this entirely for techniques that don't fit
 ## the damage-then-maybe-status shape (see DefendTechnique).
 func execute(user: Combatant, target: Combatant) -> String:
-	var mitigation: int = target.effective_defense() * (2 if target.is_defending else 1)
+	var mitigation: int = target.effective_defense()
 	var damage: int = max(int(user.familiar.power * power_multiplier) - mitigation, 1)
 
-	target.is_defending = false
 	target.take_damage(damage)
 
 	var message: String = "%s uses %s on %s for %d damage!" % [
 		user.familiar.familiar_name, technique_name, target.familiar.familiar_name, damage
 	]
+
+	var hit_message: String = target.trigger_on_hit()
+	if hit_message != "":
+		message += " " + hit_message
 
 	var status: Status = _create_status()
 	if status:
@@ -49,5 +52,15 @@ func _create_status() -> Status:
 			return BurnStatus.new(status_stacks)
 		Status.StatusEffect.ACID:
 			return AcidStatus.new(status_stacks)
+		Status.StatusEffect.BLEED:
+			return BleedStatus.new(status_stacks)
+		Status.StatusEffect.STAGGER:
+			return StaggerStatus.new(status_stacks)
+		Status.StatusEffect.FORETELL:
+			return ForetellStatus.new(status_stacks)
+		Status.StatusEffect.STUN:
+			return StunStatus.new(status_stacks)
+		Status.StatusEffect.DEFENDING:
+			return DefendingStatus.new(status_stacks)
 		_:
 			return null

@@ -198,6 +198,12 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) -> void:
 	await get_tree().create_timer(0.6).timeout
 
+	if actor.is_stunned:
+		actor.is_stunned = false
+		combat_log.add_entry("%s is stunned and skips its turn!" % actor.familiar.familiar_name, source)
+		await advance_turn()
+		return
+
 	var decision: Dictionary = actor.choose_technique(target)
 	if show_priority_skip_log:
 		for reason in decision.skip_reasons:

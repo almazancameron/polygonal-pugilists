@@ -5,7 +5,7 @@ extends RefCounted
 ## state, same reasoning as Combatant: never saved or edited in the
 ## Inspector, so RefCounted rather than Resource or Node.
 
-enum StatusEffect { NONE, POISON, BURN, ACID }
+enum StatusEffect { NONE, POISON, BURN, ACID, BLEED, STAGGER, FORETELL, STUN, DEFENDING }
 
 var stacks: int = 1
 
@@ -28,6 +28,17 @@ func on_tick(target: Combatant) -> String:
 ## Called when this status is re-applied to a target that already has it.
 ## Returns a combat log message, or "" if nothing happened. Override in subclasses.
 func on_reapply(target: Combatant) -> String:
+	return ""
+
+## Called whenever this combatant is hit by a technique's damage. Returns a
+## combat log message, or "" if nothing happened. Override in subclasses.
+func on_hit(target: Combatant) -> String:
+	return ""
+
+## Called whenever this status's stacks have just been set, whether from a
+## fresh application or a stack_with() merge. Returns a combat log message,
+## or "" if nothing happened. Override in subclasses.
+func on_applied(target: Combatant) -> String:
 	return ""
 
 func is_expired() -> bool:
@@ -60,5 +71,15 @@ static func status_effect_id(effect: StatusEffect) -> StringName:
 			return &"burn"
 		StatusEffect.ACID:
 			return &"acid"
+		StatusEffect.BLEED:
+			return &"bleed"
+		StatusEffect.STAGGER:
+			return &"stagger"
+		StatusEffect.FORETELL:
+			return &"foretell"
+		StatusEffect.STUN:
+			return &"stun"
+		StatusEffect.DEFENDING:
+			return &"defending"
 		_:
 			return &""

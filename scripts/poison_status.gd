@@ -11,7 +11,7 @@ func next_tick_damage() -> int:
 	return stacks
 
 func preview_color() -> Color:
-	return Color(0.5, 0.2, 0.5, 1.0)
+	return Color(0.5, 0.2, 0.7, 1.0)
 
 func on_tick(target: Combatant) -> String:
 	var damage: int = next_tick_damage()
