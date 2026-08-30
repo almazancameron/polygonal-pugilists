@@ -38,5 +38,29 @@ func effective_defense() -> int:
 
 	for status in statuses:
 		modified_defense = status.modify_defense(modified_defense)
-		
+
 	return modified_defense
+
+## Evaluates familiar.priority_rules in order and returns the first rule
+## whose conditions all hold, plus a skip reason for every rule passed over
+## along the way -- the caller logs those to explain the choice, per
+## GAME_DESIGN.md's "every skip needs a visible reason" requirement.
+## Expects the rule list to end with an unconditional catch-all rule (an
+## empty conditions array is vacuously true); if none matches, "technique"
+## comes back null rather than guessing.
+func choose_technique(target: Combatant) -> Dictionary:
+	var skip_reasons: Array[String] = []
+
+	for rule in familiar.priority_rules:
+		var failed_condition: Condition = null
+		for condition in rule.conditions:
+			if not condition.is_met(self, target):
+				failed_condition = condition
+				break
+
+		if failed_condition == null:
+			return {"technique": rule.technique, "skip_reasons": skip_reasons}
+
+		skip_reasons.append("%s skipped (condition not met: %s)" % [rule.technique.technique_name, failed_condition.describe()])
+
+	return {"technique": null, "skip_reasons": skip_reasons}

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://d37momddmqqlf"]
+
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="1"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2"]
+[ext_resource type="Resource" uid="uid://do0l8g5fiby1w" path="res://resources/priority_rules/use_searing_spit_if_missing.tres" id="4"]
+[ext_resource type="Resource" uid="uid://bg4bh3d1de17o" path="res://resources/priority_rules/use_acid_bath_if_missing.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/priority_rules/fallback_venom_strike.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+build_name = "Status Stacker"
+priority_rules = Array[ExtResource("2")]([ExtResource("4"), ExtResource("5"), ExtResource("6")])

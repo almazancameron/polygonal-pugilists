@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://bgocjaty20glq"]
 
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_5uf1g"]
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_femnv"]
 [ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="2_v3lvr"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="3_jfx6b"]

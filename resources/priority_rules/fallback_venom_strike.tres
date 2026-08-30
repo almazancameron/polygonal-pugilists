@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1"]
+[ext_resource type="Resource" uid="uid://5uker742q0el" path="res://resources/techniques/venom_strike.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+technique = ExtResource("2")

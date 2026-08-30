@@ -12,3 +12,4 @@ extends Resource
 @export var speed: int = 10
 @export var focus: int = 10
 @export var techniques: Array[Technique] = []
+@export var priority_rules: Array[PriorityRule] = []

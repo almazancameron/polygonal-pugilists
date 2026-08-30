@@ -1,137 +1,84 @@
-**Familiar Fight Club**
+**Pixel Pugilists**
 
-**Foundational Game Design Document v2**
-
-*Reconciled design baseline*
+**Game Design Document v1**
 
 **Document purpose**
 
-> Define the current intended direction of Familiar Fight Club while clearly separating established design pillars from provisional systems, prototype questions, and deprecated ideas. This document is intended to be usable as both a human design reference and an implementation brief for AI-assisted development.
+> Define the intended direction of *Pixel Pugilists* — a standalone, deliberately small tournament-roguelike prototype and proof-of-concept for the combat-and-buildcraft thesis behind the larger planned game, *Familiar Fight Club*. This document is the current source of truth for what is actually being built in this repository. See `FAMILIAR_FIGHT_CLUB_VISION.md` for the larger long-term vision this prototype is *not* currently building toward directly, but is expected to inform.
 
-# 0. Document status and revision policy
+# 0. Document status and scope
 
 LOCKED
-
-This is the current authoritative design baseline for Familiar Fight Club. It supersedes the original foundational document where the two conflict. It does not pretend that unresolved systems are finalized.
 
 ## 0.1 Status vocabulary
 
 | **Status**            | **Meaning**                                                                                                                               |
 |-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| **LOCKED**            | A foundational design commitment. It should not change casually, although playtesting can still reveal that a locked assumption is wrong. |
-| **CURRENT DIRECTION** | The intended solution today, but still subject to iteration as the project becomes playable.                                              |
-| **OPEN / PLAYTEST**   | Deliberately unresolved. The prototype should help answer this question rather than the document choosing prematurely.                    |
-| **DEPRECATED**        | An older design direction that should not be treated as current unless deliberately revived.                                              |
+| **LOCKED**            | A foundational design commitment for this project. Should not change casually, although playtesting can still reveal it was wrong.        |
+| **CURRENT DIRECTION** | The intended solution today, subject to iteration as the project becomes playable.                                                        |
+| **OPEN / PLAYTEST**   | Deliberately unresolved. Building and playing should answer this rather than the document choosing prematurely.                          |
+| **OUT OF SCOPE**      | Deliberately excluded from Pixel Pugilists. Belongs to the eventual full *Familiar Fight Club* — see `FAMILIAR_FIGHT_CLUB_VISION.md`.      |
 
-## 0.2 What changed from v1
+## 0.2 What Pixel Pugilists is
 
-- The central fantasy and theorycrafting-first identity remain intact.
+A standalone single-tournament roguelike: draft a fighter from a randomized bracket, fight your way through single-elimination rounds against opponents who are *also* accumulating power, choosing your own upgrades between rounds, ending in a clash between two heavily-built familiars. It is a complete, small game in its own right — not "Milestone 1 of Familiar Fight Club" nested inside a bigger document, even though it is expected to validate ideas the larger game will eventually reuse.
 
-- Combat timing and the exact universal stat model are now explicitly open questions rather than assumed to be solved.
+## 0.3 What Pixel Pugilists deliberately excludes
 
-- The first prototype has been reduced dramatically. It begins without movement and exists to prove buildcraft, readable automated decision-making, and satisfying combat resolution.
+OUT OF SCOPE for this project (see `FAMILIAR_FIGHT_CLUB_VISION.md` for all of these in their full form):
 
-- Universal knockout injuries have been removed from the baseline design.
+- Meta-progression or persistence between separate playthroughs (no Money, Reputation, Legacy Points, or unlocks that carry across runs).
+- A multi-week "raise a familiar" career, retirement, or the Ranch.
+- Multiple circuits or a narrative campaign.
+- Grid-based movement and spatial combat.
+- Recruitment/breeding/lineage systems.
 
-- The performance-reward concept has shifted toward varied fight objectives and medals rather than a single spectacle metric that favors only speed or raw damage.
-
-- The campaign now has a light anime-style narrative culminating in a corrupt league organization stacking the odds against the player.
-
-- Defeating that organization opens a postgame league-management fiction and a Hades II-style configurable challenge system whose thresholds unlock new content.
-
-## 0.3 Production hierarchy
-
-Familiar Fight Club contains three nested games: the combat engine, the familiar career, and the campaign/metagame. Development should prove them in that order.
-
-> 1\. Combat engine — Is building a familiar and watching its autonomous combat logic express that build fun?
->
-> 2\. Familiar career — Does constrained development across tournaments create memorable, distinct build arcs?
->
-> 3\. Campaign and metagame — Do circuits, Ranch persistence, unlocks, narrative, and postgame challenge structure make repeated careers meaningful?
+If a system on this list starts feeling necessary to make Pixel Pugilists work, that's worth a real conversation before adding it — it likely means either the scope is drifting toward the bigger game, or there's a genuinely small version worth carving out (the way the pre-fight build-select screen was deliberately kept small rather than becoming a full round/reward economy).
 
 # Contents
 
 - 1\. High concept
-
 - 2\. Core player experience
-
 - 3\. Design pillars
-
 - 4\. Combat foundation
-
 - 5\. Combat timing and universal stats
-
 - 6\. Behavior and autonomous decision-making
-
-- 7\. Coaching and intervention
-
-- 8\. Spatial combat, movement, and arenas
-
-- 9\. Familiar construction
-
-- 10\. Techniques, passives, tags, and statuses
-
-- 11\. Career structure and development
-
-- 12\. Tournaments, circuits, and campaign
-
-- 13\. Performance objectives and medals
-
-- 14\. Economy, recruitment, and persistent progression
-
-- 15\. Retirement and the Ranch
-
-- 16\. Postgame league and custom tournaments
-
-- 17\. Prototype roadmap
-
-- 18\. Playtest questions
-
-- 19\. Deprecated or non-baseline systems
-
-- 20\. Current elevator pitch and core identity
+- 7\. Techniques, tags, and statuses
+- 8\. Familiar construction — bracket entrants
+- 9\. Tournament structure
+- 10\. Development roadmap
+- 11\. Playtest questions
+- 12\. Elevator pitch
 
 # 1. High concept
 
 LOCKED
 
-Familiar Fight Club is a creature-raising auto-tactics game in which the player develops a familiar, constructs a coherent combat build, and guides that familiar through a finite competitive career.
+Pixel Pugilists is a single-elimination tournament roguelike. The player drafts one familiar from a randomized bracket of entrants, then guides it through the tournament by choosing upgrades between rounds — the player is not piloting the familiar turn-by-turn during a fight, they're shaping how it fights before and between fights, the same way the full Familiar Fight Club vision intends, just compressed into one run instead of a career.
 
-The player is not primarily a pilot issuing an attack every turn. The most important agency happens before and between fights: selecting techniques and passives, shaping behavior priorities, responding to development opportunities, and adapting the familiar to upcoming opponents.
+Central fantasy: pick your fighter, watch it grow more dangerous with every round, and see two fully-built familiars collide in an absurd final showdown.
 
-Combat is the performance generated by that preparation. The familiar should win in ways that visibly belong to the build the player created.
+## 1.1 What this game is not
 
-Central fantasy: Raise a unique creature, construct a coherent combat engine, and watch it win in a way that feels personal, clever, and spectacular.
-
-## 1.1 What the game is not
-
-- Not a conventional turn-based RPG where the player chooses every action directly.
-
-- Not an opaque autobattler where the player cannot understand why a unit behaved a certain way.
-
-- Not primarily a collection game where species alone determines combat identity.
-
-- Not a permanent-party progression game where one familiar is expected to grow forever.
+- Not a game where the player issues an attack every turn — combat is fully autonomous once a fight starts (see §6).
+- Not a persistent career sim — there is no "raising" a familiar over time, no retirement, no Ranch.
+- Not a narrative game — no story, characters, or campaign arc. (That belongs to Familiar Fight Club.)
 
 # 2. Core player experience
 
 LOCKED
 
-## 2.1 Theorycrafting
+## 2.1 Theorycrafting between rounds
 
-The player should repeatedly ask: “What can I build from the opportunities this familiar has received?”
-
-Build identity emerges from the interaction of species, individual traits, techniques, passives, status synergies, behavioral logic, and the choices offered during the career. The game should reward coherent engines and unusual interactions rather than converging immediately on one universally correct build.
+The player should repeatedly ask "what does my build need right now?" when choosing upgrades — build identity emerges from which techniques, priority rules, and (eventually) passives accumulate over the run, not from any single choice.
 
 ## 2.2 Execution as payoff
 
-Watching a fight should provide feedback on the player’s preparation. The player should be able to recognize what the familiar attempted, why it attempted it, what triggered, and why the result differed from expectation.
+Watching a fight should show the player's preparation working. The player should be able to tell what their familiar attempted, why, and whether it worked — same legibility goal as the full game (see `FAMILIAR_FIGHT_CLUB_VISION.md` §3.3), achieved here through the combat log and the priority-rule skip-reason logging already built.
 
-Ideal reaction: “It did exactly what I taught it to do — and all the pieces triggered together.”
+## 2.3 The bracket creates stakes without narrative
 
-## 2.3 Attachment through finite careers
-
-A familiar should feel individual because its career is finite. Opportunities are constrained, builds cannot acquire everything, victories and mistakes become part of a record, and retirement closes one competitive story while feeding future careers.
+Seeing the surrounding bracket — who else is fighting, how those matches went, who's coming up next — should create tension and a sense of stakes on its own, without needing written narrative to do it.
 
 # 3. Design pillars
 
@@ -139,31 +86,23 @@ LOCKED
 
 ## 3.1 Theorycrafting is the main form of agency
 
-The most important decisions happen while developing and configuring the familiar. Observation during battle matters, but the game should not drift into full manual control.
+Reused directly from the full game's design pillars: the most important decisions happen between fights, not during them.
 
 ## 3.2 Simple baseline rules, expressive exceptions
 
-The universal rules should be easy to explain. Complexity should come from techniques, passives, statuses, triggers, and special interactions that bend those rules in readable ways.
+The universal combat rules stay small; complexity comes from techniques, statuses, and priority-rule conditions that bend them in readable ways.
 
 ## 3.3 Autonomous combat must be legible
 
-Automation is satisfying only when the player can form expectations. Every important autonomous decision needs understandable causes, and unexpected behavior must be inspectable after the fact.
+Every automated decision needs an understandable cause, and unexpected behavior must be inspectable after the fact (the combat log and skip-reason logging exist specifically for this).
 
 ## 3.4 Build variety should change behavior, not only numbers
 
-A powerful build is more interesting when it creates a distinctive combat pattern: maintaining a status engine, countering, chaining follow-ups, setting up a delayed payoff, exploiting movement, or deliberately breaking normal action rules.
+A build should visibly fight differently, not just hit harder — already true of the difference between the two existing example builds ("Status Stacker" rotates through inflicting statuses; "Poison Spammer" turtles at low HP).
 
-## 3.5 Variable opportunities create career stories
+## 3.5 Variable bracket runs create replay value
 
-Curated randomness should constrain what a familiar can become without making success arbitrary. The player adapts to opportunities rather than assembling the exact same solved build every run.
-
-## 3.6 Each familiar has a finite story
-
-A familiar eventually leaves active competition. Retirement converts one finished build and one finished career into persistent legacy rather than erasing that familiar from the player’s world.
-
-## 3.7 Difficulty should unlock possibility
-
-Later challenge should not only inflate enemy numbers. Harder competition should introduce new opponents, new build pressures, new species or candidate pools, and other content that expands the game’s possibility space.
+Since there's no persistent career to create variety across playthroughs, the randomized bracket (entrant pool, matchups, upgrade offers) needs to carry that job instead — no two runs should draft the same fighter into the same bracket with the same upgrade choices.
 
 # 4. Combat foundation
 
@@ -171,638 +110,145 @@ LOCKED
 
 ## 4.1 Match format
 
-The baseline match is one familiar versus one familiar. Combat is automated according to each familiar’s configured capabilities and decision logic.
+One familiar versus one familiar, automated according to each familiar's configured techniques and priority rules. **Implemented.**
 
 ## 4.2 Action economy
 
-CURRENT / PROVISIONAL
-
-The intended full game should have a small, understandable baseline action economy. The earlier design used one movement plus one action per turn; that remains a useful reference model, but exact timing and action structure should be validated in prototypes.
-
-Techniques and passives may create explicit exceptions, such as follow-up attacks, reactions, counters, movement after attacking, or thresholds that allow additional actions.
+One action per turn, alternating sides. **Implemented** as `Combatant.choose_technique()` + `Technique.execute()`, called once per side per turn via `battle_controller.gd`'s `take_turn()`.
 
 ## 4.3 Determinism and variance
 
-The underlying rules should be dependable. Randomness should be explicit or constrained rather than hidden inside broad accuracy, resistance, or AI unpredictability systems.
-
-- Explicit probability effects may exist when clearly communicated.
-
-- Enemy behavior may choose among known or inferable options rather than following one fixed script.
-
-- Later spatial arenas may vary between authored layouts, but the loaded arena state should be visible and stable.
-
-- Status resistance should preferably modify outcomes predictably rather than causing invisible percentage failures.
+The player's own combat resolution stays fully deterministic and rule-driven — no hidden accuracy/resistance rolls. Randomness is reserved for the bracket layer (simulated off-screen fights, §9.3; bracket generation and upgrade offers, §9). **Implemented** for player-side combat; the bracket-layer randomness is not yet built.
 
 # 5. Combat timing and universal stats
 
 OPEN / PLAYTEST
 
-The exact turn-resolution model and universal stat line are intentionally unresolved. They should be chosen because they create interesting buildcraft and readable combat, not because the original design happened to use a familiar RPG convention.
+## 5.1 Timing model
 
-## 5.1 Timing models worth testing
+**Current implementation:** sequential/fixed alternation — the player's familiar always acts first, then the enemy, repeat. One candidate under test, not a conclusion; revisit if a difficulty curve emerges across the bracket that this model doesn't support well.
 
-- Sequential initiative: Speed determines which familiar acts first, after which the second familiar evaluates the updated state.
+## 5.2 Stat line
 
-- Simultaneous declaration: both familiars choose from the same beginning-of-turn state, then actions resolve according to a separate rule such as Speed or priority.
-
-- Simultaneous outcomes: selected actions resolve in a way that permits mutual hits or other genuinely simultaneous results.
-
-- Threshold/action-economy Speed: Speed contributes toward extra actions, extra movement, initiative thresholds, or other periodic advantages rather than only deciding first and second.
-
-No one model is canonical until the combat prototype demonstrates which creates the best combination of clarity, tactical identity, and build diversity.
-
-**Current prototype status:** Polygonal Pugilists currently runs sequential/fixed alternation (the player's familiar always acts first, then the enemy, repeat) as its first candidate under test. This is an experiment being observed, not a conclusion — Speed exists as a stat but doesn't yet drive turn order under this model.
-
-## 5.2 Stat design requirements
-
-The universal stat line should stay small. Stats should support multiple build identities and ideally influence both direct power and tactical behavior. Physical/magical offense and defense should not be split by default unless playtesting proves a compelling need.
-
-Historically useful candidates include HP, Power, Defense, and Speed, with Movement derived from species or combat systems. These names and roles are provisional.
-
-**Current prototype status:** Polygonal Pugilists currently uses HP, Power, Defense, Speed, and Focus. Speed and Focus are both defined but not yet functionally used by any system (no timing model consumes Speed, nothing yet consumes Focus) — they exist as placeholders for whichever future mechanic claims them, not as evidence that a five-stat line is the final answer.
-
-## 5.3 Speed in particular
-
-Speed should not automatically become the universally best stat. If it determines initiative, acting second must still support meaningful strategies. Alternatively, Speed may influence movement, specific technique scaling, action thresholds, or other systems. The correct role should emerge from prototype comparison.
+**Current implementation:** HP, Power, Defense, Speed, Focus. Speed and Focus are both defined but functionally unused by any system — don't give either a job until a specific mechanic (an upgrade, a bracket-simulation formula) needs one. Keep the line this small unless a real need for more appears.
 
 # 6. Behavior and autonomous decision-making
 
 LOCKED
 
-## 6.1 Behavioral priorities
+## 6.1 Priority-rule system
 
-The player must be able to configure how a familiar chooses among its available actions. An ordered priority system remains the leading approach because it is expressive, inspectable, and understandable without becoming a full programming language.
+**Implemented.** A familiar's `priority_rules` (ordered `PriorityRule`s, each an ANDed set of `Condition`s plus a `Technique`) get evaluated in order each turn; the first rule whose conditions all hold wins. Every rule the evaluator passes over produces a loggable skip reason (currently gated behind a debug toggle, off by default for normal play). Both the player and the enemy use the identical evaluator — there is no separate "AI" system.
 
-A familiar should evaluate available options and choose according to stable rules. If an option is skipped, the game should be able to explain why: condition not met, target invalid, action unavailable, movement impossible, resource missing, or another explicit reason.
+## 6.2 Where priority rules come from
 
-## 6.2 Exact rule grammar
+**Current implementation:** authored ahead of time as `PriorityRule`/`Condition`/`Technique` resources, assigned to a familiar's `priority_rules`/`techniques` via the Inspector. The player currently picks between whole pre-authored `PriorityBuild`s on a pre-fight screen (see §9.4) rather than composing individual rules themselves — composing rules directly (or from smaller building-block choices) during the between-round upgrade loop is the natural next step once §9's tournament structure exists, but isn't decided yet.
 
-CURRENT DIRECTION
-
-The original structure combined a condition, movement instruction, action, and target into one rule. This remains a strong candidate for the spatial game, but the prototype should begin with the smallest vocabulary necessary to test prioritization and build expression.
-
-## 6.3 Specialized logic
-
-Advanced behavioral components may eventually be learned or unlocked. They should feel like useful tactical cards rather than syntax fragments in a complicated programming language. A specialized option should generally have a useful floor even outside its ideal matchup.
-
-## 6.4 Explanation tooling
-
-Readable AI is a feature, not only a debugging convenience. Useful surfaces may include the selected rule, skipped-rule reasons, triggered passives, status changes, and a compact event timeline. The first prototype should prioritize this visibility early.
-
-# 7. Coaching and intervention
+# 7. Techniques, tags, and statuses
 
 CURRENT DIRECTION
 
-Combat remains autonomous, but the player may receive limited opportunities to influence execution without replacing preparation with direct control.
+## 7.1 Techniques
 
-The original “force a currently valid learned rule to the top of the priority list” remains a strong model because it means: “Do the thing I taught you, but do it now.” Exact intervention count, timing, and tournament economy are not locked.
+**Implemented.** A `Technique` is authored data: a name, a power multiplier, and (optionally) a status it applies with a stack count. Techniques with genuinely different execution logic (currently only Defend) are real subclasses instead of parameterized fields — see the codebase's own `DECISIONS.md`/`LEARNING.md` for the reasoning already worked out on when that split applies.
 
-## 7.1 Constraints
+## 7.2 Status baseline
 
-- Intervention should not invent a capability the familiar does not have.
+Same vocabulary as the full game (`FAMILIAR_FIGHT_CLUB_VISION.md` §10.5): Poison, Burn, Acid built and working; Vines, Chill, Shock, Bleed named but not implemented — movement-related ones (Vines, Chill, Shock) likely stay unimplemented for this project specifically, since Pixel Pugilists has no movement (§0.3).
 
-- Intervention should not turn every battle into manual move selection.
+## 7.3 Passives and tags
 
-- Intervention should be scarce enough that saving it versus spending it creates tension.
+OUT OF SCOPE for now. Not yet needed to test the core thesis; revisit if the technique/status roster alone doesn't produce enough build variety once the bracket exists.
 
-- Between-round coaching may allow reconfiguration using already learned components without granting new training during the bracket.
-
-# 8. Spatial combat, movement, and arenas
+# 8. Familiar construction — bracket entrants
 
 CURRENT DIRECTION
 
-Movement remains part of the intended full game, but it is deliberately excluded from the first prototype so that combat logic can be validated before spatial AI multiplies complexity.
+## 8.1 No "raising" — entrants are pre-generated
 
-## 8.1 Grid
+Familiars are not raised or developed from scratch. Each bracket entrant is a pre-generated combination of a base familiar (sprite/stats — recolors or minor sprite variations are fine, no need for unique art per entrant) and a starting moveset/priority-rule set. The player selects one entrant from the bracket and takes its place.
+
+## 8.2 Weighted rarity pool
+
+Entrant generation should draw from a weighted pool so some combinations are rarer than others (stronger stats, an unusual moveset, whatever ends up feeling notable) — enough to make drafting itself a small, interesting decision, without building the deeper trait/rarity systems the full game has (`FAMILIAR_FIGHT_CLUB_VISION.md` §9.3). Exact weighting is an open tuning question once there's enough content to weight.
+
+## 8.3 Opponents accumulate power too
+
+Opponent entrants aren't static — they should gain a comparable amount of upgrades/modifiers over the course of the bracket as the player does, so the final match is a clash between two builds that both grew over the run, not the player's build versus a flat baseline.
+
+# 9. Tournament structure
+
+CURRENT DIRECTION — the least-built part of this document; expect it to change once implementation starts.
+
+## 9.1 The bracket
+
+A single-elimination bracket of 16 or 32 entrants (exact size open), semi-randomly generated at the start of a run. The bracket screen doubles as the character-select screen — picking your entrant's spot in the bracket is how you start the run.
+
+## 9.2 Loop
+
+> 1\. Choose entrant (assume their spot in the bracket).
+>
+> 2\. Fight your round's match, fully autonomously.
+>
+> 3\. Choose upgrade(s).
+>
+> 4\. Inspect surrounding bracket results (see §9.3).
+>
+> 5\. Repeat from step 2 until the final match.
+>
+> 6\. Absurd final showdown between two heavily-built familiars.
+
+Whether an upgrade choice also happens before the very first fight (in addition to after each round) is open — worth playtesting both ways once there's an upgrade pool to offer from.
+
+## 9.3 Simulated off-screen fights
+
+Matches elsewhere in the bracket that the player doesn't take part in are *not* played through the full combat engine — they're resolved by comparing the two entrants' stats/builds into a win probability, then rolling against it. This is deliberately lightweight: full simulation of every bracket match would be expensive for no real payoff, since the player never sees them play out move-by-move.
+
+**Open questions to settle before implementing:**
+- What exactly feeds the odds calculation — raw stat totals, or does technique/priority-rule quality factor in too? Cheaper is better unless it visibly produces bad-feeling odds.
+- What fidelity does the player see when scouting an upcoming or already-decided match — an exact percentage, or a coarser signal (Favored/Toss-up/Underdog)? A coarser signal probably sits better with "occasional unclear outcomes and upsets" being a deliberate feature, not noise.
+- Is scouting free/always-visible, or a resource/choice the player spends something on? Given this project has no economy (§0.3), it's likely free — but worth deciding deliberately rather than defaulting.
+
+## 9.4 Upgrade choices between rounds
+
+The current pre-fight `PriorityBuild` picker (choose between whole pre-authored rule sets) is a deliberate stopgap built to avoid removing all player agency before this section existed — see the codebase's `DECISIONS.md`. Once this section is actually implemented, it should likely replace or absorb that picker: post-round upgrades are the real place build choices happen, and they should feel like real theorycrafting decisions (new technique, new priority rule, a stat bump, etc.) rather than picking a whole premade build each time.
+
+## 9.5 Loss ends the run
+
+Single elimination means losing a match ends the run — no Reputation-style buffer like the full game's career (`FAMILIAR_FIGHT_CLUB_VISION.md` §11.4). Worth confirming this feels right once there's a real run to lose; a bracket-flavored buffer (e.g. a rare "second chance" upgrade) is a reasonable thing to consider later if losses feel too punishing, but isn't planned now.
+
+# 10. Development roadmap
+
+Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
+
+**Done:** combat engine, statuses (Poison/Burn/Acid), techniques-as-data, the priority-rule behavior system for both sides, the pre-fight build-select stopgap.
+
+**Next:** the tournament/bracket structure (§9) — the biggest remaining gap, and the piece that turns this from "watch two premade builds fight" into the actual intended game.
+
+**After that:** whatever §9's open questions resolve into, playtesting/balance passes, and a decision on whether passives (§7.3) end up needed.
+
+# 11. Playtest questions
 
 OPEN / PLAYTEST
 
-The original 5×5 arena remains a useful baseline candidate, especially because it provides a true center tile, meaningful edges and corners, and enough room for melee/ranged distinction. It is no longer treated as a fixed requirement.
+## 11.1 Combat timing and stats
 
-## 8.2 Movement philosophy
+- Does fixed alternation hold up once opponents have accumulated very different amounts of power, or does turn order start to matter more than intended?
+- Does Speed or Focus need a job, or does the run stay interesting with them unused?
 
-When movement returns, the player should generally teach broad intentions rather than micromanaging exact destination tiles. Examples include approaching, retreating, maintaining distance, seeking cover, avoiding hazards, or remaining stationary.
+## 11.2 Bracket and upgrade pacing
 
-The exact destination should be selected through stable internal rules so players can develop intuition about how a familiar interprets an instruction.
+- How many rounds (bracket size) makes a run feel complete without dragging?
+- How many upgrade choices does a build need before it feels distinctly "yours"?
+- Do simulated off-screen results feel meaningful to scout, or do players ignore them?
+- How much of an upset should the off-screen simulation allow before it reads as unfair rather than tense?
 
-## 8.3 Arena features
+## 11.3 Status and combo pacing
 
-Arenas should contain a small number of strategically meaningful elements that create build expression rather than environmental puzzle solving.
+Carried over from the full design (`FAMILIAR_FIGHT_CLUB_VISION.md` §18.3) since it's equally relevant here: how many actions should a setup build need before payoff, and are stacking statuses interesting to maintain or just fiddly?
 
-- Walls or edges that interact with forced movement.
-
-- Cover or blockers that matter to ranged actions.
-
-- Hazardous or beneficial zones.
-
-- Destructible or interactable objects.
-
-- Simple mechanisms whose rules are visible once the fight begins.
-
-# 9. Familiar construction
+# 12. Elevator pitch
 
 LOCKED
 
-## 9.1 Species
-
-Species defines the familiar’s broad chassis and visual identity, not its entire build. It may influence baseline stats, movement traits, technique affinities, or a species-specific passive, but species should provide useful primitives rather than prescribing one narrow element or status theme.
-
-## 9.2 Individual identity
-
-Two members of the same species should be capable of developing differently. Small stat differences, innate traits, affinities, and career opportunities can nudge the player toward different builds without creating obviously worthless candidates.
-
-## 9.3 Innate traits
-
-CURRENT DIRECTION
-
-Familiars should begin with one or more innate traits that do not compete directly with ordinary passive slots and that help establish individual identity. Rarity should describe unusualness or rule-changing potential, not a simple ladder of numerical superiority.
-
-Innate traits may influence combat, development opportunities, or both. Effects that alter future offerings are especially valuable because they make the career itself feel different.
-
-## 9.4 Build limits
-
-OPEN / PLAYTEST
-
-The final loadout will likely limit techniques, combat passives, behavioral rules, and innate traits through separate or partially separate capacities. Exact slot counts and whether unusually versatile components consume additional capacity should be determined after the component systems are playable.
-
-# 10. Techniques, passives, tags, and statuses
-
-CURRENT DIRECTION
-
-## 10.1 Techniques
-
-Techniques are active combat actions. Availability should often be constrained by battlefield state, position, target state, cooldowns, prior actions, stored effects, or other explicit requirements rather than by one universal mana system.
-
-Reliable techniques and setup/payoff techniques should coexist. Reliable actions are valuable because they work immediately and provide fallbacks; synergistic actions earn higher ceilings through deliberate preparation.
-
-## 10.2 Technique development
-
-CURRENT / PROVISIONAL
-
-Techniques may have authored upgrade paths that allow the same base technique to evolve into different roles. The earlier three-path structure with a committed path and limited cross-pathing remains a useful model, but exact tree shape and capstone pacing are not locked.
-
-## 10.3 Combat passives
-
-Combat passives modify rules, create triggers, enable follow-ups, interact with tags and statuses, or alter behavior incentives. Their value should come primarily from combinations rather than isolated stat bonuses.
-
-## 10.4 Tags
-
-Complexity should be expressed through a readable tag vocabulary rather than unnecessary parallel stat systems. Possible tags include Contact, Projectile, Fire, Venom, Acid, Lightning, Charge, Bite, Summon, Healing, Guard, Forced Movement, and Terrain. The exact taxonomy remains content-driven.
-
-## 10.5 Status baseline
-
-The established status vocabulary is Poison, Burn, Acid, Vines, Chill, Shock, and Bleed. Exact numbers, stack caps, durations, and final clauses remain balance variables, but the statuses should have distinct baseline jobs.
-
-| **Status** | **Baseline identity**                                                                 |
-|------------|---------------------------------------------------------------------------------------|
-| Poison     | Stacking damage-over-time effect with decay or consumption opportunities.             |
-| Burn       | Persistent damage-over-time effect that is simpler and less stack-centric by default. Reapplying Burn to an already-burning target should trigger a distinct "Flare" moment — bonus immediate damage scaled to however much duration remained — in addition to refreshing the duration. This rewards refreshing Burn before it fades rather than making reapplication a no-op. |
-| Acid       | Defense-reduction / vulnerability effect with stacking potential. Baseline duration is indefinite — Acid persists until the battle ends, or (once such systems exist) until cleansed or cancelled by an opposing defensive buff, rather than decaying on its own. |
-| Vines      | Movement-control effect, especially relevant once spatial combat is introduced.       |
-| Chill      | Movement reduction or other mobility pressure over a duration.                        |
-| Shock      | Punishes movement, historically by dealing damage as the afflicted familiar moves.    |
-| Bleed      | Stacking delayed-payoff damage whose eventual burst scales with accumulated stacks.   |
-
-## 10.6 Deterministic resistance
-
-CURRENT DIRECTION
-
-Status resistance should usually modify application predictably rather than create hidden “resisted” percentage rolls. Possible levers include fewer stacks, shorter duration, reduced damage, faster decay, lower maximum stacks, or weakened secondary effects.
-
-# 11. Career structure and development
-
-CURRENT DIRECTION
-
-## 11.1 Finite career
-
-The player raises one active competing familiar through a finite career. Exact career length remains a pacing question, but the earlier target of roughly 60–90 minutes is still a useful reference rather than a locked requirement.
-
-## 11.2 Career loop
-
-> 1\. Select or acquire a familiar candidate.
->
-> 2\. Choose or enter an available circuit.
->
-> 3\. Complete a short development phase.
->
-> 4\. Enter a tournament or major fight sequence.
->
-> 5\. Coach and adapt between rounds where allowed.
->
-> 6\. Receive rewards, losses, career consequences, and new opportunities.
->
-> 7\. Continue through the circuit until the familiar retires through victory, depleted career viability, or another explicit ending condition.
->
-> 8\. Return to the Ranch, where the retired familiar contributes to persistent progression.
-
-## 11.3 Three-week development rhythm
-
-CURRENT DIRECTION
-
-The current baseline is approximately three development opportunities between tournament events. Each week presents a curated-random set of choices such as learning a technique, gaining a passive, upgrading a technique, adjusting stats, obtaining specialized logic, scouting, recovering from a special debuff, or triggering a special event.
-
-Offerings should mix support for the current build, broadly useful value, and at least occasional pivot opportunities. Special events can provide more targeted control when the player needs to address a weakness or pursue a specific synergy.
-
-## 11.4 Loss and career viability
-
-OPEN / PLAYTEST
-
-The run-ending consequence of losing is deliberately unresolved. One-loss careers may create strong tension if fights are fair and predictable enough, but may be too punitive if the game expects experimentation.
-
-The leading alternative is Reputation as “career HP.” Losses deal significant Reputation damage; some powerful services, risks, or shortcuts may also cost Reputation; recovery is rare; reaching zero ends the career. This allows meaningful failure without automatically ending every run after one bad matchup.
-
-## 11.5 Persistent debuffs
-
-CURRENT DIRECTION
-
-There is no universal injury system. Rare events, explicit opponent effects, curses, or risky choices may inflict persistent or difficult-to-remove debuffs as memorable career complications, but ordinary knockouts should not automatically generate an additional injury subsystem.
-
-# 12. Tournaments, circuits, and campaign
-
-LOCKED
-
-## 12.1 Tournament format
-
-Tournaments are short multi-fight sequences that provide the payoff for development. Before entering, the familiar commits to its current learned toolkit. Between rounds, coaching may allow reordering behavior, swapping already learned components, reviewing scouting, and allocating limited recovery or interventions, but not learning entirely new capabilities.
-
-## 12.2 Circuits
-
-The game contains several authored competitive circuits. Each circuit should have a thematic identity, characteristic opponents, development-event tendencies, and eventually spatial arena tendencies. Exact routing, transfers, and branching remain provisional.
-
-## 12.3 Narrative tone
-
-CURRENT DIRECTION
-
-The campaign uses a loose anime-style plot to connect the competitive climb. The story should add personality, rivals, escalating stakes, and memorable circuit identities without overwhelming the buildcrafting game with constant narrative interruption.
-
-## 12.4 Campaign arc
-
-> 1\. The player begins as an unknown trainer entering lower-level circuits.
->
-> 2\. Each circuit introduces rivals, champions, organizers, local personalities, and small self-contained conflicts.
->
-> 3\. As the player rises, suspicious patterns around matchmaking, favoritism, rules, or league control become more visible.
->
-> 4\. The player eventually learns that a shady organization controlling the competitive ecosystem has been manipulating outcomes or protecting its interests.
->
-> 5\. The final story tournament is deliberately unfair: the organization stacks rules, recovery, brackets, matchups, or other conditions against the player.
->
-> 6\. Winning breaks the organization’s control and transitions the game into its long-term postgame fiction.
-
-## 12.5 Narrative restraint
-
-The conspiracy should remain readable and energetic rather than becoming a dense political thriller. The competitive scene, characters, and familiar careers remain the emotional center of the game.
-
-# 13. Performance objectives and medals
-
-CURRENT DIRECTION
-
-Winning is always sufficient for basic progression. Strong or stylish performance can grant additional rewards, but the game should not define “good play” as only winning faster through overwhelming damage.
-
-## 13.1 Objective philosophy
-
-Different fights, circuits, or opponents may offer performance objectives inspired by dungeon-medal systems: clear signals that encourage the player to demonstrate different forms of mastery.
-
-- Defeat an opponent substantially faster than its expected fight length.
-
-- Win while taking very little damage.
-
-- Win after a comeback or from a disadvantaged state.
-
-- Trigger a notable status interaction or setup-payoff chain.
-
-- Exploit an arena feature once spatial combat exists.
-
-- Win while satisfying an explicit restriction or special condition.
-
-- Execute a rare build-specific interaction or finishing condition.
-
-These are examples of objective categories, not a locked checklist. Objectives should be selected so different builds can shine rather than making every match ask for the same speed-clear solution.
-
-## 13.2 Medals
-
-Named medals can commemorate notable performance and make a familiar’s career record more memorable. Medals may grant bonus practical rewards, contribute to Legacy, or serve primarily as records and goals. Their exact reward weight remains open.
-
-## 13.3 Baselines and opponent expectations
-
-Where the game rewards unusually fast or dominant wins, it should compare performance against meaningful expectations for that opponent or encounter rather than arbitrary universal turn counts.
-
-# 14. Economy, recruitment, and persistent progression
-
-CURRENT DIRECTION
-
-## 14.1 Money
-
-Money is the practical persistent currency for services such as scouting, recovery, special training, rerolls, candidate acquisition, event entry, or Ranch functions. Exact sinks are still subject to system simplification.
-
-## 14.2 Reputation
-
-CURRENT / PROVISIONAL
-
-Reputation remains the leading candidate for a per-familiar career resource. It may govern eligibility, invitations, risky services, circuit branches, and ultimately career viability. If the Reputation-as-run-HP model is adopted, losses and voluntary risky spending both consume this same scarce resource.
-
-## 14.3 Legacy Points
-
-Legacy Points are permanent progression earned when familiar careers end. Legacy should primarily unlock breadth and possibility rather than direct universal numerical superiority.
-
-- New species or candidate pools.
-
-- New techniques, passives, innate-trait pools, or development events.
-
-- New circuits, opponents, or arena variation.
-
-- Ranch facilities and mentorship functions.
-
-- Later lineage/breeding systems.
-
-## 14.4 Recruitment
-
-New familiars are acquired rather than captured during battle. The baseline recruitment structure remains rotating Ranch candidates plus special candidates or eggs earned through career rewards, events, circuits, or unlock milestones. A fallback candidate should always be available so the player cannot become unable to start another career.
-
-## 14.5 Lineage
-
-CURRENT DIRECTION
-
-Later progression may allow retired familiars to influence future candidates through a simple breeding or mentorship system. The goal is meaningful influence over traits, affinities, stat tendencies, or cosmetic features without turning the game into a breeding-management simulator or producing exact clones.
-
-# 15. Retirement and the Ranch
-
-LOCKED
-
-## 15.1 Retirement
-
-Retirement ends tournament participation, not the familiar’s existence. A retired familiar remains part of the player’s history and can continue contributing to future careers.
-
-## 15.2 Legacy contribution
-
-A career’s lasting contribution may reflect tournament progress, championships, difficult opponents, medals/objectives, unusual build accomplishments, and other meaningful milestones. Exact formulas should be simple enough that the player understands why a career generated its reward.
-
-## 15.3 Mentorship
-
-Retired familiars may influence later training offerings, techniques, recovery, scouting, special events, or circuit knowledge. Mentorship should ideally have visible Ranch presence and character rather than functioning only as an invisible percentage modifier.
-
-## 15.4 Ranch roles
-
-- Welcome or help evaluate new candidates.
-
-- Assist training, recovery, or scouting.
-
-- Participate in practice or exhibition activities.
-
-- Improve or staff Ranch facilities.
-
-- Appear in scenes, commentary, records, and celebrations.
-
-## 15.5 Archive and memory
-
-Players should be able to revisit important careers through records such as prior builds, medals, notable opponents, trophies, and potentially battle replays. Favorite familiars should remain meaningful after retirement rather than becoming disposable run data.
-
-# 16. Postgame league and custom tournaments
-
-CURRENT DIRECTION
-
-## 16.1 Narrative transition
-
-After the player defeats the corrupt organization, the competitive scene continues because the player and allies help replace or rebuild the league. The postgame is therefore not a non-canonical reset; the player’s relationship to the competition has changed.
-
-## 16.2 Custom tournament modifiers
-
-The postgame unlocks a configurable challenge system inspired by Hades II’s Fear structure. The player enables tournament modifiers, each carrying a challenge value. Different combinations can reach the same overall rating while creating very different run pressures.
-
-Modifiers should prefer rule changes and build constraints over pure numerical inflation. Illustrative categories include harsher economy, reduced recovery, stronger opponent traits, more elite trainers, more punishing arenas, roster restrictions, or altered tournament structure.
-
-## 16.3 Challenge rating name
-
-OPEN / PLAYTEST
-
-The rating itself still needs a final name. “Reputation” should probably be avoided if Reputation remains the familiar’s career resource. Renown, Notoriety, Prestige, Hype, or another term can be evaluated later against the game’s final tone.
-
-## 16.4 Threshold unlocks
-
-Clearing tournaments at higher challenge thresholds should unlock new game content rather than only paying out more currency.
-
-- Stronger or more unusual trainers enter the opponent pool.
-
-- New species or candidate pools become available to acquire.
-
-- New arenas, circuit variants, rules, or special events appear.
-
-- Optional elite or superboss trainers become available.
-
-Thresholds should generally care about the highest qualifying challenge cleared rather than encourage repetitive farming of the easiest modifier combination at one level.
-
-## 16.5 Why this matters
-
-The postgame loop becomes: raise challenge → encounter new content → gain new build possibilities → use those possibilities to push challenge further.
-
-# 17. Prototype roadmap
-
-LOCKED
-
-The first prototype should be much smaller than the original v1 sandbox. Its job is to answer the central combat question before the project absorbs the complexity of movement, long-term careers, or content production.
-
-## 17.1 Milestone 0 — learning exercises
-
-CURRENT DIRECTION
-
-Small Godot exercises may be used when necessary, but they should preferentially teach systems that feed directly into Familiar Fight Club: scene composition, signals, Resources/data models, UI updates, state machines, save data, and combat events.
-
-## 17.2 Milestone 1 — Polygonal Pugilists
-
-A deliberately stripped-down, no-movement combat prototype.
-
-### Goal
-
-Is constructing a build, defining simple autonomous priorities, and watching the familiar execute that build satisfying enough to justify the full game?
-
-### Required systems
-
-- One-versus-one automated combat.
-
-- A minimal universal action/timing model that can be swapped or iterated.
-
-- A small set of techniques and passives.
-
-- A small status/event system.
-
-- Readable targeting and behavioral priorities.
-
-- Clear combat log or explanation surfaces.
-
-- Immediate rematch / rebuild flow.
-
-- A short progression structure of roughly rounds 1 through 5 with a simple shop/reward layer.
-
-- A boss/final opponent strong enough to reveal whether the build came together.
-
-### Explicit exclusions
-
-- No movement or spatial arena logic.
-
-- No full Ranch simulation.
-
-- No multiple circuits.
-
-- No complete campaign narrative.
-
-- No lineage system.
-
-- No universal injury system.
-
-- No need for final art production.
-
-### Success criteria
-
-> 1\. The player can make at least two meaningfully different successful builds.
->
-> 2\. The familiar’s action choices are understandable.
->
-> 3\. Interactions and triggers visibly create satisfying chains or payoffs.
->
-> 4\. Unexpected behavior can be diagnosed rather than feeling random.
->
-> 5\. After a fight, the player can identify a meaningful build change they want to try.
->
-> 6\. The short reward/shop loop makes the build evolve rather than merely repeat.
-
-## 17.3 Milestone 2 — spatial combat sandbox
-
-CURRENT DIRECTION
-
-Only after the non-spatial engine is fun should the prototype add movement, grid/arena geometry, spatial targeting, hazards, forced movement, and movement-related statuses. This milestone exists to test whether spatial depth improves the game enough to justify its implementation cost and how large the baseline arena should be.
-
-## 17.4 Milestone 3 — miniature career
-
-Once combat is strong, add one short circuit with approximately three-week development phases, a few tournaments, candidate selection, basic Money/Reputation, retirement, and a minimal Ranch/Legacy return. The purpose is to test whether repeated development choices create attachment and distinct career arcs.
-
-## 17.5 Milestone 4 — campaign and postgame proof
-
-Narrative circuits, league corruption, broader Ranch persistence, performance medals, and postgame challenge thresholds should be expanded only after the career loop demonstrates that repeated familiar runs are compelling.
-
-# 18. Playtest questions
-
-OPEN / PLAYTEST
-
-## 18.1 Combat timing and stats
-
-- Which turn-resolution model creates the best balance of readability and interesting interaction?
-
-- What should Speed actually do?
-
-- How small can the universal stat line be without flattening build variety?
-
-- Do extra-action thresholds create excitement or simply make Speed mandatory?
-
-## 18.2 Behavior readability
-
-- How many rules or priorities can players comfortably manage?
-
-- How much explanation should be visible live versus available on inspection?
-
-- What kinds of targeting or conditions are expressive without becoming programming homework?
-
-## 18.3 Status and combo pacing
-
-- How many actions should a setup build need before its payoff?
-
-- Are stacking statuses interesting to maintain or merely fiddly?
-
-- How should control statuses be balanced in one-versus-one combat?
-
-- How much deterministic resistance is required for meaningful counterplay?
-
-## 18.4 Career failure
-
-- Does one loss ending a career create satisfying stakes or discourage experimentation?
-
-- If Reputation is run HP, how many meaningful losses should a healthy career survive?
-
-- What voluntary Reputation spends are tempting enough to create real risk decisions?
-
-- How rare should Reputation recovery be?
-
-## 18.5 Performance objectives
-
-- Can objectives reward varied mastery without favoring one archetype?
-
-- How should the game establish an expected fight length for speed-clear medals?
-
-- Should medals influence Legacy, immediate rewards, cosmetics, or some combination?
-
-## 18.6 Spatial combat
-
-- Does movement add enough build depth to justify the extra AI and readability complexity?
-
-- Is 5×5 sufficient, or does ranged/spatial play need a larger baseline?
-
-- Can broad movement directives resolve predictably enough that players trust automation?
-
-## 18.7 Career pacing
-
-- How many development choices are needed before a familiar feels like it has a distinct build story?
-
-- How many tournaments make retirement feel earned rather than abrupt?
-
-- How much persistence should transfer between careers before runs stop feeling distinct?
-
-# 19. Deprecated or non-baseline systems
-
-DEPRECATED
-
-These ideas existed in the original design but should not be treated as current requirements.
-
-## 19.1 Mandatory sequential Speed initiative
-
-The old design assumed the faster familiar completed a turn before the slower familiar evaluated the new state. This is now only one timing model to test.
-
-## 19.2 Mandatory 5×5 arena
-
-A 5×5 grid remains a candidate, not a locked balancing baseline.
-
-## 19.3 Full movement system in the first prototype
-
-The first prototype intentionally removes movement. Spatial combat is a later validation milestone.
-
-## 19.4 Universal knockout injuries
-
-Ordinary knockouts no longer automatically generate injuries. Persistent debuffs are reserved for explicit and comparatively rare events or effects.
-
-## 19.5 Overbuilt first prototype
-
-The original prototype attempted to prove movement, behavior construction, statuses, arenas, enemy variance, interventions, and more at once. The current roadmap isolates the combat thesis first.
-
-## 19.6 Spectacle as a single dominant score
-
-The underlying desire to reward impressive victories remains, but the preferred direction is a broader objective/medal system that recognizes speed, efficiency, comeback play, combos, restrictions, and other forms of mastery.
-
-# 20. Current elevator pitch and core identity
-
-LOCKED
-
-## 20.1 Elevator pitch
-
-Familiar Fight Club is a creature-raising auto-tactics game where you build a familiar’s techniques, passives, and decision logic, then guide it through a finite tournament career. The familiar fights autonomously, so every match is a performance of the build you created. Each career develops differently, eventually ends in retirement, and leaves a legacy that expands future possibilities.
-
-## 20.2 Campaign/postgame extension
-
-Across multiple circuits, a light anime-style story leads the player from unknown trainer to champion, then into conflict with the corrupt organization controlling the competitive scene. Defeating that organization unlocks a rebuilt-league postgame where the player can configure increasingly difficult tournaments and reach challenge thresholds that attract stronger trainers, new species, and new content.
-
-## 20.3 Core identity
-
-The game’s strongest distinguishing idea is not simply “Monster Rancher with automated combat.” It is a creature-raising game where training means constructing an autonomous tactical build, and the familiar’s career becomes the story of how that build evolved and expressed itself.
-
-- Species provides the starting point.
-
-- Innate traits provide individuality.
-
-- Curated development provides the career’s opportunities.
-
-- The player’s theorycrafting provides the fighting style.
-
-- Combat provides the performance.
-
-- Retirement turns that performance into legacy.
-
-- Postgame challenge turns mastery into new possibility.
-
-Revision note: This v2 document intentionally preserves open questions where additional design discussion would be less valuable than building and observing a prototype. When a prototype resolves one of those questions, the relevant section should be promoted from OPEN / PLAYTEST to CURRENT DIRECTION or LOCKED and the deprecated alternative recorded rather than erased.
+Pixel Pugilists is a single-elimination tournament roguelike: draft a fighter from a randomized bracket, watch it fight autonomously according to the techniques and priorities you've given it, choose how it grows between rounds, and scout the rest of the field as everyone else's builds grow too — building toward a final clash between two familiars that have accumulated a run's worth of power. It's a standalone prototype proving the combat-and-buildcraft core of the larger planned game, *Familiar Fight Club*, without any of that game's career, Ranch, or narrative systems.

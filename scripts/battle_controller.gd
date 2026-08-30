@@ -1,18 +1,29 @@
 extends Control
 
-## Drives one 1v1 battle: builds both Combatants, alternates turns, resolves
-## whichever Technique the player or enemy uses, and ends the battle on
-## victory or defeat.
+## Drives one 1v1 battle: builds both Combatants, lets the player pick a
+## priority build, then alternates turns -- both sides now choose their own
+## technique via Combatant.choose_technique(), with no manual clicking once
+## the fight starts -- resolving whichever Technique is chosen, and ending
+## the battle on victory or defeat.
 ##
-## Wiring this scene requires one manual step in the editor: assign
-## player_familiar_data and enemy_familiar_data below. ActionPanel's buttons
-## are generated at runtime from player_familiar_data.techniques (see
-## populate_action_buttons()), not hand-wired in the scene.
+## Wiring this scene requires manual steps in the editor: assign
+## player_familiar_data, enemy_familiar_data, and available_builds below.
+## BuildSelectPanel's buttons are generated at runtime from available_builds
+## (see populate_build_select_buttons()), not hand-wired in the scene.
 
 enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 
 @export var player_familiar_data: Familiar
 @export var enemy_familiar_data: Familiar
+
+## The priority builds offered on the pre-fight build-select screen. The
+## chosen build's priority_rules get assigned onto player_familiar_data.
+@export var available_builds: Array[PriorityBuild] = []
+
+## Logs the enemy's skipped-rule reasoning to the combat log. Off by
+## default since it's debug noise for normal play; flip on in the
+## Inspector to see why the enemy did or didn't pick each technique.
+@export var show_priority_skip_log: bool = false
 
 @onready var combat_log: CombatLog = $CombatLog
 
@@ -27,9 +38,7 @@ enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 @onready var player_portrait: TextureRect = $Panels/PlayerPanel/Portrait
 @onready var enemy_portrait: TextureRect = $Panels/EnemyPanel/Portrait
 
-@onready var action_panel: HBoxContainer = $ActionPanel
-
-var action_buttons: Array[Button] = []
+@onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
 var player: Combatant
 var enemy: Combatant
@@ -49,37 +58,30 @@ func _ready() -> void:
 	player_portrait.texture = player.familiar.sprite
 	enemy_portrait.texture = enemy.familiar.sprite
 
-	populate_action_buttons()
+	populate_build_select_buttons()
+
+## Builds one button per available build, letting the player pick which
+## priority_rules Twerpent fights with before the battle actually starts --
+## the smallest possible slice of buildcrafting, not a full round/reward
+## loop, just enough to make "two meaningfully different builds" something
+## the player chooses rather than something only authored in the Inspector.
+func populate_build_select_buttons() -> void:
+	for build in available_builds:
+		var button := Button.new()
+		button.text = build.build_name
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.theme = preload("res://assets/themes/button_font.tres")
+		button.pressed.connect(_on_build_selected.bind(build))
+
+		build_select_panel.add_child(button)
+
+func _on_build_selected(build: PriorityBuild) -> void:
+	player_familiar_data.priority_rules = build.priority_rules
+	build_select_panel.queue_free()
 
 	combat_log.add_entry("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 	phase = Phase.PLAYER_TURN
-
-## Builds one button per technique in the player's movepool, replacing the
-## fixed five-button layout the manual test harness used previously. Each
-## button calls the same handler, bound with the specific technique it
-## represents -- the handler never needs to know which technique that is.
-func populate_action_buttons() -> void:
-	for technique in player_familiar_data.techniques:
-		var button := Button.new()
-		button.text = technique.technique_name
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.theme = preload("res://assets/themes/button_font.tres")
-		button.pressed.connect(_on_technique_button_pressed.bind(technique))
-
-		action_panel.add_child(button)
-		action_buttons.append(button)
-
-func _on_technique_button_pressed(technique: Technique) -> void:
-	if phase != Phase.PLAYER_TURN:
-		return
-
-	var message: String = technique.execute(player, enemy)
-
-	combat_log.add_entry(message, CombatLog.Source.PLAYER)
-
-	update_hp_display(enemy)
-
-	await advance_turn()
+	await take_turn(player, enemy, CombatLog.Source.PLAYER)
 
 ## The one path for updating what a combatant's HPBar shows. The fill and
 ## the status-damage preview must always move together -- the preview's
@@ -118,13 +120,11 @@ func advance_turn() -> void:
 	if phase == Phase.PLAYER_TURN:
 		phase = Phase.ENEMY_UPKEEP
 
-		set_action_buttons_enabled(false)
-
 		await run_upkeep(enemy, enemy_hp_bar, CombatLog.Source.ENEMY)
 
 		if phase != Phase.BATTLE_OVER:
 			phase = Phase.ENEMY_TURN
-			await enemy_turn()
+			await take_turn(enemy, player, CombatLog.Source.ENEMY)
 	else:
 		phase = Phase.PLAYER_UPKEEP
 
@@ -132,7 +132,7 @@ func advance_turn() -> void:
 
 		if phase != Phase.BATTLE_OVER:
 			phase = Phase.PLAYER_TURN
-			set_action_buttons_enabled(true)
+			await take_turn(player, enemy, CombatLog.Source.PLAYER)
 
 ## Ticks statuses for the side whose turn is about to begin (upkeep-style,
 ## before they can act). The caller checks `phase` afterward, not a return
@@ -156,17 +156,23 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 
 	await check_victory()
 
-func enemy_turn() -> void:
+## The one path for either side's turn -- both player and enemy pick their
+## technique the same way now (Combatant.choose_technique()), so there's no
+## reason left for a player-specific and an enemy-specific version of this.
+func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) -> void:
 	await get_tree().create_timer(0.6).timeout
 
-	# Guubal deliberately has just one technique in its movepool -- still
-	# zero decision-making, per the enemy-behavior convention.
-	var technique: Technique = enemy_familiar_data.techniques[0]
-	var message: String = technique.execute(enemy, player)
+	var decision: Dictionary = actor.choose_technique(target)
+	if show_priority_skip_log:
+		for reason in decision.skip_reasons:
+			combat_log.add_entry(reason, source)
 
-	combat_log.add_entry(message, CombatLog.Source.ENEMY)
+	var technique: Technique = decision.technique
+	var message: String = technique.execute(actor, target)
 
-	update_hp_display(player)
+	combat_log.add_entry(message, source)
+
+	update_hp_display(target)
 
 	await advance_turn()
 
@@ -179,8 +185,6 @@ func check_victory() -> bool:
 	if enemy.is_defeated():
 		phase = Phase.BATTLE_OVER
 
-		set_action_buttons_enabled(false)
-
 		combat_log.add_entry("Victory! %s is defeated." % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
 
 		await get_tree().create_timer(1.0).timeout
@@ -190,8 +194,6 @@ func check_victory() -> bool:
 	if player.is_defeated():
 		phase = Phase.BATTLE_OVER
 
-		set_action_buttons_enabled(false)
-
 		combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
 
 		await get_tree().create_timer(1.0).timeout
@@ -200,7 +202,3 @@ func check_victory() -> bool:
 		return true
 
 	return false
-
-func set_action_buttons_enabled(enabled: bool) -> void:
-	for button in action_buttons:
-		button.disabled = not enabled

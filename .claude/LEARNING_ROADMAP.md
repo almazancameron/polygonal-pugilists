@@ -1,18 +1,21 @@
-# Familiar Fight Club — Learning Roadmap
+# Pixel Pugilists — Learning Roadmap
 
-Living curriculum tying real FFC development to the developer's growing Godot/GDScript
-fluency. Update this file whenever a concept's status changes, a step is completed, or
-the architecture shifts — see `.claude/CLAUDE.md` for the teaching workflow this file
-supports.
+Living curriculum tying real Pixel Pugilists development to the developer's growing
+Godot/GDScript fluency. Update this file whenever a concept's status changes, a step is
+completed, or the architecture shifts — see `.claude/CLAUDE.md` for the teaching workflow
+this file supports. Pixel Pugilists is a standalone prototype for the larger planned
+*Familiar Fight Club* — see `GAME_DESIGN.md` and `FAMILIAR_FIGHT_CLUB_VISION.md`.
 
-Developer's stated priority order: **#1 learn the engine, #2 build FFC, #3 have fun.**
+Developer's stated priority order: **#1 learn the engine, #2 build Pixel Pugilists, #3 have fun.**
 Pacing favors depth over speed — slow down, ask for explanations back, and spend extra
 exercises on shaky concepts rather than rushing toward a milestone.
 
 ## 1. Current project snapshot
 
 Godot 4.7 (Forward Plus, Jolt Physics, d3d12 on Windows), `project.godot` already correctly
-named "Polygonal Pugilists." The project was bootstrapped from scratch — no code carried
+named "Pixel Pugilists" (renamed mid-project from "Polygonal Pugilists" once real sprite
+art replaced placeholder shapes — see `DEVLOG.md`). The project was bootstrapped from
+scratch — no code carried
 over from the sibling `turn-based-combat-tutorial` reference project, though its
 `CombatHistory`/`combat_log.gd` decoupled data/view pattern was deliberately reused under
 new names.
@@ -39,22 +42,40 @@ Single scene family under `res://scenes/` and `res://scripts/`, wired together i
 - **`Status`** (`status.gd`, `RefCounted`) base class, with `PoisonStatus`, `BurnStatus`,
   and `AcidStatus` subclasses. See `DECISIONS.md` and `LEARNING.md` for the mechanics and
   the polymorphism/hook-ordering lessons this produced.
-- **`CombatLog`** / `CombatLogView`, **`HPBar`** — small, decoupled, reusable UI pieces.
-  `HPBar` is a composite `Control` (`Bar` + `StatusPreview` + `Label`) that also draws a
-  colored preview of the damage each active status will deal on its next tick.
+- **`Technique`** (`technique.gd`, `Resource`) — a familiar's authored combat action.
+  Status-applying moves are one class parameterized by `status_effect`/`status_stacks`,
+  not one subclass per move; `DefendTechnique` is a real subclass since its `execute()`
+  genuinely differs. `Familiar.techniques: Array[Technique]` holds each familiar's
+  moveset. See `DECISIONS.md`.
+- **`Condition`** (`condition.gd`, `Resource`) — one subclass per condition kind
+  (`TargetMissingStatusCondition`, `SelfHPBelowXCondition`,
+  `TargetStatusStacksBelowXCondition`), since these read genuinely different battle-state
+  facts, unlike `Technique`'s parameterized cases. `PriorityRule` pairs an ANDed
+  `conditions: Array[Condition]` with a `technique`; `Familiar.priority_rules` is an
+  ordered list of these, evaluated by `Combatant.choose_technique()`.
+- **`PriorityBuild`** (`priority_build.gd`, `Resource`) — a named, authored
+  `priority_rules` set the player can pick between on a small pre-fight build-select
+  screen. Deliberately the smallest possible slice of buildcrafting, not the eventual
+  round/reward loop — see `DECISIONS.md`.
+- **`CombatLog`** / `CombatLogView`, **`HPBar`**, **`StatusRow`** — small, decoupled,
+  reusable UI pieces. `HPBar` draws a colored preview of upcoming status damage;
+  `StatusRow` shows every active status uniformly (including non-damaging ones like Acid).
 
-**Current playable state:** a full 1v1 fight plays out correctly — every player action
-works, Guubal automatically uses an acid attack every turn (still zero decision-making,
-deliberately — see §4 Step 4 below), HP bars and status previews update live, and victory
-and defeat both end the battle correctly. This has been verified with headless Godot
-scripting (see `CLAUDE.md`'s Validation section), not only by manual play.
+**Current playable state:** the player picks a `PriorityBuild` on a small pre-fight
+screen, then a full 1v1 fight plays out with **zero manual clicks on either side** — both
+`Combatant`s choose their technique each turn via the same `choose_technique()` evaluator,
+via `battle_controller.gd`'s unified `take_turn()`. HP bars, status previews, and the
+status icon row all update live; victory and defeat both end the battle correctly. This
+has been verified with headless Godot scripting (see `CLAUDE.md`'s Validation section),
+not only by manual play. Playtest note: with only two premade builds and five techniques,
+watching a fight feels thin right now — expected, since the real buildcrafting layer
+(Step 6) doesn't exist yet; see `DEVLOG.md`.
 
-**What's conspicuously absent relative to Milestone 1:** no behavioral-priority system yet
-(the enemy unconditionally executes one hardcoded action), no targeting (only one possible
-opponent exists), no round/shop loop, no rematch/rebuild flow, no save data, no permanent
-automated test suite (a reliable throwaway headless-verification pattern exists and has
-been used constantly, but always written by Claude and deleted after use — see §7). This
-is expected at this point in the roadmap, not a gap in what's been done.
+**What's conspicuously absent relative to Milestone 1:** no round/shop loop, no
+rematch/rebuild flow, no persistent build accumulation across fights, no targeting (only
+one possible opponent exists), no boss encounter, no save data, no permanent automated
+test suite (a reliable throwaway headless-verification pattern exists and has been used
+constantly, but always written by Claude and deleted after use — see §7).
 
 ## 2. Demonstrated knowledge
 
@@ -76,18 +97,25 @@ is expected at this point in the roadmap, not a gap in what's been done.
 | Async/coroutines (`await`) | Practicing | Implemented the upkeep-phase pacing after a detailed design conversation; understands the "calling a coroutine without awaiting it still runs it" behavior and the `get_tree().quit()` timing gotcha it exposed |
 | Save/persistence | Not introduced | — |
 | Automated tests | Not introduced | The headless-script verification pattern (see `CLAUDE.md`) has been used constantly this session, but always written by Claude — writing one independently would be a good future exercise |
+| Data vs. subclass judgment (parameterize vs. subtype) | Demonstrated | Correctly challenged Claude's own over-subclassed first pass at `Technique` (one subclass per status-applying move) as unearned, since the cases were parametrically identical rather than behaviorally different — led directly to the enum+fields redesign now in `DECISIONS.md` |
+| Typed `Array[CustomResourceClass]` exports | Demonstrated | `Array[Technique]`, `Array[PriorityRule]`, `Array[Condition]` authored and edited correctly and independently via the Inspector across many resource files this session, including nested/embedded sub-resource arrays |
+| Godot resource save/dirty-tracking mechanics | Introduced | Diagnosed (with Claude, via live MCP introspection) why a deeply-nested resource edit made through a scene's Inspector didn't persist to the underlying `.tres` file — a real, reusable debugging lesson, not yet independently applied |
+
+**Also worth noting — design ownership, not a checklist item**: this session the developer initiated two substantive pushbacks on Claude's own proposed designs (the `Technique` over-subclassing above, and a sequencing challenge to Step 5 that led to inserting the pre-fight build-select screen — see `DECISIONS.md`) rather than just implementing assigned exercises. That's ahead of where `CLAUDE.md`'s ownership progression expected at this point in the roadmap; worth continuing to invite real critique of proposed designs, not just review-after-implementation.
 
 ## 3. Current curriculum milestone
 
-**Milestone 1 — Polygonal Pugilists** (`GAME_DESIGN.md` §17.2): prove that constructing a
+**Pixel Pugilists' core thesis** (`GAME_DESIGN.md` §1, §12): prove that constructing a
 build, defining simple autonomous priorities, and watching the familiar execute that
 build is satisfying enough to justify the full game. Explicitly no movement/spatial
 combat, no Ranch, no circuits, no campaign, no injury system.
 
 Progress so far: the combat engine, real stats, a small status/event system (Poison/Burn/
-Acid), and a combat log/explanation surface all exist. Still missing before Milestone 1 is
-complete: behavioral priorities, targeting, the round/shop loop, rematch/rebuild flow, and
-a boss encounter.
+Acid), a combat log/explanation surface, and a full behavioral-priority system driving
+*both* sides (Steps 4–5) all exist — a fight plays out entirely autonomously once the
+player picks a pre-fight build. Still missing before Milestone 1 is complete: the
+round/shop loop, rematch/rebuild flow, persistent build accumulation across a run,
+targeting, and a boss encounter.
 
 ## 4. Ordered learning/development steps
 
@@ -114,56 +142,57 @@ construction (see `DECISIONS.md`), rather than needing a separate fix.
 - **Unlocks:** enough of a status system to make priority conditions ("if target is
   poisoned...") meaningful in Step 4.
 
-### Before Step 4 — an open sequencing question, not yet decided
-Four action handlers (Poison Strike, Searing Spit, Acid Bath, and Guubal's acid attack)
-currently duplicate the same damage formula. Moving techniques to a `Technique` Resource
-(subclassed per move, the way `Status` already is) would remove that duplication and
-matches where `GAME_DESIGN.md` §9/§10 already points — but it's real, separate work from
-Step 4 below. Whether to do that refactor before or after Step 4 hasn't been decided; see
-`DECISIONS.md` and `DEVLOG.md`'s "Where to continue."
+### Techniques-as-data refactor — ✅ Done (happened ahead of Step 4)
+Resolved the open sequencing question by doing this first. `Technique` (Resource)
+replaced the four duplicated damage-formula call sites. First pass over-subclassed
+(one class per status-applying move); the developer correctly identified this as
+unearned abstraction and it was collapsed into one parameterized class. See
+`DECISIONS.md` for the durable rule this produced.
 
-### Step 4 — Minimal behavioral priority system
-- **FFC feature/result:** An ordered list of condition→action rules that the *enemy*
-  evaluates each turn to autonomously pick among its available moves, replacing the
-  current hardcoded single action. Skip reasons get logged per §6.4 ("explanation tooling
-  ... should prioritize this visibility early").
-- **Concepts introduced/practiced:** the smallest usable rule vocabulary (condition +
-  action, no movement/targeting complexity yet, per §6.2's direction to start minimal),
-  iterating an ordered list and explaining why an option was or wasn't chosen.
-- **Already decided:** this must be a real ordered-priority system, not randomness — a
-  50/50 coin-flip between moves was explicitly considered and rejected this session for
-  being a different, likely-throwaway mechanism (see `DECISIONS.md`).
-- **Who implements the first example:** Claude (the evaluator + one example condition).
-- **Developer's exercise:** add a second, related condition.
-- **Definition of done:** the enemy chooses among more than one move without manual
-  clicks, and every choice (and every skip) has a visible, correct reason in the log.
-- **Unlocks:** this is the point where the manual button harness starts being retired, per
-  Step 5.
+### Step 4 — Minimal behavioral priority system — ✅ Done
+- **What happened:** Claude built the evaluator (`Combatant.choose_technique()`) and one
+  example condition (`TargetMissingStatusCondition`); the developer built
+  `SelfHPBelowXCondition` and `TargetStatusStacksBelowXCondition` — both had real bugs
+  (int-division truncation; a fallback branch that misread "has an unrelated status" as
+  "has the checked status") caught in review and fixed by the developer. Skip reasons log
+  per §6.4, gated behind a `show_priority_skip_log` toggle (off by default) so normal play
+  isn't noisy.
+- **Beyond original scope:** `PriorityRule.condition` (singular) became
+  `conditions: Array[Condition]` (ANDed) at the developer's suggestion, with an empty
+  array serving as the catch-all case instead of a dedicated "always true" resource.
+- **Unlocks:** Step 5.
 
-### Step 5 — Player-side priorities + retiring the manual harness
-- **FFC feature/result:** The player's familiar also acts via the same priority
-  evaluator; Attack/Defend/status buttons are removed (their job is done — they proved the
-  resolution engine).
-- **Concepts introduced/practiced:** reuse of Step 4's evaluator across both sides;
-  minimal "build configuration" UI to let the developer *set* priorities rather than
-  hardcode them.
-- **Who implements the first example:** Claude sets up the shared evaluator path; **the
-  developer** authors the player's rule list contents.
-- **Developer's exercise:** author two meaningfully different player rule sets and observe
-  how differently the same techniques play out — an early check against Milestone 1's
-  success criterion #1 ("two meaningfully different successful builds").
-- **Definition of done:** a full fight can play out with zero manual clicks, driven
+### Step 5 — Player-side priorities + retiring the manual harness — ✅ Done
+- **What happened:** `enemy_turn()` and the click-driven player path unified into one
+  `take_turn(actor, target, source)` — both sides now choose identically. The developer
+  raised a real design concern before implementation: retiring manual control entirely,
+  before any buildcrafting exists to replace it, would leave the prototype with nothing
+  to actually do. Resolved with a small pre-fight `PriorityBuild` build-select screen
+  (Claude built "Status Stacker"; developer built "Poison Spammer") rather than either
+  reordering the whole roadmap or shipping a dead spectator-only build.
+- **Developer's exercise, done:** authored "Poison Spammer" (Defend below 50% HP,
+  otherwise always Venom Strike) — genuinely different from "Status Stacker" (rotate
+  through missing statuses, then Attack), confirmed via direct evaluator tests. Also
+  caught its own real bug while doing so: editing the *shared* `fallback_attack.tres` to
+  fit one build silently changed Guubal's fallback too — see `DECISIONS.md`.
+- **Definition of done, met:** a full fight plays out with zero manual clicks, driven
   entirely by authored priorities on both sides.
 
-### Step 6 — Round loop + simple shop/reward (higher-level, less detailed)
-Rounds 1–5 with a minimal reward/shop step between them and an immediate rematch/rebuild
-flow (both explicitly required by Milestone 1). First real place persistence-during-a-
-session likely matters.
+### Step 6 — Tournament bracket structure (higher-level, less detailed)
+Superseded/sharpened by a design conversation after Step 5: this is no longer "rounds 1–5
+with a shop layer" but the single-elimination bracket described in `GAME_DESIGN.md` §9 —
+a 16-or-32-entrant bracket doubling as character select, simulated off-screen matches
+(stat comparison → odds → roll, with scouting), and upgrade choices between rounds
+replacing the current pre-fight `PriorityBuild` picker. First real place
+persistence-during-a-run likely matters (does `Familiar.techniques`/`priority_rules`
+growing at runtime suffice, or does an explicit per-run build object make more sense?).
+See `GAME_DESIGN.md` §9's open questions before implementing.
 
-### Step 7 — Boss/final encounter + build-comparison pass (higher-level)
-A stronger final opponent and a deliberate comparison of two different builds against it,
-directly testing Milestone 1's success criteria as a whole. Developer-led by this point,
-Claude reviewing.
+### Step 7 — Final showdown + build-comparison pass (higher-level)
+The bracket's final match, opponents having accumulated a comparable amount of power to
+the player over the run, plus a deliberate comparison of two different drafted builds
+against it — directly testing the core thesis (`GAME_DESIGN.md` §1/§12) as a whole.
+Developer-led by this point, Claude reviewing.
 
 ## 5. Open design experiments
 
@@ -191,26 +220,26 @@ Explicitly not being built yet, to avoid scope creep:
 - Reputation-as-career-HP, career loss severity, Legacy Points.
 - Postgame challenge-modifier system, medals/objectives beyond maybe a stub later.
 - Save/persistence — not needed until a session needs to survive being closed.
-- A generic `modify_stat()` hook, a status icon row's special-case for "Defending," and
-  any other generalization waiting on a second concrete case — see `DECISIONS.md` for the
-  specific ones already discussed and deliberately deferred.
-- Coaching/intervention system (§7) — depends on priorities existing first (Step 4/5).
+- A generic `modify_stat()` hook, and any other generalization waiting on a second
+  concrete case — see `DECISIONS.md` for the specific ones already discussed and
+  deliberately deferred.
+- Coaching/intervention system (§7) — priorities now exist (Steps 4–5 done), but this is
+  still Milestone-1-out-of-scope until the round loop (Step 6) gives coaching something
+  to happen *between*.
 
 ## 7. Next lesson
 
-Two things worth deciding before writing more code, both already surfaced in
-`DEVLOG.md`'s "Where to continue" and `DECISIONS.md`:
+Step 6 — the round loop + simple shop/reward layer (see §4 above) — is the clear next
+step: it's Milestone 1's biggest remaining gap, and it's what turns the pre-fight
+build-select screen from "pick between two fixed builds" into real, accumulating
+buildcrafting. Worth a design conversation before implementing (per the developer's own
+recent instinct about sequencing) covering at minimum: how many rounds, what a
+reward/shop offer actually looks like for a five-technique/three-condition roster this
+small, and whether `Familiar.techniques`/`priority_rules` growing at runtime (works today,
+since resources persist in memory across scene reloads within a session) is sufficient or
+whether an explicit per-run build object is worth introducing.
 
-1. **Sequencing:** techniques-as-data refactor first, or Step 4's behavioral-priority
-   system first? Not yet decided — see "Before Step 4" above.
-2. **A concrete, designed-but-unbuilt piece regardless of that decision:** a status icon
-   row (separate from `HPBar`, showing every active status's presence + stack count,
-   since Acid currently has no visual indicator at all beyond its one application log
-   line). Full design already written down in `DEVLOG.md` — implementing it doesn't
-   depend on the sequencing decision above and could happen first if it's a better next
-   rep for the developer.
-
-Whichever comes first, the pattern stays the same: Claude designs/reviews, developer
-implements, following the ownership progression `CLAUDE.md` describes — the developer has
-now driven the last two statuses (Burn, Acid) close to independently, which is the right
-direction.
+Given the developer's demonstrated architecture judgment this session (see §2's note on
+design ownership), Step 6 is a good candidate to push further along the ownership curve:
+Claude proposing/reviewing the round-loop shape, developer driving more of the actual
+implementation than in Steps 4–5.

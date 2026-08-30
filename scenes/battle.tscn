@@ -6,7 +6,9 @@
 [ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="3_4k1nj"]
 [ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
 [ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
+[ext_resource type="Resource" uid="uid://d37momddmqqlf" path="res://resources/priority_builds/status_stacker.tres" id="4_yahae"]
 [ext_resource type="FontFile" uid="uid://bq75qhujojfju" path="res://assets/fonts/BoldPixels.ttf" id="5_4k1nj"]
+[ext_resource type="Resource" uid="uid://5uu1lq7lvf65" path="res://resources/priority_builds/poison_spammer.tres" id="5_v7i3o"]
 [ext_resource type="PackedScene" uid="uid://wqprgejhrrw5" path="res://scenes/status_row.tscn" id="7_yahae"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
@@ -47,6 +49,7 @@ grow_vertical = 2
 script = ExtResource("1_battle")
 player_familiar_data = ExtResource("2_6vh42")
 enemy_familiar_data = ExtResource("3_4k1nj")
+available_builds = [ExtResource("4_yahae"), ExtResource("5_v7i3o")]
 
 [node name="CombatLog" type="Node" parent="." unique_id=1861618585]
 script = ExtResource("2_log")
@@ -136,7 +139,7 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_lf7me")
 script = ExtResource("4_logview")
 
-[node name="ActionPanel" type="HBoxContainer" parent="." unique_id=1655570240]
+[node name="BuildSelectPanel" type="HBoxContainer" parent="." unique_id=1655570240]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
