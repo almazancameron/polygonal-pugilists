@@ -1,24 +1,36 @@
 extends Control
 
-## Drives one 1v1 battle: builds both Combatants, lets the player pick a
-## priority build, then alternates turns -- both sides now choose their own
-## technique via Combatant.choose_technique(), with no manual clicking once
-## the fight starts -- resolving whichever Technique is chosen, and ending
-## the battle on victory or defeat.
+## Drives one 1v1 battle, then a sequence of them across a run: builds both
+## Combatants, lets the player pick a priority build, then alternates turns
+## until one side is defeated -- both sides choose their own technique via
+## Combatant.choose_technique(), with no manual clicking once a fight
+## starts. A non-final win shows an upgrade choice and starts the next
+## round against opponent_lineup's next entry; the final win or any loss
+## ends the run.
 ##
-## Wiring this scene requires manual steps in the editor: assign
-## player_familiar_data, enemy_familiar_data, and available_builds below.
-## BuildSelectPanel's buttons are generated at runtime from available_builds
-## (see populate_build_select_buttons()), not hand-wired in the scene.
+## Manual Inspector wiring required: player_familiar_data, available_builds,
+## upgrade_pool, opponent_lineup. enemy_familiar_data derives itself from
+## opponent_lineup[0] -- no separate wiring needed for it.
 
 enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 
 @export var player_familiar_data: Familiar
-@export var enemy_familiar_data: Familiar
 
 ## The priority builds offered on the pre-fight build-select screen. The
 ## chosen build's priority_rules get assigned onto player_familiar_data.
 @export var available_builds: Array[PriorityBuild] = []
+
+## Upgrade offers shown after each non-final round. Currently the whole
+## pool is offered every round rather than a random subset -- revisit
+## once there's more than one upgrade authored.
+@export var upgrade_pool: Array[UpgradeOption] = []
+
+## Opponents in order of increasing difficulty.
+@export var opponent_lineup: Array[Familiar] = []
+@onready var enemy_familiar_data: Familiar = opponent_lineup[0] if opponent_lineup.size() > 0 else null
+
+## Index into opponent_lineup for the fight currently in progress.
+var current_round: int = 0
 
 ## Logs the enemy's skipped-rule reasoning to the combat log. Off by
 ## default since it's debug noise for normal play; flip on in the
@@ -60,26 +72,48 @@ func _ready() -> void:
 
 	populate_build_select_buttons()
 
-## Builds one button per available build, letting the player pick which
-## priority_rules Twerpent fights with before the battle actually starts --
-## the smallest possible slice of buildcrafting, not a full round/reward
-## loop, just enough to make "two meaningfully different builds" something
-## the player chooses rather than something only authored in the Inspector.
+## Spawns a button on the shared choice panel (used for both build-select
+## and upgrade-select) that calls on_pressed when clicked.
+func add_choice_button(label: String, on_pressed: Callable) -> void:
+	var button := Button.new()
+	button.text = label
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.theme = preload("res://assets/themes/button_font.tres")
+	button.pressed.connect(on_pressed)
+
+	build_select_panel.add_child(button)
+
 func populate_build_select_buttons() -> void:
 	for build in available_builds:
-		var button := Button.new()
-		button.text = build.build_name
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.theme = preload("res://assets/themes/button_font.tres")
-		button.pressed.connect(_on_build_selected.bind(build))
+		add_choice_button(build.build_name, _on_build_selected.bind(build))
 
-		build_select_panel.add_child(button)
+func populate_upgrade_select_buttons() -> void:
+	var available_upgrades: Array[UpgradeOption] = upgrade_pool.duplicate()
+	available_upgrades.shuffle()  # Randomize the order of upgrades for variety
+	available_upgrades = available_upgrades.slice(0, min(3, available_upgrades.size()))  # Limit to 3 upgrades
+
+	for upgrade in available_upgrades:
+		add_choice_button(upgrade.label, _on_upgrade_selected.bind(upgrade))
 
 func _on_build_selected(build: PriorityBuild) -> void:
 	player_familiar_data.priority_rules = build.priority_rules
-	build_select_panel.queue_free()
+	await begin_fight("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 
-	combat_log.add_entry("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
+func _on_upgrade_selected(upgrade: UpgradeOption) -> void:
+	upgrade.apply(player_familiar_data)
+	player.current_hp = player.familiar.max_hp  # Ensure current_hp matches if max_hp changed
+	update_hp_display(player)  # Update the HP bar in case max_hp changed
+	if upgrade.unique:
+		upgrade_pool.erase(upgrade)
+	await begin_fight("Upgrade applied: %s. Let the battle continue!" % upgrade.describe(), CombatLog.Source.PLAYER)
+
+## Clears whichever choice screen is showing (build-select or
+## upgrade-select) and starts the player's first turn of the fight.
+func begin_fight(message: String, source: CombatLog.Source) -> void:
+	for child in build_select_panel.get_children():
+		child.queue_free()
+
+	combat_log.add_entry(message, source)
 	phase = Phase.PLAYER_TURN
 	await take_turn(player, enemy, CombatLog.Source.PLAYER)
 
@@ -120,28 +154,27 @@ func advance_turn() -> void:
 	if phase == Phase.PLAYER_TURN:
 		phase = Phase.ENEMY_UPKEEP
 
-		await run_upkeep(enemy, enemy_hp_bar, CombatLog.Source.ENEMY)
+		if await run_upkeep(enemy, enemy_hp_bar, CombatLog.Source.ENEMY):
+			return
 
-		if phase != Phase.BATTLE_OVER:
-			phase = Phase.ENEMY_TURN
-			await take_turn(enemy, player, CombatLog.Source.ENEMY)
+		phase = Phase.ENEMY_TURN
+		await take_turn(enemy, player, CombatLog.Source.ENEMY)
 	else:
 		phase = Phase.PLAYER_UPKEEP
 
-		await run_upkeep(player, player_hp_bar, CombatLog.Source.PLAYER)
+		if await run_upkeep(player, player_hp_bar, CombatLog.Source.PLAYER):
+			return
 
-		if phase != Phase.BATTLE_OVER:
-			phase = Phase.PLAYER_TURN
-			await take_turn(player, enemy, CombatLog.Source.PLAYER)
+		phase = Phase.PLAYER_TURN
+		await take_turn(player, enemy, CombatLog.Source.PLAYER)
 
-## Ticks statuses for the side whose turn is about to begin (upkeep-style,
-## before they can act). The caller checks `phase` afterward, not a return
-## value here, to tell whether the tick itself ended the battle -- that's
-## already covered by check_victory()'s side effect of setting `phase` to
-## BATTLE_OVER, so there's nothing this function needs to report back.
-func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -> void:
+## Ticks statuses for the side about to act. Returns whatever
+## check_victory() returns, so the caller can stop the turn loop whenever
+## check_victory() says to -- not just when the battle is fully over, but
+## also when paused for a mid-run upgrade choice.
+func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -> bool:
 	if combatant.statuses.is_empty():
-		return
+		return false
 
 	await get_tree().create_timer(0.6).timeout
 
@@ -154,7 +187,7 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 
 	update_hp_display(combatant)
 
-	await check_victory()
+	return await check_victory()
 
 ## The one path for either side's turn -- both player and enemy pick their
 ## technique the same way now (Combatant.choose_technique()), so there's no
@@ -183,22 +216,41 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 ## continue for another full step before things settle.
 func check_victory() -> bool:
 	if enemy.is_defeated():
+		if current_round < opponent_lineup.size() - 1:
+			combat_log.add_entry("Victory! %s is defeated. Prepare for the next round!" % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
+
+			start_next_round()
+			return true
+
 		phase = Phase.BATTLE_OVER
-
 		combat_log.add_entry("Victory! %s is defeated." % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
-
 		await get_tree().create_timer(1.0).timeout
-
 		get_tree().quit()
 		return true
+
 	if player.is_defeated():
 		phase = Phase.BATTLE_OVER
-
 		combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
-
 		await get_tree().create_timer(1.0).timeout
-
 		get_tree().quit()
 		return true
 
 	return false
+
+## Advances to the next opponent, resets both Combatants (full heal, no
+## statuses -- see DECISIONS.md), and shows the upgrade-choice screen.
+## take_turn() only resumes once the player picks one (_on_upgrade_selected).
+func start_next_round() -> void:
+	current_round += 1
+	enemy_familiar_data = opponent_lineup[current_round]
+	phase = Phase.PLAYER_UPKEEP
+
+	populate_upgrade_select_buttons()
+
+	player = Combatant.new(player_familiar_data)
+	update_hp_display(player)
+
+	enemy = Combatant.new(enemy_familiar_data)
+	enemy_name_label.text = enemy.familiar.familiar_name
+	enemy_portrait.texture = enemy.familiar.sprite
+	update_hp_display(enemy)

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="TargetMissingStatusCondition" format=3]
+[gd_resource type="Resource" script_class="TargetMissingStatusCondition" format=3 uid="uid://blhgs05y8jat3"]
 
-[ext_resource type="Script" path="res://scripts/target_missing_status_condition.gd" id="1"]
+[ext_resource type="Script" uid="uid://ci06ykedjo4w0" path="res://scripts/target_missing_status_condition.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-status_id = &"burn"
+status_effect = 2

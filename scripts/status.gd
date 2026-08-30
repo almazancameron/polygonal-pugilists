@@ -5,6 +5,8 @@ extends RefCounted
 ## state, same reasoning as Combatant: never saved or edited in the
 ## Inspector, so RefCounted rather than Resource or Node.
 
+enum StatusEffect { NONE, POISON, BURN, ACID }
+
 var stacks: int = 1
 
 func _init(initial_stacks: int = 1) -> void:
@@ -42,3 +44,18 @@ func modify_defense(base_defense: int) -> int:
 
 func icon() -> Texture2D:
 	return null
+
+## Translates a StatusEffect enum value to the StringName a concrete
+## Status subclass's own status_id() returns. Lets other classes
+## (Technique, Condition subclasses) compare against StatusEffect
+## directly instead of keeping their own separate enum-to-StringName table.
+static func status_effect_id(effect: StatusEffect) -> StringName:
+	match effect:
+		StatusEffect.POISON:
+			return &"poison"
+		StatusEffect.BURN:
+			return &"burn"
+		StatusEffect.ACID:
+			return &"acid"
+		_:
+			return &""

@@ -5,11 +5,9 @@ extends Resource
 ## Familiar's stats are, so it can be assigned in the Inspector via
 ## Familiar.techniques and saved to its own .tres file.
 
-enum StatusEffect { NONE, POISON, BURN, ACID }
-
 @export var technique_name: String = "Technique"
 @export var power_multiplier: float = 1.0
-@export var status_effect: StatusEffect = StatusEffect.NONE
+@export var status_effect: Status.StatusEffect = Status.StatusEffect.NONE
 @export var status_stacks: int = 1
 
 ## Deals damage (respecting Defend) and applies whatever _create_status()
@@ -45,11 +43,11 @@ func execute(user: Combatant, target: Combatant) -> String:
 ## entirely by overriding execute() instead, the way DefendTechnique does.
 func _create_status() -> Status:
 	match status_effect:
-		StatusEffect.POISON:
+		Status.StatusEffect.POISON:
 			return PoisonStatus.new(status_stacks)
-		StatusEffect.BURN:
+		Status.StatusEffect.BURN:
 			return BurnStatus.new(status_stacks)
-		StatusEffect.ACID:
+		Status.StatusEffect.ACID:
 			return AcidStatus.new(status_stacks)
 		_:
 			return null
