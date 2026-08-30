@@ -19,7 +19,7 @@ func preview_color() -> Color:
 	return Color(0.3, 0.7, 1.0, 1.0)
 
 func icon() -> Texture2D:
-	return null  # TODO: no icon asset yet
+	return preload("res://assets/sprites/icons/defend_icon.tres")
 
 func describe() -> String:
 	return "Doubles defense until this familiar is hit."

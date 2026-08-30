@@ -6,6 +6,5 @@
 script = ExtResource("1_bvcwl")
 technique_name = "Acid Bath"
 power_multiplier = 0.667
-status_effect = 5
-status_stacks = 2
+status_effect = 3
 metadata/_custom_type_script = "uid://bp4gbg2w2sdur"
