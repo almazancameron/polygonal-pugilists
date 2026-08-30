@@ -45,6 +45,9 @@ func modify_defense(base_defense: int) -> int:
 func icon() -> Texture2D:
 	return null
 
+func describe() -> String:
+	return "Status"
+
 ## Translates a StatusEffect enum value to the StringName a concrete
 ## Status subclass's own status_id() returns. Lets other classes
 ## (Technique, Condition subclasses) compare against StatusEffect

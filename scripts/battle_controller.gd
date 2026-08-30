@@ -74,11 +74,14 @@ func _ready() -> void:
 
 ## Spawns a button on the shared choice panel (used for both build-select
 ## and upgrade-select) that calls on_pressed when clicked.
-func add_choice_button(label: String, on_pressed: Callable) -> void:
+func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") -> void:
 	var button := Button.new()
 	button.text = label
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.theme = preload("res://assets/themes/button_font.tres")
+	if tooltip != "":
+		button.tooltip_text = tooltip
+
 	button.pressed.connect(on_pressed)
 
 	build_select_panel.add_child(button)
@@ -93,7 +96,7 @@ func populate_upgrade_select_buttons() -> void:
 	available_upgrades = available_upgrades.slice(0, min(3, available_upgrades.size()))  # Limit to 3 upgrades
 
 	for upgrade in available_upgrades:
-		add_choice_button(upgrade.label, _on_upgrade_selected.bind(upgrade))
+		add_choice_button(upgrade.label, _on_upgrade_selected.bind(upgrade), upgrade.describe())
 
 func _on_build_selected(build: PriorityBuild) -> void:
 	player_familiar_data.priority_rules = build.priority_rules
@@ -142,7 +145,7 @@ func refresh_status_preview(combatant: Combatant, hp_bar: HPBar, status_row: Sta
 		var damage: int = status.next_tick_damage()
 		var stacks: int = status.stacks
 		if stacks > 0:
-			segments.append({"color": status.preview_color(), "stacks": stacks, "damage": damage, "icon": status.icon()})
+			segments.append({"id": status.status_id(), "color": status.preview_color(), "stacks": stacks, "damage": damage, "icon": status.icon(), "description": status.describe()})
 
 	hp_bar.set_status_preview_segments(segments)
 	status_row.set_status_icons(segments)

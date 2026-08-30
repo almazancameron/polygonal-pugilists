@@ -21,3 +21,7 @@ func on_tick(target: Combatant) -> String:
 
 func icon() -> Texture2D:
 	return preload("res://assets/sprites/icons/poison_icon.tres")
+
+func describe() -> String:
+	return ("Deals %d damage (based on stacks) at the start of enemy's turn.\n" +
+	"Loses 1 stack per turn.") % [stacks]

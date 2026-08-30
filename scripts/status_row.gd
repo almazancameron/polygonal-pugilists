@@ -1,32 +1,66 @@
 class_name StatusRow
 extends HBoxContainer
 
+## Maps a status's status_id() to the container currently displaying it, so a
+## status that's still active keeps the same node (and tooltip hover state)
+## across refreshes instead of being destroyed and recreated every time
+## set_status_icons() is called -- see DECISIONS.md/DEVLOG.md for why that
+## used to make active tooltips flash/disappear.
+var _icon_containers: Dictionary = {}
 
 func set_status_icons(entries: Array[Dictionary]) -> void:
-	for child in get_children():
-		child.free()
+	var seen_ids: Array[StringName] = []
 
 	for entry in entries:
-		# entry is a dict with keys "color", "stacks", "icon", and "damage" (unused)
-		var icon_texture: Texture2D = entry.get("icon", null)
-		var color: Color = entry.get("color", Color(1, 1, 1, 1))
-		var stacks: int = entry.get("stacks", 1)
+		# entry is a dict with keys "id", "color", "stacks", "icon", "description", and "damage" (unused)
+		var id: StringName = entry.get("id", &"")
+		seen_ids.append(id)
 
-		var icon_texture_rect: TextureRect = TextureRect.new()
-		icon_texture_rect.texture = icon_texture
-		icon_texture_rect.modulate = color
-		icon_texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-		icon_texture_rect.custom_minimum_size = Vector2(16, 16)  # Set a minimum size for the icon
+		var container: HBoxContainer = _icon_containers.get(id)
+		if container == null:
+			container = _build_status_container()
+			_icon_containers[id] = container
+			add_child(container)
 
-		var stack_label: Label = Label.new()
-		stack_label.text = str(stacks)
-		stack_label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
-		stack_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1))
-		stack_label.add_theme_constant_override("shadow_offset_x", 1)
-		stack_label.add_theme_constant_override("shadow_offset_y", 1)
-		stack_label.add_theme_constant_override("font_size", 12)
-		stack_label.add_theme_font_override("font", load("res://assets/fonts/BoldPixels.ttf"))
+		_update_status_container(container, entry)
 
-		add_child(stack_label)
+	for id in _icon_containers.keys().duplicate():
+		if id not in seen_ids:
+			_icon_containers[id].free()
+			_icon_containers.erase(id)
 
-		add_child(icon_texture_rect)
+## Builds the (initially empty) label+icon pair for one status. Only called
+## the first time a given status_id shows up -- every later refresh reuses
+## this same container via _update_status_container() instead.
+func _build_status_container() -> HBoxContainer:
+	var container := HBoxContainer.new()
+
+	var stack_label := Label.new()
+	stack_label.name = "StackLabel"
+	stack_label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+	stack_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1))
+	stack_label.add_theme_constant_override("shadow_offset_x", 1)
+	stack_label.add_theme_constant_override("shadow_offset_y", 1)
+	stack_label.add_theme_constant_override("font_size", 12)
+	stack_label.add_theme_font_override("font", load("res://assets/fonts/BoldPixels.ttf"))
+	container.add_child(stack_label)
+
+	var icon_texture_rect := TextureRect.new()
+	icon_texture_rect.name = "Icon"
+	icon_texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	icon_texture_rect.custom_minimum_size = Vector2(16, 16)  # Set a minimum size for the icon
+	container.add_child(icon_texture_rect)
+
+	return container
+
+## Refreshes one status's displayed stacks/color/icon/tooltip in place.
+## tooltip_text lives on the container (not the icon alone) so hovering
+## either the icon or the stack count shows the description.
+func _update_status_container(container: HBoxContainer, entry: Dictionary) -> void:
+	var stack_label: Label = container.get_node("StackLabel")
+	var icon_texture_rect: TextureRect = container.get_node("Icon")
+
+	stack_label.text = str(entry.get("stacks", 1))
+	icon_texture_rect.texture = entry.get("icon", null)
+	icon_texture_rect.modulate = entry.get("color", Color(1, 1, 1, 1))
+	container.tooltip_text = entry.get("description", "")

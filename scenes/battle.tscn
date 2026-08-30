@@ -4,6 +4,7 @@
 [ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/familiars/twerpent.tres" id="2_6vh42"]
 [ext_resource type="Script" uid="uid://cy44cok5wjn5a" path="res://scripts/combat_log.gd" id="2_log"]
 [ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="3_4k1nj"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="3_djc8l"]
 [ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
 [ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
 [ext_resource type="Resource" uid="uid://d37momddmqqlf" path="res://resources/priority_builds/status_stacker.tres" id="4_yahae"]
@@ -54,7 +55,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_battle")
 player_familiar_data = ExtResource("2_6vh42")
-available_builds = [ExtResource("4_yahae"), ExtResource("5_v7i3o")]
+available_builds = Array[ExtResource("3_djc8l")]([ExtResource("4_yahae"), ExtResource("5_v7i3o")])
 upgrade_pool = Array[ExtResource("6_03edq")]([ExtResource("7_22uqi"), ExtResource("7_ekamt"), ExtResource("8_djc8l"), ExtResource("9_h4dll")])
 opponent_lineup = Array[ExtResource("6_66ngm")]([ExtResource("3_4k1nj"), ExtResource("3_4k1nj"), ExtResource("3_4k1nj"), ExtResource("3_4k1nj")])
 

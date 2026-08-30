@@ -13,7 +13,7 @@ func stack_with(other: Status) -> void:
     stacks = max(stacks, other.stacks)
 
 func next_tick_damage() -> int:
-    return 3
+    return 2
 
 func preview_color() -> Color:
     return Color(1.0, 0.5, 0.0, 1.0)
@@ -33,3 +33,8 @@ func on_reapply(target: Combatant) -> String:
 
 func icon() -> Texture2D:
     return preload("res://assets/sprites/icons/burn_icon.tres")
+
+func describe() -> String:
+    return ("Deals %d damage at the start of enemy's turn for 5 turns.\n" +
+    "Applying a new burn will cause it to flare for\n" +
+    "%d bonus damage (based on remaining duration) and reset the duration.") % [next_tick_damage(), stacks]

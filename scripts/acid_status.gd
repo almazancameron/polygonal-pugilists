@@ -20,3 +20,7 @@ func icon() -> Texture2D:
 
 func preview_color() -> Color:
     return Color(0.0, 1.0, 0.5, 1.0)
+
+func describe() -> String:
+    return ("Reduces target's defense by 10%% for each stack. Max 5 stacks.\n" +
+    "Currently reducing defense by %d%%.") % [int(10 * stacks)]
