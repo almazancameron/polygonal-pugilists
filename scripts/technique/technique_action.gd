@@ -1,0 +1,2 @@
+class_name TechniqueAction
+extends Resource

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"c:\\Users\\zanka\\OneDrive\\Documents\\Portals\\Misc\\GODOT\\polygonal-pugilists\" && \"../Godot_v4.7.1-stable_win64_console.exe\" --headless --check-only --quit*)",
+      "Bash(cd \"c:\\Users\\zanka\\OneDrive\\Documents\\Portals\\Misc\\GODOT\\polygonal-pugilists\" && timeout 30 \"../Godot_v4.7.1-stable_win64_console.exe\" --headless --check-only --quit*)",
+      "Bash(cd \"c:\\Users\\zanka\\OneDrive\\Documents\\Portals\\Misc\\GODOT\\polygonal-pugilists\" && timeout 20 \"../Godot_v4.7.1-stable_win64_console.exe\" --headless --check-only --quit*)",
+      "Bash(cd \"c:\\Users\\zanka\\OneDrive\\Documents\\Portals\\Misc\\GODOT\\polygonal-pugilists\" && \"../Godot_v4.7.1-stable_win64_console.exe\" --headless --script res://scripts/_verify_*)",
+      "Bash(cd \"c:\\Users\\zanka\\OneDrive\\Documents\\Portals\\Misc\\GODOT\\polygonal-pugilists\" && timeout 30 \"../Godot_v4.7.1-stable_win64_console.exe\" --headless --script res://scripts/_verify_*)",
+      "Bash(cd \"c:\\Users\\zanka\\OneDrive\\Documents\\Portals\\Misc\\GODOT\\polygonal-pugilists\" && timeout 20 \"../Godot_v4.7.1-stable_win64_console.exe\" --headless --script res://scripts/_verify_*)",
+      "Edit(.claude/*.md)",
+      "Write(.claude/*.md)"
+    ]
+  }
+}

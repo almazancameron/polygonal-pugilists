@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://da84lw5fqddnu"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_tech"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_group"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="3_hit"]
+[ext_resource type="Script" uid="uid://b0y2qhaakxlsw" path="res://scripts/technique/heal_action.gd" id="4_heal"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="5_action"]
+
+[sub_resource type="Resource" id="Action_hit"]
+script = ExtResource("3_hit")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Action_heal"]
+script = ExtResource("4_heal")
+heal_percent = 0.5
+metadata/_custom_type_script = "uid://b0y2qhaakxlsw"
+
+[sub_resource type="Resource" id="Group_main"]
+script = ExtResource("2_group")
+actions = Array[ExtResource("5_action")]([SubResource("Action_hit"), SubResource("Action_heal")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_tech")
+technique_name = "Gorge"
+power_multiplier = 0.667
+step_groups = Array[ExtResource("2_group")]([SubResource("Group_main")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

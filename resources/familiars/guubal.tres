@@ -3,8 +3,7 @@
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_00pm7"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_kn4wb"]
 [ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="2_iskl7"]
-[ext_resource type="Resource" uid="uid://64xcokc585vm" path="res://resources/priority_rules/use_acid_bath_if_below_5.tres" id="2_tj0wc"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique.gd" id="3_kn4wb"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="3_kn4wb"]
 [ext_resource type="Resource" uid="uid://c4kkxcksl5g2b" path="res://resources/priority_rules/fallback_attack.tres" id="3_q8h7j"]
 [ext_resource type="Resource" uid="uid://dk2il2vavbbkq" path="res://resources/techniques/acid_bath.tres" id="4_00pm7"]
 [ext_resource type="Resource" uid="uid://dnuicifi5lm2y" path="res://resources/techniques/attack.tres" id="6_7ffue"]
@@ -18,10 +17,10 @@ script = ExtResource("1_00pm7")
 familiar_name = "Guubal"
 sprite = SubResource("AtlasTexture_m4hsq")
 max_hp = 80
-power = 16
+power = 18
 defense = 4
 speed = 6
 focus = 6
 techniques = Array[ExtResource("3_kn4wb")]([ExtResource("4_00pm7"), ExtResource("6_7ffue")])
-priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("2_tj0wc"), ExtResource("3_q8h7j")])
+priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("3_q8h7j")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

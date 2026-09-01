@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://c7emsyj0iyh2y"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_tech"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_group"]
+[ext_resource type="Script" uid="uid://b0y2qhaakxlsw" path="res://scripts/technique/heal_action.gd" id="3_heal"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="4_action"]
+
+[sub_resource type="Resource" id="Action_heal"]
+script = ExtResource("3_heal")
+heal_flat = 10
+metadata/_custom_type_script = "uid://b0y2qhaakxlsw"
+
+[sub_resource type="Resource" id="Group_main"]
+script = ExtResource("2_group")
+actions = Array[ExtResource("4_action")]([SubResource("Action_heal")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_tech")
+technique_name = "Pure Restoration"
+power_multiplier = 0.0
+step_groups = Array[ExtResource("2_group")]([SubResource("Group_main")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

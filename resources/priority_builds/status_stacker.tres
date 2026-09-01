@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="1"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2"]
 [ext_resource type="Resource" uid="uid://bg4bh3d1de17o" path="res://resources/priority_rules/use_acid_bath_if_missing.tres" id="5"]
-[ext_resource type="Resource" path="res://resources/priority_rules/fallback_venom_strike.tres" id="6"]
+[ext_resource type="Resource" uid="uid://dlfaib6tl5mqy" path="res://resources/priority_rules/fallback_venom_strike.tres" id="6"]
 
 [resource]
 script = ExtResource("1")

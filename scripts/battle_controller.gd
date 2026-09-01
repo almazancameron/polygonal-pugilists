@@ -179,16 +179,20 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 	if combatant.statuses.is_empty():
 		return false
 
-	await get_tree().create_timer(0.6).timeout
-
 	for status in combatant.statuses.duplicate():
 		var message: String = status.on_tick(combatant)
 		if message != "":
 			combat_log.add_entry(message, source)
+
 		if status.is_expired():
 			combatant.statuses.erase(status)
 
-	update_hp_display(combatant)
+		update_hp_display(combatant)
+
+		if combatant.is_defeated():
+			return await check_victory()
+
+		await get_tree().create_timer(0.6).timeout
 
 	return await check_victory()
 
@@ -196,7 +200,6 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 ## technique the same way now (Combatant.choose_technique()), so there's no
 ## reason left for a player-specific and an enemy-specific version of this.
 func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) -> void:
-	await get_tree().create_timer(0.6).timeout
 
 	if actor.is_stunned:
 		actor.is_stunned = false
@@ -210,11 +213,18 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 			combat_log.add_entry(reason, source)
 
 	var technique: Technique = decision.technique
-	var message: String = technique.execute(actor, target)
+	var steps: Array[Callable] = technique.execute(actor, target)
 
-	combat_log.add_entry(message, source)
+	for step in steps:
+		var step_message: String = step.call()
+		if step_message == "":
+			continue
 
-	update_hp_display(target)
+		combat_log.add_entry(step_message, source)
+		update_hp_display(actor)
+		update_hp_display(target)
+
+		await get_tree().create_timer(0.6).timeout
 
 	await advance_turn()
 

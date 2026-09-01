@@ -32,3 +32,18 @@ static func stat_name(stat: Stat) -> String:
 			return "Focus"
 		_:
 			return "Stat"
+
+func get_stat(stat: Stat) -> int:
+	match stat:
+		Stat.MAX_HP:
+			return max_hp
+		Stat.POWER:
+			return power
+		Stat.DEFENSE:
+			return defense
+		Stat.SPEED:
+			return speed
+		Stat.FOCUS:
+			return focus
+		_:
+			return 0

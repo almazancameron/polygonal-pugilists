@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AddTechniqueUpgrade" format=3 uid="uid://d1x4a2a0ix323"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_jqspx"]
+[ext_resource type="Script" uid="uid://bngdwml8l72or" path="res://scripts/upgrade/add_technique_upgrade.gd" id="1_qduy0"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_5hsq1"]
+[ext_resource type="Resource" uid="uid://bnee8njocdp0k" path="res://resources/techniques/triple_slash.tres" id="3_wq086"]
+
+[sub_resource type="Resource" id="Resource_goihn"]
+script = ExtResource("2_5hsq1")
+technique = ExtResource("3_wq086")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"
+
+[resource]
+script = ExtResource("1_qduy0")
+technique = ExtResource("3_wq086")
+rule = SubResource("Resource_goihn")
+label = "Learn Triple Strike"
+metadata/_custom_type_script = "uid://bngdwml8l72or"

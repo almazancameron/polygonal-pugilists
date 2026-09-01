@@ -10,13 +10,18 @@
 [ext_resource type="Resource" uid="uid://d37momddmqqlf" path="res://resources/priority_builds/status_stacker.tres" id="4_yahae"]
 [ext_resource type="FontFile" uid="uid://bq75qhujojfju" path="res://assets/fonts/BoldPixels.ttf" id="5_4k1nj"]
 [ext_resource type="Resource" uid="uid://5uu1lq7lvf65" path="res://resources/priority_builds/poison_spammer.tres" id="5_v7i3o"]
-[ext_resource type="Script" uid="uid://bu88upmg3hkr3" path="res://scripts/upgrade_option.gd" id="6_03edq"]
+[ext_resource type="Script" uid="uid://bu88upmg3hkr3" path="res://scripts/upgrade/upgrade_option.gd" id="6_03edq"]
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="6_66ngm"]
 [ext_resource type="Resource" uid="uid://bpaddqeqyh06y" path="res://resources/upgrades/searing_spit_upgrade.tres" id="7_22uqi"]
+[ext_resource type="Resource" uid="uid://bg4gbruo0yubm" path="res://resources/upgrades/concussive_blow_upgrade.tres" id="7_dd63g"]
 [ext_resource type="Resource" uid="uid://c1avm6wx55j5" path="res://resources/upgrades/defense_upgrade.tres" id="7_ekamt"]
 [ext_resource type="PackedScene" uid="uid://wqprgejhrrw5" path="res://scenes/status_row.tscn" id="7_yahae"]
 [ext_resource type="Resource" uid="uid://fgffbffxbii5" path="res://resources/upgrades/max_hp_upgrade.tres" id="8_djc8l"]
+[ext_resource type="Resource" uid="uid://bol0uqti02o8f" path="res://resources/upgrades/gorge_upgrade.tres" id="9_fpf3k"]
 [ext_resource type="Resource" uid="uid://0v4lanvod62h" path="res://resources/upgrades/power_upgrade.tres" id="9_h4dll"]
+[ext_resource type="Resource" uid="uid://ck0hhrp2myhuf" path="res://resources/upgrades/open_wounds_upgrade.tres" id="11_bi5l8"]
+[ext_resource type="Resource" uid="uid://m52xt7qsoxm1" path="res://resources/upgrades/pure_restoration_upgrade.tres" id="13_jt4d8"]
+[ext_resource type="Resource" uid="uid://d1x4a2a0ix323" path="res://resources/upgrades/triple_slash_upgrade.tres" id="15_kl6ie"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
 
@@ -56,7 +61,7 @@ grow_vertical = 2
 script = ExtResource("1_battle")
 player_familiar_data = ExtResource("2_6vh42")
 available_builds = Array[ExtResource("3_djc8l")]([ExtResource("4_yahae"), ExtResource("5_v7i3o")])
-upgrade_pool = Array[ExtResource("6_03edq")]([ExtResource("7_22uqi"), ExtResource("7_ekamt"), ExtResource("8_djc8l"), ExtResource("9_h4dll")])
+upgrade_pool = Array[ExtResource("6_03edq")]([ExtResource("7_dd63g"), ExtResource("7_ekamt"), ExtResource("9_fpf3k"), ExtResource("8_djc8l"), ExtResource("11_bi5l8"), ExtResource("9_h4dll"), ExtResource("13_jt4d8"), ExtResource("7_22uqi"), ExtResource("15_kl6ie")])
 opponent_lineup = Array[ExtResource("6_66ngm")]([ExtResource("3_4k1nj"), ExtResource("3_4k1nj"), ExtResource("3_4k1nj"), ExtResource("3_4k1nj")])
 
 [node name="CombatLog" type="Node" parent="." unique_id=1861618585]

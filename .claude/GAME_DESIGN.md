@@ -158,7 +158,7 @@ Same vocabulary as the full game (`FAMILIAR_FIGHT_CLUB_VISION.md` §10.5): Poiso
 
 ## 7.3 Passives and tags
 
-OUT OF SCOPE for now. Not yet needed to test the core thesis; revisit if the technique/status roster alone doesn't produce enough build variety once the bracket exists.
+CURRENT DIRECTION. Needed, not optional -- part of the current content-pass scope (a dozen or so passives, authored as a new `UpgradeOption` subtype) and a core piece of how bracket entrants get their identity: each of the 16 starting familiars is meant to carry one species-bound passive (innate from the start, not drafted) alongside its base stats, using the same passive type the in-run upgrade pool later offers as a pickup.
 
 # 8. Familiar construction — bracket entrants
 
@@ -175,6 +175,22 @@ Entrant generation should draw from a weighted pool so some combinations are rar
 ## 8.3 Opponents accumulate power too
 
 Opponent entrants aren't static — they should gain a comparable amount of upgrades/modifiers over the course of the bracket as the player does, so the final match is a clash between two builds that both grew over the run, not the player's build versus a flat baseline.
+
+## 8.4 Species vs. Familiar vs. Combatant
+
+Three layers, each progressively more specific:
+
+- **Species** (planned) — a template: base stats and one bound-in passive, shared by every member of that species. Not yet built; today's `Familiar` resource holds what Species will own.
+- **Familiar** — one specific fighter's current build for this run: its own stats (seeded from its species, then diverging via upgrades), its accumulated techniques and priority rules, and any passives picked up beyond its species-bound one.
+- **Combatant** — one fighter's live state for the battle currently in progress (current HP, active statuses). Already built, unaffected by the Species split.
+
+For Pixel Pugilists, Species should *seed* a Familiar once at creation time (copy in base stats and the bound passive, then Familiar is independently authoritative from then on) rather than Familiar holding a live reference it keeps deriving from — a Familiar's whole point is to diverge from its species over a run, so continuing to resolve stats back through the species template adds real complexity (every stat read would need to walk species + accumulated modifiers) for no benefit this project needs. A live reference is expected to matter for the full Familiar Fight Club game instead, where cross-run tracking (species completion, species-specific achievements) genuinely needs to know what species a given career's familiar belongs to for longer than just its creation moment.
+
+## 8.5 Minimum entrant build skeleton
+
+Each of the 16 (or 32) starting bracket entrants should have exactly: a species (base stats + its one bound passive), one conditioned priority rule (a condition plus the technique it gates), and one unconditioned fallback technique (an empty-conditions `PriorityRule`, the same catch-all shape already used today). That's enough for every starting entrant to already fight noticeably differently from the others, giving the player a wide variety of jumping-off points to build from.
+
+Familiars filling that skeleton can come from either of two sources: procedurally constructed at runtime (randomly draw a species + a starting technique + a starting priority rule from their respective pools), or hand-authored as complete fixed variations (today's `guubal.tres`-style familiars) that get drawn from directly. Nothing rules out mixing both approaches in the same bracket.
 
 # 9. Tournament structure
 
@@ -221,11 +237,11 @@ Single elimination means losing a match ends the run — no Reputation-style buf
 
 Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
 
-**Done:** combat engine, statuses (Poison/Burn/Acid), techniques-as-data, the priority-rule behavior system for both sides, the pre-fight build-select stopgap.
+**Done:** combat engine, 19 statuses (Poison/Burn/Acid/Bleed/Stagger/Stun/Foretell/Defending/Fortify/Hone/Enlarge/Recharge/Infestation/Ward/Hex/Absorption/Ruin/Thorns/Retaliation), techniques-as-composable-steps (`TechniqueStepGroup`/`TechniqueAction` — hit/heal/status-apply/status-modify actions, gated per-group by conditions, with situational `DamageBonus`es), the priority-rule behavior system for both sides, the pre-fight build-select stopgap, sequential per-step combat resolution (each hit/heal/status application gets its own paced log line rather than one batched turn summary).
 
-**Next:** the tournament/bracket structure (§9) — the biggest remaining gap, and the piece that turns this from "watch two premade builds fight" into the actual intended game.
+**Next:** finish the current content-pass milestone (more familiars/techniques/traits, tracked in `LEARNING_ROADMAP.md`), then build a real in-run priority-rule editor -- the §9.4 replacement for the `PriorityBuild` stopgap. Picking up a new technique between rounds with no way to see or arrange whether it'll actually trigger is a real gap, and the bracket shouldn't be built on top of it.
 
-**After that:** whatever §9's open questions resolve into, playtesting/balance passes, and a decision on whether passives (§7.3) end up needed.
+**After that:** the tournament/bracket structure (§9) itself, then whatever its open questions resolve into, and playtesting/balance passes.
 
 # 11. Playtest questions
 
