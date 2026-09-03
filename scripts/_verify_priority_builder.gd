@@ -13,6 +13,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"block_definitions",
 	"condition_block",
 	"rule_segment",
+	"segment_list",
 ]
 
 const CONDITION_BLOCK_SCENE: String = "res://scenes/priority_builder/condition_block.tscn"
@@ -36,6 +37,7 @@ func _run_checks() -> void:
 	_check_block_definitions()
 	_check_condition_block()
 	_check_rule_segment()
+	_check_segment_list()
 
 	for check_name in EXPECTED_CHECKS:
 		if not _completed.has(check_name):
@@ -53,6 +55,59 @@ func _run_checks() -> void:
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
+
+func _check_segment_list() -> void:
+	var list := SegmentList.new()
+	root.add_child(list)
+
+	_expect(not list.has_empty_segment(), "an empty list has no empty segment")
+
+	var fresh: RuleSegment = list.add_segment()
+	_expect(fresh != null, "add_segment() returned null")
+	_expect(list.has_empty_segment(), "the freshly added segment should count as empty")
+
+	var first: RuleSegment = _filled_segment("res://resources/techniques/acid_bath.tres")
+	var second: RuleSegment = _filled_segment("res://resources/techniques/venom_strike.tres")
+	list.add_child(first)
+	list.add_child(second)
+
+	# Display order is compile order -- the whole point of the screen.
+	var compiled: Dictionary = list.compile()
+	var rules: Array[PriorityRule] = compiled["rules"]
+	_expect(rules.size() == 2, "expected 2 complete rules, got %d" % rules.size())
+	if rules.size() == 2:
+		_expect(rules[0].technique.technique_name == "Acid Bath",
+			"first rule should be Acid Bath, got %s" % rules[0].technique.technique_name)
+		_expect(rules[1].technique.technique_name == "Venom Strike",
+			"second rule should be Venom Strike, got %s" % rules[1].technique.technique_name)
+
+	# The incomplete segment is excluded from rules but reported, so the UI
+	# can badge it rather than the evaluator crashing on it.
+	var incomplete: Array[RuleSegment] = compiled["incomplete"]
+	_expect(incomplete.size() == 1, "the empty segment should be reported incomplete, got %d" % incomplete.size())
+	_expect(incomplete.has(fresh), "the reported incomplete segment should be the empty one")
+
+	# rules[i] must correspond to segments[i].
+	var paired: Array[RuleSegment] = compiled["segments"]
+	_expect(paired.size() == rules.size(), "segments and rules must be index-aligned")
+	if paired.size() == 2:
+		_expect(paired[0] == first, "segments[0] should be the first segment")
+		_expect(paired[1] == second, "segments[1] should be the second segment")
+
+	# Reordering changes compile order.
+	list.move_child(second, first.get_index())
+	var reordered: Array[PriorityRule] = list.compile()["rules"]
+	_expect(reordered.size() == 2, "reorder should still yield 2 rules")
+	if reordered.size() == 2:
+		_expect(reordered[0].technique.technique_name == "Venom Strike",
+			"after reorder the first rule should be Venom Strike, got %s" % reordered[0].technique.technique_name)
+
+	# insert_index_for_y compares against each segment's vertical midpoint.
+	_expect(list.insert_index_for_y(-100.0) == 0, "a y above everything should insert at 0")
+	_expect(list.insert_index_for_y(100000.0) == list.segments().size(),
+		"a y below everything should insert at the end")
+
+	_completed.append("segment_list")
 
 ## A segment holding only a technique -- the catch-all shape. Detached from
 ## root so a caller can reparent it into a SegmentList.
