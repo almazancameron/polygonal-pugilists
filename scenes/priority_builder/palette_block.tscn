@@ -11,4 +11,5 @@ script = ExtResource("1_pblock")
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 mouse_filter = 2
+autowrap_mode = 3
 text = "Block"

@@ -25,7 +25,7 @@ script = ExtResource("3_6bx8y")
 kind = 2
 property = &"right_value"
 max_value = 999.0
-suffix = " HP"
+suffix = "HP"
 
 [resource]
 script = ExtResource("2_bdwqa")

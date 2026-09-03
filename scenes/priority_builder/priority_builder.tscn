@@ -1,14 +1,14 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://vjdrxuhv1ynl"]
 
-[ext_resource type="Script" path="res://scripts/priority_builder/priority_builder.gd" id="1_pbuild"]
-[ext_resource type="Script" path="res://scripts/priority_builder/block_palette.gd" id="2_palette"]
-[ext_resource type="Script" path="res://scripts/priority_builder/segment_list.gd" id="3_seglist"]
-[ext_resource type="Script" path="res://scripts/priority_builder/state_probe.gd" id="4_probe"]
+[ext_resource type="Script" uid="uid://ckflwuv3hqqhp" path="res://scripts/priority_builder/priority_builder.gd" id="1_pbuild"]
+[ext_resource type="Script" uid="uid://cjdl2kmn7rngw" path="res://scripts/priority_builder/block_palette.gd" id="2_palette"]
+[ext_resource type="Script" uid="uid://cqq7n1gcnmhku" path="res://scripts/priority_builder/segment_list.gd" id="3_seglist"]
+[ext_resource type="Script" uid="uid://bkpnjtatw185i" path="res://scripts/priority_builder/state_probe.gd" id="4_probe"]
 [ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="5_tooltip"]
 [ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/familiars/twerpent.tres" id="6_builder"]
 [ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="7_opponent"]
 
-[node name="PriorityBuilder" type="Control"]
+[node name="PriorityBuilder" type="Control" unique_id=1870533042]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,7 +19,7 @@ script = ExtResource("1_pbuild")
 builder_familiar = ExtResource("6_builder")
 opponent_familiar = ExtResource("7_opponent")
 
-[node name="Columns" type="HBoxContainer" parent="."]
+[node name="Columns" type="HBoxContainer" parent="." unique_id=508902837]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,106 +28,108 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="LeftColumn" type="VBoxContainer" parent="Columns"]
-layout_mode = 2
+[node name="LeftColumn" type="VBoxContainer" parent="Columns" unique_id=807309529]
 custom_minimum_size = Vector2(260, 0)
-
-[node name="FamiliarPanel" type="PanelContainer" parent="Columns/LeftColumn"]
 layout_mode = 2
 
-[node name="Rows" type="VBoxContainer" parent="Columns/LeftColumn/FamiliarPanel"]
+[node name="FamiliarPanel" type="PanelContainer" parent="Columns/LeftColumn" unique_id=1994821259]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="Columns/LeftColumn/FamiliarPanel/Rows"]
+[node name="Rows" type="VBoxContainer" parent="Columns/LeftColumn/FamiliarPanel" unique_id=908574958]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Columns/LeftColumn/FamiliarPanel/Rows" unique_id=365889528]
 layout_mode = 2
 text = "Familiar"
 
-[node name="Portrait" type="TextureRect" parent="Columns/LeftColumn/FamiliarPanel/Rows"]
-layout_mode = 2
+[node name="Portrait" type="TextureRect" parent="Columns/LeftColumn/FamiliarPanel/Rows" unique_id=2094062844]
 custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="StatGrid" type="GridContainer" parent="Columns/LeftColumn/FamiliarPanel/Rows"]
+[node name="StatGrid" type="GridContainer" parent="Columns/LeftColumn/FamiliarPanel/Rows" unique_id=72481837]
 layout_mode = 2
 columns = 2
 
-[node name="TechniqueLabel" type="Label" parent="Columns/LeftColumn"]
+[node name="TechniqueLabel" type="Label" parent="Columns/LeftColumn" unique_id=1548285851]
 layout_mode = 2
 text = "TECHNIQUES"
 
-[node name="TechniqueScroll" type="ScrollContainer" parent="Columns/LeftColumn"]
+[node name="TechniqueScroll" type="ScrollContainer" parent="Columns/LeftColumn" unique_id=1115238117]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TechniquePalette" type="VBoxContainer" parent="Columns/LeftColumn/TechniqueScroll"]
+[node name="TechniquePalette" type="VBoxContainer" parent="Columns/LeftColumn/TechniqueScroll" unique_id=743482918]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_palette")
 
-[node name="BuildColumn" type="VBoxContainer" parent="Columns"]
+[node name="BuildColumn" type="VBoxContainer" parent="Columns" unique_id=1718360387]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Header" type="HBoxContainer" parent="Columns/BuildColumn"]
+[node name="Header" type="HBoxContainer" parent="Columns/BuildColumn" unique_id=1846722877]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Columns/BuildColumn/Header"]
+[node name="Title" type="Label" parent="Columns/BuildColumn/Header" unique_id=248032231]
 layout_mode = 2
 text = "PRIORITY"
 
-[node name="Spacer" type="Control" parent="Columns/BuildColumn/Header"]
+[node name="Spacer" type="Control" parent="Columns/BuildColumn/Header" unique_id=333957175]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="AddSlotButton" type="Button" parent="Columns/BuildColumn/Header"]
+[node name="AddSlotButton" type="Button" parent="Columns/BuildColumn/Header" unique_id=751606923]
 layout_mode = 2
 text = "+ Add slot"
 
-[node name="BuildScroll" type="ScrollContainer" parent="Columns/BuildColumn"]
+[node name="BuildScroll" type="ScrollContainer" parent="Columns/BuildColumn" unique_id=281569208]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="SegmentList" type="VBoxContainer" parent="Columns/BuildColumn/BuildScroll"]
+[node name="SegmentList" type="VBoxContainer" parent="Columns/BuildColumn/BuildScroll" unique_id=536640715]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 script = ExtResource("3_seglist")
 
-[node name="RightColumn" type="VBoxContainer" parent="Columns"]
-layout_mode = 2
+[node name="RightColumn" type="VBoxContainer" parent="Columns" unique_id=1892121245]
 custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
 
-[node name="ConditionLabel" type="Label" parent="Columns/RightColumn"]
+[node name="ConditionLabel" type="Label" parent="Columns/RightColumn" unique_id=845176829]
 layout_mode = 2
 text = "CONDITIONS"
 
-[node name="ConditionScroll" type="ScrollContainer" parent="Columns/RightColumn"]
+[node name="ConditionScroll" type="ScrollContainer" parent="Columns/RightColumn" unique_id=1983763367]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="ConditionPalette" type="VBoxContainer" parent="Columns/RightColumn/ConditionScroll"]
+[node name="ConditionPalette" type="VBoxContainer" parent="Columns/RightColumn/ConditionScroll" unique_id=806786697]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_palette")
 
-[node name="StateProbe" type="PanelContainer" parent="Columns/RightColumn"]
+[node name="StateProbe" type="PanelContainer" parent="Columns/RightColumn" unique_id=1568946463]
 layout_mode = 2
 script = ExtResource("4_probe")
 
-[node name="Rows" type="VBoxContainer" parent="Columns/RightColumn/StateProbe"]
+[node name="Rows" type="VBoxContainer" parent="Columns/RightColumn/StateProbe" unique_id=754339426]
 layout_mode = 2
 
-[node name="ProbeTitle" type="Label" parent="Columns/RightColumn/StateProbe/Rows"]
+[node name="ProbeTitle" type="Label" parent="Columns/RightColumn/StateProbe/Rows" unique_id=1617198251]
 layout_mode = 2
 text = "MOCK STATE"
 
-[node name="Controls" type="VBoxContainer" parent="Columns/RightColumn/StateProbe/Rows"]
+[node name="Controls" type="VBoxContainer" parent="Columns/RightColumn/StateProbe/Rows" unique_id=2042298080]
 layout_mode = 2
 
-[node name="Message" type="Label" parent="Columns/RightColumn/StateProbe/Rows"]
+[node name="Message" type="Label" parent="Columns/RightColumn/StateProbe/Rows" unique_id=775643326]
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="TooltipLayer" parent="." instance=ExtResource("5_tooltip")]
+[node name="TooltipLayer" parent="." unique_id=1148912503 instance=ExtResource("5_tooltip")]

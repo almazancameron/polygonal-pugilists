@@ -1,10 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/priority_builder/rule_segment.gd" id="1_rseg"]
+[ext_resource type="Script" path="res://scripts/priority_builder/drop_zone.gd" id="2_dzone"]
 
 [node name="RuleSegment" type="PanelContainer"]
 offset_right = 420.0
-offset_bottom = 96.0
+offset_bottom = 120.0
 mouse_filter = 0
 script = ExtResource("1_rseg")
 
@@ -18,7 +19,7 @@ mouse_filter = 2
 
 [node name="Handle" type="Label" parent="Rows/Header"]
 layout_mode = 2
-mouse_filter = 2
+tooltip_text = "drag to reorder"
 text = "  ≡  "
 
 [node name="IndexLabel" type="Label" parent="Rows/Header"]
@@ -38,10 +39,14 @@ text = "×"
 
 [node name="ConditionBody" type="VBoxContainer" parent="Rows"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 24)
 mouse_filter = 2
+script = ExtResource("2_dzone")
+empty_text = "drop conditions here"
+empty_height = 30.0
 
 [node name="TechniqueSlot" type="VBoxContainer" parent="Rows"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 24)
 mouse_filter = 2
+script = ExtResource("2_dzone")
+empty_text = "drop a technique here"
+empty_height = 30.0

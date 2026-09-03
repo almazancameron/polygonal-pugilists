@@ -20,8 +20,11 @@ signal structure_changed
 ## that same scene is a cyclic dependency Godot rejects.
 const SCENE_PATH: String = "res://scenes/priority_builder/condition_block.tscn"
 
-@onready var sentence_row: HBoxContainer = $Rows/Sentence
-@onready var body: VBoxContainer = $Rows/BodyMargin/Body
+## HFlowContainer, not HBoxContainer: a sentence with several dropdowns is
+## wider than a narrow column, and an HBox would force the whole list to
+## scroll horizontally instead of wrapping.
+@onready var sentence_row: HFlowContainer = $Rows/Sentence
+@onready var body: DropZone = $Rows/BodyMargin/Body
 
 var definition: ConditionBlockDefinition
 
@@ -53,8 +56,10 @@ func setup(block_definition: ConditionBlockDefinition) -> void:
 		label.text = definition.block_label
 		sentence_row.add_child(label)
 
+	# A wrapper takes exactly one condition, so say so where the limit is
+	# enforced -- otherwise the refused second drop reads as a bug.
 	if is_wrapper():
-		_add_body_placeholder()
+		body.empty_text = "drop ONE condition here"
 
 func _add_text(part: SentencePart) -> void:
 	var label := Label.new()
@@ -86,6 +91,16 @@ func _add_number(part: SentencePart) -> void:
 	spin.step = part.step
 	spin.suffix = part.suffix
 
+	# Apply the value as it is typed rather than on submit/focus-loss.
+	# SpinBox's parse-on-unfocus path rejected typed input here and silently
+	# reverted the field to its previous value, which looked exactly like the
+	# number vanishing. Updating on change sidesteps that path entirely.
+	spin.update_on_text_changed = true
+	spin.select_all_on_focus = true
+	# Wide enough that the value plus its suffix is not scrolled out of view
+	# when the field loses focus.
+	spin.custom_minimum_size.x = 96.0
+
 	# The condition stores a scaled value; the widget shows the unscaled one
 	# (0.25 stored reads as 25 for a percentage).
 	var current: Variant = _condition.get(part.property)
@@ -95,17 +110,6 @@ func _add_number(part: SentencePart) -> void:
 	spin.value_changed.connect(func(_value: float) -> void: structure_changed.emit())
 	sentence_row.add_child(spin)
 	_widgets[part.property] = spin
-
-## Spec section 7.1 requires the wrapper's one-condition limit to be visible,
-## not merely enforced -- a drop refused for a non-obvious reason reads as a
-## bug. Removed as soon as something is dropped in, so a filled wrapper
-## reads as full rather than as an open target.
-func _add_body_placeholder() -> void:
-	var label := Label.new()
-	label.name = "BodyPlaceholder"
-	label.text = "drop one condition here"
-	label.modulate = Color(1, 1, 1, 0.5)
-	body.add_child(label)
 
 ## Option tables per OptionSource. Values are stored explicitly rather than
 ## derived from display order -- Comparator's declared order is GREATER,
@@ -213,15 +217,29 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
+
+	# Same forwarding as RuleSegment: a segment dragged for reorder can pass
+	# over a block nested inside another segment, and refusing here would
+	# not bubble past this STOP control to the list.
+	var list: SegmentList = SegmentList.find_enclosing(self)
+	if list != null and list.is_reorder_payload(data):
+		list.show_insert_indicator(get_global_transform() * at_position)
+		return true
+
 	if not _is_over_body(at_position):
 		return false
 	return _accepts_condition(data)
 
 func _drop_data(at_position: Vector2, data: Variant) -> void:
+	var list: SegmentList = SegmentList.find_enclosing(self)
+	if list != null and list.is_reorder_payload(data):
+		list.reorder_to_global_point(data["node"], get_global_transform() * at_position)
+		return
+
 	if not _is_over_body(at_position):
 		return
 
-	_remove_body_placeholder()
+	# The body's placeholder hides itself once it has content -- see DropZone.
 
 	if data.get("source") == "palette":
 		var block: ConditionBlock = load(SCENE_PATH).instantiate()
@@ -288,12 +306,6 @@ func _is_inside_wrapper() -> bool:
 			return true
 		node = node.get_parent()
 	return false
-
-func _remove_body_placeholder() -> void:
-	var placeholder: Node = body.get_node_or_null("BodyPlaceholder")
-	if placeholder != null:
-		body.remove_child(placeholder)
-		placeholder.queue_free()
 
 ## Test seam for headless verification -- drives a widget the way a click
 ## would, so build_condition()'s real read path is what gets exercised

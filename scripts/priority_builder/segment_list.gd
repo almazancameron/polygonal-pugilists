@@ -50,10 +50,10 @@ func _on_delete_requested(segment: RuleSegment) -> void:
 	structure_changed.emit()
 
 func _refresh_indices() -> void:
-	var position: int = 1
+	var rank: int = 1
 	for segment in segments():
-		segment.set_index(position)
-		position += 1
+		segment.set_index(rank)
+		rank += 1
 
 ## True while any slot is entirely empty. Gates the Add Slot button, so
 ## there is never more than one empty slot at a time.
@@ -95,30 +95,63 @@ func insert_index_for_y(y: float) -> int:
 		index += 1
 	return index
 
-func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+## Walks ancestors to find the enclosing list.
+##
+## Drop targets nested inside a segment need this to hand a reorder off.
+## Godot's _can_drop_data does not reliably bubble past a MOUSE_FILTER_STOP
+## ancestor, and RuleSegment is STOP -- so the original design, where a
+## segment returned false for a reorder payload and expected the query to
+## reach this list, meant the list was simply never asked and reordering
+## silently did nothing.
+static func find_enclosing(from: Node) -> SegmentList:
+	var node: Node = from
+	while node != null:
+		if node is SegmentList:
+			return node
+		node = node.get_parent()
+	return null
+
+func is_reorder_payload(data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
-	if not (data.get("source") == "build" and data.get("node") is RuleSegment):
+	return data.get("source") == "build" and data.get("node") is RuleSegment
+
+## Positions and shows the insertion line for a point in global space.
+func show_insert_indicator(global_point: Vector2) -> void:
+	var local: Vector2 = get_global_transform().affine_inverse() * global_point
+	move_child(_indicator, insert_index_for_y(local.y))
+	_indicator.visible = true
+
+func hide_insert_indicator() -> void:
+	if _indicator != null:
 		_indicator.visible = false
+
+func reorder_to_global_point(segment: RuleSegment, global_point: Vector2) -> void:
+	hide_insert_indicator()
+
+	if segment.get_parent() != self:
+		return
+
+	var local: Vector2 = get_global_transform().affine_inverse() * global_point
+	move_child(segment, clampi(insert_index_for_y(local.y), 0, get_child_count() - 1))
+	_refresh_indices()
+	structure_changed.emit()
+
+## Handles drops that land in the gaps between segments; a drop on a segment
+## itself is forwarded here by RuleSegment.
+func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+	if not is_reorder_payload(data):
+		hide_insert_indicator()
 		return false
 
 	# _can_drop_data runs every frame while a drag hovers, which is what
 	# makes it the right place to move the insertion indicator.
-	move_child(_indicator, insert_index_for_y(at_position.y))
-	_indicator.visible = true
+	show_insert_indicator(get_global_transform() * at_position)
 	return true
 
 func _drop_data(at_position: Vector2, data: Variant) -> void:
-	_indicator.visible = false
-
-	var segment: RuleSegment = data["node"]
-	if segment.get_parent() != self:
-		return
-
-	move_child(segment, clampi(insert_index_for_y(at_position.y), 0, get_child_count() - 1))
-	_refresh_indices()
-	structure_changed.emit()
+	reorder_to_global_point(data["node"], get_global_transform() * at_position)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_DRAG_END and _indicator != null:
-		_indicator.visible = false
+	if what == NOTIFICATION_DRAG_END:
+		hide_insert_indicator()

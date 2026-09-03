@@ -20,8 +20,8 @@ const TECHNIQUE_BLOCK_SCENE: String = "res://scenes/priority_builder/technique_b
 @onready var index_label: Label = $Rows/Header/IndexLabel
 @onready var verdict_label: Label = $Rows/Header/VerdictLabel
 @onready var delete_button: Button = $Rows/Header/DeleteButton
-@onready var condition_body: VBoxContainer = $Rows/ConditionBody
-@onready var technique_slot: VBoxContainer = $Rows/TechniqueSlot
+@onready var condition_body: DropZone = $Rows/ConditionBody
+@onready var technique_slot: DropZone = $Rows/TechniqueSlot
 
 var _tooltip_layer: TooltipLayer
 
@@ -123,10 +123,14 @@ func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
 
-	# A segment being dragged for reorder is the SegmentList's business, not
-	# a slot's -- refusing here lets the query bubble up to the list.
-	if data.get("node") is RuleSegment:
-		return false
+	# A reorder is the list's business, but it has to be forwarded rather
+	# than refused: Godot does not reliably bubble _can_drop_data past a
+	# MOUSE_FILTER_STOP ancestor, and this node is STOP, so returning false
+	# here meant the list was never asked and reordering never worked.
+	var list: SegmentList = SegmentList.find_enclosing(self)
+	if list != null and list.is_reorder_payload(data):
+		list.show_insert_indicator(get_global_transform() * at_position)
+		return true
 
 	if _is_over(technique_slot, at_position):
 		return _accepts_technique(data)
@@ -137,6 +141,11 @@ func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	return false
 
 func _drop_data(at_position: Vector2, data: Variant) -> void:
+	var list: SegmentList = SegmentList.find_enclosing(self)
+	if list != null and list.is_reorder_payload(data):
+		list.reorder_to_global_point(data["node"], get_global_transform() * at_position)
+		return
+
 	if _is_over(technique_slot, at_position):
 		_drop_technique(data)
 	elif _is_over(condition_body, at_position):

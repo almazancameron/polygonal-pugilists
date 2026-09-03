@@ -1,10 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/priority_builder/condition_block.gd" id="1_cblock"]
+[ext_resource type="Script" path="res://scripts/priority_builder/drop_zone.gd" id="2_dzone"]
 
 [node name="ConditionBlock" type="PanelContainer"]
 offset_right = 320.0
-offset_bottom = 48.0
+offset_bottom = 64.0
 mouse_filter = 0
 script = ExtResource("1_cblock")
 
@@ -12,16 +13,18 @@ script = ExtResource("1_cblock")
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Sentence" type="HBoxContainer" parent="Rows"]
+[node name="Sentence" type="HFlowContainer" parent="Rows"]
 layout_mode = 2
 mouse_filter = 2
 
 [node name="BodyMargin" type="MarginContainer" parent="Rows"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 16
+theme_override_constants/margin_left = 14
 
 [node name="Body" type="VBoxContainer" parent="Rows/BodyMargin"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 18)
 mouse_filter = 2
+script = ExtResource("2_dzone")
+empty_text = "drop a condition here (AND)"
+empty_height = 28.0
