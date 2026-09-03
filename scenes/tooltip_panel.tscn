@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://dq7cm2t656s7y"]
+
+[ext_resource type="Script" uid="uid://cpoocf6py0tto" path="res://scripts/tooltip_panel.gd" id="1_5atpf"]
+
+[node name="TooltipPanel" type="PanelContainer" unique_id=733801476]
+custom_minimum_size = Vector2(0, 32)
+script = ExtResource("1_5atpf")
+
+[node name="Content" type="Control" parent="." unique_id=1604412215]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Content" unique_id=2094315661]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+bbcode_enabled = true
+text = "EXAMPLE"
+fit_content = true
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Content" unique_id=1727825236]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = 18.0
+grow_horizontal = 0
+text = "×"
