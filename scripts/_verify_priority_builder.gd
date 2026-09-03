@@ -14,6 +14,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"condition_block",
 	"rule_segment",
 	"segment_list",
+	"state_probe",
 ]
 
 const CONDITION_BLOCK_SCENE: String = "res://scenes/priority_builder/condition_block.tscn"
@@ -38,6 +39,7 @@ func _run_checks() -> void:
 	_check_condition_block()
 	_check_rule_segment()
 	_check_segment_list()
+	_check_state_probe()
 
 	for check_name in EXPECTED_CHECKS:
 		if not _completed.has(check_name):
@@ -55,6 +57,91 @@ func _run_checks() -> void:
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
+
+func _check_state_probe() -> void:
+	var probe := StateProbe.new()
+	root.add_child(probe)
+	probe.setup(load("res://resources/familiars/twerpent.tres"), load("res://resources/familiars/guubal.tres"))
+
+	_expect(probe.user != null and probe.target != null, "probe should build both combatants")
+	_expect(probe.user.current_hp == probe.user.familiar.max_hp, "probe user should start at full HP")
+
+	# Declared state must land verbatim, not filtered through add_status()'s
+	# Ward absorption. Give the target Ward first, then Poison -- through
+	# add_status() the Ward would eat the Poison before any condition saw it,
+	# which would make the probe useless for reasoning about conditions.
+	probe.set_status(probe.target, Status.StatusEffect.WARD, 5)
+	probe.set_status(probe.target, Status.StatusEffect.POISON, 3)
+	var poison: Status = probe.target.get_status(Status.StatusEffect.POISON)
+	_expect(poison != null, "declared Poison should be present despite Ward")
+	if poison != null:
+		_expect(poison.stacks == 3, "declared Poison should keep 3 stacks, got %d" % poison.stacks)
+
+	# Rule 1 requires target Poison < 1 and fails (target has 3). Rule 2 is
+	# an unconditional catch-all and fires. Rule 3 is therefore unreached --
+	# the badge that shows a catch-all has made everything below it dead.
+	var list := SegmentList.new()
+	root.add_child(list)
+
+	var conditional: RuleSegment = _filled_segment("res://resources/techniques/acid_bath.tres")
+	list.add_child(conditional)
+	var block: ConditionBlock = _new_condition_block("status_vs_value")
+	root.remove_child(block)
+	conditional.condition_body.add_child(block)
+	block.set_property_for_test(&"left_target", 1)
+	block.set_property_for_test(&"left_status_effect", Status.StatusEffect.POISON)
+	block.set_property_for_test(&"comparator", StatusComparisonCondition.Comparator.LESS)
+	block.set_property_for_test(&"right_value", 1)
+
+	var catch_all: RuleSegment = _filled_segment("res://resources/techniques/venom_strike.tres")
+	list.add_child(catch_all)
+	var dead: RuleSegment = _filled_segment("res://resources/techniques/attack.tres")
+	list.add_child(dead)
+
+	probe.evaluate(list.compile())
+
+	_expect(probe.verdict_for(conditional) == StateProbe.Verdict.SKIPPED,
+		"rule 1 should be SKIPPED, got %s" % probe.verdict_for(conditional))
+	_expect(probe.verdict_for(catch_all) == StateProbe.Verdict.FIRES,
+		"the catch-all should FIRE, got %s" % probe.verdict_for(catch_all))
+	_expect(probe.verdict_for(dead) == StateProbe.Verdict.UNREACHED,
+		"the rule below the catch-all should be UNREACHED, got %s" % probe.verdict_for(dead))
+	_expect(probe.mismatch_message() == "",
+		"probe walk and choose_technique() disagreed: %s" % probe.mismatch_message())
+	_expect(probe.no_match_message() == "", "a firing catch-all should produce no no-match message")
+
+	# An incomplete segment is badged and excluded, not crashed on -- it is
+	# the null deref at combatant.gd's rule.technique.technique_name.
+	var incomplete: RuleSegment = load(RULE_SEGMENT_SCENE).instantiate()
+	list.add_child(incomplete)
+	var orphan: ConditionBlock = _new_condition_block("hp_vs_percent")
+	root.remove_child(orphan)
+	incomplete.condition_body.add_child(orphan)
+	probe.evaluate(list.compile())
+	_expect(probe.verdict_for(incomplete) == StateProbe.Verdict.INCOMPLETE,
+		"a technique-less segment should be INCOMPLETE, got %s" % probe.verdict_for(incomplete))
+	_expect(probe.verdict_for(catch_all) == StateProbe.Verdict.FIRES,
+		"an incomplete segment must not change which rule fires")
+
+	# Flip the probe state and the winner should change -- rule 1's
+	# condition now holds.
+	probe.set_status(probe.target, Status.StatusEffect.POISON, 0)
+	probe.evaluate(list.compile())
+	_expect(probe.verdict_for(conditional) == StateProbe.Verdict.FIRES,
+		"with target Poison cleared, rule 1 should now FIRE, got %s" % probe.verdict_for(conditional))
+	_expect(probe.verdict_for(catch_all) == StateProbe.Verdict.UNREACHED,
+		"the catch-all should now be UNREACHED")
+	_expect(probe.mismatch_message() == "", "cross-check disagreed after state change: %s" % probe.mismatch_message())
+
+	# With no complete rule at all, the probe names the fix instead of
+	# silently reporting a null technique.
+	var empty_list := SegmentList.new()
+	root.add_child(empty_list)
+	probe.evaluate(empty_list.compile())
+	_expect(probe.no_match_message() != "", "an empty build should produce a no-match message")
+	print("  no-match message: %s" % probe.no_match_message())
+
+	_completed.append("state_probe")
 
 func _check_segment_list() -> void:
 	var list := SegmentList.new()
