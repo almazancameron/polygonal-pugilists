@@ -11,14 +11,29 @@ extends SceneTree
 const EXPECTED_CHECKS: Array[String] = [
 	"technique_describe",
 	"block_definitions",
+	"condition_block",
 ]
+
+const CONDITION_BLOCK_SCENE: String = "res://scenes/priority_builder/condition_block.tscn"
+const RULE_SEGMENT_SCENE: String = "res://scenes/priority_builder/rule_segment.tscn"
+const TECHNIQUE_BLOCK_SCENE: String = "res://scenes/priority_builder/technique_block.tscn"
+const BLOCK_DIR: String = "res://resources/priority_builder/blocks"
 
 var _failures: Array[String] = []
 var _completed: Array[String] = []
 
+## Checks run on the first process_frame, NOT in _initialize(). During
+## _initialize() the SceneTree's root is not yet inside the tree
+## (root.is_inside_tree() == false), so add_child() does not propagate
+## _ready() and every @onready var on an added Control stays null. By the
+## first process_frame root is in-tree and _ready() fires normally.
 func _initialize() -> void:
+	process_frame.connect(_run_checks, CONNECT_ONE_SHOT)
+
+func _run_checks() -> void:
 	_check_technique_describe()
 	_check_block_definitions()
+	_check_condition_block()
 
 	for check_name in EXPECTED_CHECKS:
 		if not _completed.has(check_name):
@@ -36,6 +51,113 @@ func _initialize() -> void:
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
+
+func _definition(name: String) -> ConditionBlockDefinition:
+	return load("%s/%s.tres" % [BLOCK_DIR, name])
+
+## Two combatants for is_met() checks -- twerpent (max_hp 75) versus guubal.
+func _make_pair() -> Array:
+	var user := Combatant.new(load("res://resources/familiars/twerpent.tres"))
+	var target := Combatant.new(load("res://resources/familiars/guubal.tres"))
+	return [user, target]
+
+## Declared, not applied -- bypasses add_status()'s Ward absorption and
+## on_applied hooks. Mirrors state_probe.gd; see spec section 8.1.
+func _add_status(combatant: Combatant, effect: Status.StatusEffect, stacks: int) -> void:
+	var status: Status = Status.create(effect, stacks)
+	status.owner = combatant
+	combatant.statuses.append(status)
+
+func _new_condition_block(definition_name: String) -> ConditionBlock:
+	var block: ConditionBlock = load(CONDITION_BLOCK_SCENE).instantiate()
+	root.add_child(block)
+	block.setup(_definition(definition_name))
+	return block
+
+func _check_condition_block() -> void:
+	var scene: PackedScene = load(CONDITION_BLOCK_SCENE)
+	_expect(scene != null, "could not load condition_block.tscn")
+	if scene == null:
+		return
+
+	var definition: ConditionBlockDefinition = _definition("status_vs_value")
+
+	var block_a: ConditionBlock = scene.instantiate()
+	root.add_child(block_a)
+	block_a.setup(definition)
+
+	var block_b: ConditionBlock = scene.instantiate()
+	root.add_child(block_b)
+	block_b.setup(definition)
+
+	# The aliasing check: two blocks built from one shared definition must
+	# own separate Condition instances. See DECISIONS.md on the incident
+	# where editing fallback_attack.tres for one build changed Guubal's too.
+	var condition_a: Condition = block_a.build_condition()
+	var condition_b: Condition = block_b.build_condition()
+	_expect(condition_a != condition_b, "two blocks from one definition share a Condition instance")
+	_expect(condition_a is StatusComparisonCondition, "status_vs_value did not build a StatusComparisonCondition")
+
+	_expect(condition_a.compare_mode == StatusComparisonCondition.CompareMode.FLAT_VALUE,
+		"fixed_values did not set compare_mode to FLAT_VALUE")
+
+	# Drive the widgets and confirm the values reach the Condition.
+	block_a.set_property_for_test(&"left_status_effect", Status.StatusEffect.ACID)
+	block_a.set_property_for_test(&"left_target", 1)
+	block_a.set_property_for_test(&"comparator", StatusComparisonCondition.Comparator.LESS)
+	block_a.set_property_for_test(&"right_value", 5)
+
+	var condition: StatusComparisonCondition = block_a.build_condition()
+	_expect(condition.left_status_effect == Status.StatusEffect.ACID, "left_status_effect did not round-trip")
+	_expect(condition.right_value == 5, "right_value did not round-trip, got %s" % condition.right_value)
+
+	var pair: Array = _make_pair()
+	var user: Combatant = pair[0]
+	var target: Combatant = pair[1]
+	_expect(condition.is_met(user, target), "target with 0 Acid should satisfy 'Acid < 5'")
+	_add_status(target, Status.StatusEffect.ACID, 6)
+	_expect(not condition.is_met(user, target), "target with 6 Acid should fail 'Acid < 5'")
+	print("  status_vs_value describe: %s" % condition.describe())
+
+	# Editing block_a must not have touched block_b -- the live half of the
+	# aliasing check.
+	var untouched: StatusComparisonCondition = block_b.build_condition()
+	_expect(untouched.left_status_effect != Status.StatusEffect.ACID or untouched.right_value != 5,
+		"editing block_a's widgets changed block_b's condition")
+
+	# The float-into-int question from spec 4.2. hp_vs_percent's
+	# display_scale is 0.01, so a widget reading 25 must store 0.25 on a
+	# float property; the status block's right_value is int-typed and must
+	# survive the same set() path.
+	var hp_block: ConditionBlock = scene.instantiate()
+	root.add_child(hp_block)
+	hp_block.setup(_definition("hp_vs_percent"))
+	hp_block.set_property_for_test(&"right_value", 0.25)
+	hp_block.set_property_for_test(&"left_target", 0)
+	hp_block.set_property_for_test(&"comparator", HpComparisonCondition.Comparator.LESS)
+	var hp_condition: HpComparisonCondition = hp_block.build_condition()
+	_expect(is_equal_approx(hp_condition.right_value, 0.25),
+		"HP percent should store 0.25, got %s" % hp_condition.right_value)
+	print("  hp_vs_percent describe: %s" % hp_condition.describe())
+
+	var int_block: ConditionBlock = scene.instantiate()
+	root.add_child(int_block)
+	int_block.setup(definition)
+	int_block.set_property_for_test(&"right_value", 7.0)
+	var int_condition: StatusComparisonCondition = int_block.build_condition()
+	_expect(int_condition.right_value == 7,
+		"float 7.0 into int right_value should convert to 7, got %s" % int_condition.right_value)
+
+	_expect(not block_a.is_wrapper(), "status_vs_value should not be a wrapper")
+	_expect(block_a.is_complete(), "a leaf block with no body should be complete")
+
+	var not_block: ConditionBlock = scene.instantiate()
+	root.add_child(not_block)
+	not_block.setup(_definition("not"))
+	_expect(not_block.is_wrapper(), "not.tres should produce a wrapper block")
+	_expect(not not_block.is_complete(), "an empty wrapper must be incomplete")
+
+	_completed.append("condition_block")
 
 ## Explicit property-list lookup rather than the `in` operator, which is
 ## ambiguous on Objects. This is what catches a misspelled

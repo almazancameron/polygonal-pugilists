@@ -17,7 +17,15 @@
   - `"../Godot_v4.7.1-stable_win64_console.exe" --headless --check-only --quit` — parse and missing-node errors project-wide.
   - `"../Godot_v4.7.1-stable_win64_console.exe" --headless --script res://scripts/_verify_priority_builder.gd` — behavior.
 - **The verify script is throwaway.** `CLAUDE.md`'s pattern is delete-immediately-after-use. This plan deliberately keeps one `scripts/_verify_priority_builder.gd` alive across Tasks 1–9, growing it per task, and deletes it in Task 11. Deviation is intentional: per-task verification needs it to persist. It must not survive the final commit.
-- **`extends SceneTree` verify scripts use `_initialize()`, not `_init()`.** `root` does not exist yet in `_init()`, and adding a `Control` to `root` is what makes its `_ready()` (and therefore its `@onready` vars) run.
+- **`extends SceneTree` verify scripts must run their checks on the first `process_frame`, not in `_initialize()`.** Verified empirically: during `_initialize()`, `root.is_inside_tree()` is `false`, so `add_child()` does **not** propagate `_ready()` and every `@onready` var on an added `Control` stays null (`is_node_ready()` returns false). By the first `process_frame`, root is in-tree and `_ready()` fires. So:
+
+  ```gdscript
+  func _initialize() -> void:
+      process_frame.connect(_run_checks, CONNECT_ONE_SHOT)
+  ```
+
+  This is a harness constraint only — production code adds blocks to a live tree, where `@onready` behaves normally.
+- **The verify harness must assert that each check ran to completion.** A GDScript runtime error aborts only the function it occurs in; the caller keeps going. Without a completion marker per check, an aborted check leaves the failure list empty and the harness reports success for code that never ran (observed in Task 1).
 - **Typed GDScript**, matching existing project style. Tabs for indentation, matching `scripts/combatant.gd`.
 - **Never mutate a `ConditionBlockDefinition` at runtime.** Definitions are shared and read-only; each block owns its own `Condition`. See spec §6.1 and `DECISIONS.md` §"A resource referenced by more than one owner must not be edited to fit one consumer".
 - **Enum ordinals are load-bearing** when authoring `.tres` `fixed_values` (spec §4.3): `FLAT_VALUE` = 1; `STATUS`/`HP`/`STAT` = 0; `Target.SELF` = 0, `Target.TARGET` = 1; `Comparator` is `GREATER`=0, `GREATER_OR_EQUAL`=1, `LESS`=2, `LESS_OR_EQUAL`=3, `EQUAL`=4.
