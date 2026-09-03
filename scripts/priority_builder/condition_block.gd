@@ -152,6 +152,13 @@ func body_children() -> Array[ConditionBlock]:
 ## A wrapper needs exactly one body child to be runnable -- an empty one is
 ## the null deref at not_condition.gd:7. Leaves are always complete.
 func is_complete() -> bool:
+	# A block added to the tree but not yet setup() has no Condition to
+	# contribute. A drop necessarily does add_child() before setup(), and
+	# add_child() fires child_entered_tree, which triggers a compile in
+	# between -- so this state is reached on every single drop, not rarely.
+	if definition == null or _condition == null:
+		return false
+
 	if not is_wrapper():
 		for child in body_children():
 			if not child.is_complete():

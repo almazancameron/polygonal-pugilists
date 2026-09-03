@@ -15,6 +15,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"rule_segment",
 	"segment_list",
 	"state_probe",
+	"screen",
 ]
 
 const CONDITION_BLOCK_SCENE: String = "res://scenes/priority_builder/condition_block.tscn"
@@ -40,6 +41,7 @@ func _run_checks() -> void:
 	_check_rule_segment()
 	_check_segment_list()
 	_check_state_probe()
+	_check_screen()
 
 	for check_name in EXPECTED_CHECKS:
 		if not _completed.has(check_name):
@@ -57,6 +59,87 @@ func _run_checks() -> void:
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
+
+## Instantiates the whole screen. --check-only never instantiates a scene,
+## so this is the only headless check that catches a wrong @onready node
+## path, a missing script assignment, or a _ready() that throws.
+func _check_screen() -> void:
+	var scene: PackedScene = load("res://scenes/priority_builder/priority_builder.tscn")
+	_expect(scene != null, "could not load priority_builder.tscn")
+	if scene == null:
+		return
+
+	var screen: PriorityBuilder = scene.instantiate()
+	root.add_child(screen)
+
+	_expect(screen.builder_familiar != null, "builder_familiar was not assigned in the scene")
+	_expect(screen.opponent_familiar != null, "opponent_familiar was not assigned in the scene")
+	_expect(screen.tooltip_layer != null, "tooltip_layer did not resolve")
+
+	# _ready() starts the screen with exactly one empty slot, which means the
+	# add button must already be disabled.
+	_expect(screen.segment_list.segments().size() == 1,
+		"screen should start with 1 slot, got %d" % screen.segment_list.segments().size())
+	_expect(screen.add_slot_button.disabled,
+		"add button should be disabled while an empty slot exists")
+
+	# Nine condition palette entries plus one header per category.
+	var palette_blocks: int = 0
+	var headers: int = 0
+	for child in screen.condition_palette.get_children():
+		if child is PaletteBlock:
+			palette_blocks += 1
+		elif child is Label:
+			headers += 1
+	_expect(palette_blocks == 9, "condition palette should hold 9 blocks, got %d" % palette_blocks)
+	_expect(headers == 4, "condition palette should have 4 category headers, got %d" % headers)
+
+	# Techniques come from the familiar's own movepool.
+	var technique_blocks: int = 0
+	for child in screen.technique_palette.get_children():
+		if child is PaletteBlock:
+			technique_blocks += 1
+	_expect(technique_blocks == screen.builder_familiar.techniques.size(),
+		"technique palette should match the familiar's %d techniques, got %d" % [
+			screen.builder_familiar.techniques.size(), technique_blocks
+		])
+
+	# An empty build reports the no-match message through the screen's own
+	# label, not just the probe.
+	_expect(screen.probe_message.text.contains("No rule matched"),
+		"screen should surface the no-match message, got '%s'" % screen.probe_message.text)
+
+	# Mirrors the real drop sequence in RuleSegment._drop_technique, which
+	# must be add_child() then setup() because setup() populates @onready
+	# containers. add_child() fires child_entered_tree, so a refresh runs
+	# with the block present but unconfigured -- this half must not crash,
+	# and the slot must read as incomplete rather than as a rule with a null
+	# technique.
+	var technique_block: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
+	var slot: RuleSegment = screen.segment_list.segments()[0]
+	slot.technique_slot.add_child(technique_block)
+
+	_expect(not slot.is_complete(), "a slot holding an unconfigured TechniqueBlock must be incomplete")
+	# Non-empty though: a node IS present, which is exactly the distinction
+	# between the two predicates. This state lasts less than a frame in the
+	# real flow -- add_child, setup and emit are all one function call -- so
+	# the add button's momentary enable is never observable.
+	_expect(not slot.is_empty(), "a slot holding any block node is not empty")
+	_expect(screen.probe_message.text.contains("No rule matched"),
+		"mid-drop the build still has no runnable rule")
+
+	# Second half of the drop: configure, then signal -- exactly what
+	# _drop_data does after calling _drop_technique.
+	technique_block.setup(load("res://resources/techniques/attack.tres"), null)
+	slot.structure_changed.emit()
+
+	_expect(slot.is_complete(), "a configured technique-only slot should be complete")
+	_expect(not screen.add_slot_button.disabled,
+		"add button should re-enable once the empty slot is filled")
+	_expect(screen.probe_message.text == "",
+		"a firing catch-all should clear the message, got '%s'" % screen.probe_message.text)
+
+	_completed.append("screen")
 
 func _check_state_probe() -> void:
 	var probe := StateProbe.new()

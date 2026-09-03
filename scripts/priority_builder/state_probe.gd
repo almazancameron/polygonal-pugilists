@@ -127,8 +127,11 @@ func _cross_check(rules: Array[PriorityRule], winner: int) -> void:
 func _incomplete_reason(segment: RuleSegment) -> String:
 	if segment.is_empty():
 		return "empty slot"
-	if segment.technique_block() == null:
+
+	var holder: TechniqueBlock = segment.technique_block()
+	if holder == null or holder.technique == null:
 		return "no technique"
+
 	return "a NOT block has an empty body"
 
 func verdict_for(segment: RuleSegment) -> Verdict:

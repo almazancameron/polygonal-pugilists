@@ -1,0 +1,133 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/priority_builder/priority_builder.gd" id="1_pbuild"]
+[ext_resource type="Script" path="res://scripts/priority_builder/block_palette.gd" id="2_palette"]
+[ext_resource type="Script" path="res://scripts/priority_builder/segment_list.gd" id="3_seglist"]
+[ext_resource type="Script" path="res://scripts/priority_builder/state_probe.gd" id="4_probe"]
+[ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="5_tooltip"]
+[ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/familiars/twerpent.tres" id="6_builder"]
+[ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="7_opponent"]
+
+[node name="PriorityBuilder" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_pbuild")
+builder_familiar = ExtResource("6_builder")
+opponent_familiar = ExtResource("7_opponent")
+
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="LeftColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+custom_minimum_size = Vector2(260, 0)
+
+[node name="FamiliarPanel" type="PanelContainer" parent="Columns/LeftColumn"]
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="Columns/LeftColumn/FamiliarPanel"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Columns/LeftColumn/FamiliarPanel/Rows"]
+layout_mode = 2
+text = "Familiar"
+
+[node name="Portrait" type="TextureRect" parent="Columns/LeftColumn/FamiliarPanel/Rows"]
+layout_mode = 2
+custom_minimum_size = Vector2(96, 96)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatGrid" type="GridContainer" parent="Columns/LeftColumn/FamiliarPanel/Rows"]
+layout_mode = 2
+columns = 2
+
+[node name="TechniqueLabel" type="Label" parent="Columns/LeftColumn"]
+layout_mode = 2
+text = "TECHNIQUES"
+
+[node name="TechniqueScroll" type="ScrollContainer" parent="Columns/LeftColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TechniquePalette" type="VBoxContainer" parent="Columns/LeftColumn/TechniqueScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_palette")
+
+[node name="BuildColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Header" type="HBoxContainer" parent="Columns/BuildColumn"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Columns/BuildColumn/Header"]
+layout_mode = 2
+text = "PRIORITY"
+
+[node name="Spacer" type="Control" parent="Columns/BuildColumn/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="AddSlotButton" type="Button" parent="Columns/BuildColumn/Header"]
+layout_mode = 2
+text = "+ Add slot"
+
+[node name="BuildScroll" type="ScrollContainer" parent="Columns/BuildColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SegmentList" type="VBoxContainer" parent="Columns/BuildColumn/BuildScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+script = ExtResource("3_seglist")
+
+[node name="RightColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+custom_minimum_size = Vector2(320, 0)
+
+[node name="ConditionLabel" type="Label" parent="Columns/RightColumn"]
+layout_mode = 2
+text = "CONDITIONS"
+
+[node name="ConditionScroll" type="ScrollContainer" parent="Columns/RightColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ConditionPalette" type="VBoxContainer" parent="Columns/RightColumn/ConditionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_palette")
+
+[node name="StateProbe" type="PanelContainer" parent="Columns/RightColumn"]
+layout_mode = 2
+script = ExtResource("4_probe")
+
+[node name="Rows" type="VBoxContainer" parent="Columns/RightColumn/StateProbe"]
+layout_mode = 2
+
+[node name="ProbeTitle" type="Label" parent="Columns/RightColumn/StateProbe/Rows"]
+layout_mode = 2
+text = "MOCK STATE"
+
+[node name="Controls" type="VBoxContainer" parent="Columns/RightColumn/StateProbe/Rows"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="Columns/RightColumn/StateProbe/Rows"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="TooltipLayer" parent="." instance=ExtResource("5_tooltip")]

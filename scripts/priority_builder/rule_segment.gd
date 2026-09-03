@@ -64,8 +64,15 @@ func is_empty() -> bool:
 ## combatant.gd's rule.technique.technique_name and not_condition.gd's
 ## wrapped_condition.is_met() -- so an incomplete segment is excluded from
 ## evaluation rather than handed to the evaluator.
+## Also false for a block that is in the tree but not yet set up. A drop does
+## add_child() then setup(), because setup() populates @onready containers --
+## and add_child() fires child_entered_tree in between, which triggers a
+## refresh that compiles this slot mid-construction. Treating a node-present
+## -but-unconfigured block as complete produced a null technique and a null
+## Condition in the compiled rule, crashing the probe on every drop.
 func is_complete() -> bool:
-	if technique_block() == null:
+	var holder: TechniqueBlock = technique_block()
+	if holder == null or holder.technique == null:
 		return false
 	for block in condition_blocks():
 		if not block.is_complete():
