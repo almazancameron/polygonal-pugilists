@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="ConditionBlockDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/status_comparison_condition.gd" id="1_km8ef"]
+[ext_resource type="Script" path="res://scripts/priority_builder/condition_block_definition.gd" id="2_eote0"]
+[ext_resource type="Script" path="res://scripts/priority_builder/sentence_part.gd" id="3_kexc3"]
+
+[sub_resource type="Resource" id="Resource_ciqnw"]
+script = ExtResource("3_kexc3")
+kind = 1
+property = &"left_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_exrp0"]
+script = ExtResource("3_kexc3")
+kind = 1
+property = &"left_status_effect"
+option_source = 3
+
+[sub_resource type="Resource" id="Resource_ap4q8"]
+script = ExtResource("3_kexc3")
+text = " stacks "
+
+[sub_resource type="Resource" id="Resource_p0cy8"]
+script = ExtResource("3_kexc3")
+kind = 1
+property = &"comparator"
+option_source = 2
+
+[sub_resource type="Resource" id="Resource_fursi"]
+script = ExtResource("3_kexc3")
+kind = 2
+property = &"right_value"
+
+[resource]
+script = ExtResource("2_eote0")
+block_label = "Status stacks vs value"
+condition_script = ExtResource("1_km8ef")
+fixed_values = {
+"compare_mode": 1
+}
+sentence = Array[ExtResource("3_kexc3")]([SubResource("Resource_ciqnw"), SubResource("Resource_exrp0"), SubResource("Resource_ap4q8"), SubResource("Resource_p0cy8"), SubResource("Resource_fursi")])

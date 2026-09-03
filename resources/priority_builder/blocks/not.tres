@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ConditionBlockDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/not_condition.gd" id="1_bbpi6"]
+[ext_resource type="Script" path="res://scripts/priority_builder/condition_block_definition.gd" id="2_rpmqw"]
+[ext_resource type="Script" path="res://scripts/priority_builder/sentence_part.gd" id="3_e1l6p"]
+
+[resource]
+script = ExtResource("2_rpmqw")
+category = "Logic"
+block_label = "NOT"
+condition_script = ExtResource("1_bbpi6")
+body_property = &"wrapped_condition"

@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="ConditionBlockDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/stat_comparison_condition.gd" id="1_dtnk3"]
+[ext_resource type="Script" path="res://scripts/priority_builder/condition_block_definition.gd" id="2_c21rr"]
+[ext_resource type="Script" path="res://scripts/priority_builder/sentence_part.gd" id="3_bhoep"]
+
+[sub_resource type="Resource" id="Resource_ubp7l"]
+script = ExtResource("3_bhoep")
+kind = 1
+property = &"left_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_8ahpq"]
+script = ExtResource("3_bhoep")
+kind = 1
+property = &"left_stat"
+option_source = 4
+
+[sub_resource type="Resource" id="Resource_m284a"]
+script = ExtResource("3_bhoep")
+text = " "
+
+[sub_resource type="Resource" id="Resource_0cqpk"]
+script = ExtResource("3_bhoep")
+kind = 1
+property = &"comparator"
+option_source = 2
+
+[sub_resource type="Resource" id="Resource_tp15f"]
+script = ExtResource("3_bhoep")
+kind = 1
+property = &"right_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_5ifnw"]
+script = ExtResource("3_bhoep")
+kind = 1
+property = &"right_stat"
+option_source = 4
+
+[resource]
+script = ExtResource("2_c21rr")
+category = "Stat"
+block_label = "Stat vs stat"
+condition_script = ExtResource("1_dtnk3")
+fixed_values = {
+"compare_mode": 0
+}
+sentence = Array[ExtResource("3_bhoep")]([SubResource("Resource_ubp7l"), SubResource("Resource_8ahpq"), SubResource("Resource_m284a"), SubResource("Resource_0cqpk"), SubResource("Resource_tp15f"), SubResource("Resource_5ifnw")])

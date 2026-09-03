@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="ConditionBlockDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/status_comparison_condition.gd" id="1_ty31s"]
+[ext_resource type="Script" path="res://scripts/priority_builder/condition_block_definition.gd" id="2_04o4w"]
+[ext_resource type="Script" path="res://scripts/priority_builder/sentence_part.gd" id="3_gf441"]
+
+[sub_resource type="Resource" id="Resource_nguua"]
+script = ExtResource("3_gf441")
+kind = 1
+property = &"left_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_utq30"]
+script = ExtResource("3_gf441")
+text = " total status stacks "
+
+[sub_resource type="Resource" id="Resource_7pi16"]
+script = ExtResource("3_gf441")
+kind = 1
+property = &"comparator"
+option_source = 2
+
+[sub_resource type="Resource" id="Resource_essew"]
+script = ExtResource("3_gf441")
+kind = 2
+property = &"right_value"
+
+[resource]
+script = ExtResource("2_04o4w")
+block_label = "Total stacks vs value"
+condition_script = ExtResource("1_ty31s")
+fixed_values = {
+"check_all": true,
+"compare_mode": 1
+}
+sentence = Array[ExtResource("3_gf441")]([SubResource("Resource_nguua"), SubResource("Resource_utq30"), SubResource("Resource_7pi16"), SubResource("Resource_essew")])

@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="ConditionBlockDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/status_comparison_condition.gd" id="1_uc7dk"]
+[ext_resource type="Script" path="res://scripts/priority_builder/condition_block_definition.gd" id="2_f7xye"]
+[ext_resource type="Script" path="res://scripts/priority_builder/sentence_part.gd" id="3_2uqn4"]
+
+[sub_resource type="Resource" id="Resource_pbiss"]
+script = ExtResource("3_2uqn4")
+kind = 1
+property = &"left_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_orugw"]
+script = ExtResource("3_2uqn4")
+kind = 1
+property = &"left_status_effect"
+option_source = 3
+
+[sub_resource type="Resource" id="Resource_icp8e"]
+script = ExtResource("3_2uqn4")
+text = " stacks "
+
+[sub_resource type="Resource" id="Resource_yp1ay"]
+script = ExtResource("3_2uqn4")
+kind = 1
+property = &"comparator"
+option_source = 2
+
+[sub_resource type="Resource" id="Resource_618fe"]
+script = ExtResource("3_2uqn4")
+kind = 1
+property = &"right_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_606ol"]
+script = ExtResource("3_2uqn4")
+kind = 1
+property = &"right_status_effect"
+option_source = 3
+
+[sub_resource type="Resource" id="Resource_116w7"]
+script = ExtResource("3_2uqn4")
+text = " stacks"
+
+[resource]
+script = ExtResource("2_f7xye")
+block_label = "Status stacks vs status stacks"
+condition_script = ExtResource("1_uc7dk")
+fixed_values = {
+"compare_mode": 0
+}
+sentence = Array[ExtResource("3_2uqn4")]([SubResource("Resource_pbiss"), SubResource("Resource_orugw"), SubResource("Resource_icp8e"), SubResource("Resource_yp1ay"), SubResource("Resource_618fe"), SubResource("Resource_606ol"), SubResource("Resource_116w7")])

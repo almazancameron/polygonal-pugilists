@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="ConditionBlockDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/hp_comparison_condition.gd" id="1_4qfe4"]
+[ext_resource type="Script" path="res://scripts/priority_builder/condition_block_definition.gd" id="2_bdwqa"]
+[ext_resource type="Script" path="res://scripts/priority_builder/sentence_part.gd" id="3_6bx8y"]
+
+[sub_resource type="Resource" id="Resource_r4de3"]
+script = ExtResource("3_6bx8y")
+kind = 1
+property = &"left_target"
+option_source = 1
+
+[sub_resource type="Resource" id="Resource_wq4ys"]
+script = ExtResource("3_6bx8y")
+text = " HP "
+
+[sub_resource type="Resource" id="Resource_72xtw"]
+script = ExtResource("3_6bx8y")
+kind = 1
+property = &"comparator"
+option_source = 2
+
+[sub_resource type="Resource" id="Resource_2nyrk"]
+script = ExtResource("3_6bx8y")
+kind = 2
+property = &"right_value"
+max_value = 999.0
+suffix = " HP"
+
+[resource]
+script = ExtResource("2_bdwqa")
+category = "HP"
+block_label = "HP vs value"
+condition_script = ExtResource("1_4qfe4")
+fixed_values = {
+"compare_mode": 1,
+"use_percent": false
+}
+sentence = Array[ExtResource("3_6bx8y")]([SubResource("Resource_r4de3"), SubResource("Resource_wq4ys"), SubResource("Resource_72xtw"), SubResource("Resource_2nyrk")])
