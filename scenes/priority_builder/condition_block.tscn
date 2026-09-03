@@ -23,4 +23,5 @@ theme_override_constants/margin_left = 16
 
 [node name="Body" type="VBoxContainer" parent="Rows/BodyMargin"]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 18)
 mouse_filter = 2

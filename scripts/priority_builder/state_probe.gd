@@ -77,7 +77,7 @@ func evaluate(compiled: Dictionary) -> void:
 
 		if winner != -1:
 			_verdicts[segment] = Verdict.UNREACHED
-			segment.set_verdict("– unreached", "a rule above this one already fired")
+			segment.set_verdict("– unreached", "an earlier rule fired")
 			continue
 
 		var failed: Condition = null
@@ -150,20 +150,30 @@ func build_controls(into: VBoxContainer) -> void:
 	_add_side_controls(into, user, "Me")
 	_add_side_controls(into, target, "Them")
 
+## Two narrow rows per side rather than one wide one. A single row of
+## label + HP + status picker + stacks + button measured well over 500px,
+## and since this panel is not scrollable its minimum size propagated up and
+## starved the middle build column, clipping the Add Slot button.
 func _add_side_controls(into: VBoxContainer, combatant: Combatant, label_text: String) -> void:
-	var row := HBoxContainer.new()
-	into.add_child(row)
+	var hp_row := HBoxContainer.new()
+	into.add_child(hp_row)
 
 	var name_label := Label.new()
 	name_label.text = "%s (%s)" % [label_text, combatant.familiar.familiar_name]
-	row.add_child(name_label)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.clip_text = true
+	hp_row.add_child(name_label)
 
 	var hp := SpinBox.new()
 	hp.min_value = 0
 	hp.max_value = combatant.familiar.max_hp
 	hp.value = combatant.current_hp
+	hp.custom_minimum_size = Vector2(72, 0)
 	hp.value_changed.connect(func(value: float) -> void: set_hp(combatant, int(value)))
-	row.add_child(hp)
+	hp_row.add_child(hp)
+
+	var status_row := HBoxContainer.new()
+	into.add_child(status_row)
 
 	var effect_picker := OptionButton.new()
 	for effect in Status.StatusEffect.values():
@@ -171,13 +181,16 @@ func _add_side_controls(into: VBoxContainer, combatant: Combatant, label_text: S
 			continue
 		effect_picker.add_item(String(Status.status_effect_id(effect)).capitalize())
 		effect_picker.set_item_metadata(effect_picker.item_count - 1, effect)
-	row.add_child(effect_picker)
+	effect_picker.clip_text = true
+	effect_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	status_row.add_child(effect_picker)
 
 	var stacks := SpinBox.new()
 	stacks.min_value = 0
 	stacks.max_value = 99
 	stacks.value = 0
-	row.add_child(stacks)
+	stacks.custom_minimum_size = Vector2(64, 0)
+	status_row.add_child(stacks)
 
 	# "set" rather than "add": 0 removes the status, so one control both
 	# applies and clears.
@@ -187,4 +200,4 @@ func _add_side_controls(into: VBoxContainer, combatant: Combatant, label_text: S
 		var effect: Status.StatusEffect = effect_picker.get_item_metadata(effect_picker.selected)
 		set_status(combatant, effect, int(stacks.value))
 	)
-	row.add_child(apply)
+	status_row.add_child(apply)

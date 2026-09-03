@@ -144,11 +144,12 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 
 	structure_changed.emit()
 
-## Global rects for the same reason as ConditionBlock._is_over_body() --
-## these containers are nested under Rows, so their local positions are not
-## in the same coordinate space as at_position.
-func _is_over(container: Control, _at_position: Vector2) -> bool:
-	return container.get_global_rect().has_point(get_global_mouse_position())
+## Same approach as ConditionBlock._is_over_body(): transform the event's own
+## position to global space rather than doing local rect math (these
+## containers are nested under Rows, so their positions are in a different
+## space than at_position) and rather than reading the live cursor.
+func _is_over(container: Control, at_position: Vector2) -> bool:
+	return container.get_global_rect().has_point(get_global_transform() * at_position)
 
 func _is_condition_payload(data: Dictionary) -> bool:
 	if data.has("definition"):

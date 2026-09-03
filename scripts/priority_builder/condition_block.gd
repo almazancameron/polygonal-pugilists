@@ -242,12 +242,16 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 func _on_child_structure_changed() -> void:
 	structure_changed.emit()
 
-## Global rects, not local ones. `body` sits inside a MarginContainer, so
-## body.position is margin-relative while at_position is block-relative --
-## subtracting one from the other would be off by the margin. Comparing
-## global rects against the global cursor is correct at any nesting depth.
-func _is_over_body(_at_position: Vector2) -> bool:
-	return body.get_global_rect().has_point(get_global_mouse_position())
+## Transforms the event's own position into global space and tests it against
+## body's global rect.
+##
+## Not local rect math: `body` sits inside a MarginContainer, so body.position
+## is margin-relative while at_position is block-relative -- subtracting one
+## from the other is off by the margin. And not get_global_mouse_position()
+## either, which would make the result depend on where the cursor happens to
+## be *now* rather than where the drop event occurred.
+func _is_over_body(at_position: Vector2) -> bool:
+	return body.get_global_rect().has_point(get_global_transform() * at_position)
 
 ## A wrapper's body takes exactly one leaf condition, and that condition
 ## takes no body children of its own. Without this, a block nested inside a

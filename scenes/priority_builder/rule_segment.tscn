@@ -28,11 +28,8 @@ text = "1"
 
 [node name="VerdictLabel" type="Label" parent="Rows/Header"]
 layout_mode = 2
-mouse_filter = 2
-
-[node name="Spacer" type="Control" parent="Rows/Header"]
-layout_mode = 2
 size_flags_horizontal = 3
+clip_text = true
 mouse_filter = 2
 
 [node name="DeleteButton" type="Button" parent="Rows/Header"]
