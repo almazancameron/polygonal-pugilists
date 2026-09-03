@@ -16,6 +16,10 @@ extends PanelContainer
 
 signal structure_changed
 
+## Loaded by path rather than preloaded: a scene whose own script preloads
+## that same scene is a cyclic dependency Godot rejects.
+const SCENE_PATH: String = "res://scenes/priority_builder/condition_block.tscn"
+
 @onready var sentence_row: HBoxContainer = $Rows/Sentence
 @onready var body: VBoxContainer = $Rows/BodyMargin/Body
 
@@ -169,8 +173,8 @@ func build_condition() -> Condition:
 			_condition.set(property, widget.get_item_metadata(widget.selected))
 		elif widget is SpinBox:
 			var part: SentencePart = _part_for(property)
-			var scale: float = part.display_scale if part != null else 1.0
-			_condition.set(property, widget.value * scale)
+			var value_scale: float = part.display_scale if part != null else 1.0
+			_condition.set(property, widget.value * value_scale)
 
 	if is_wrapper():
 		var children: Array[ConditionBlock] = body_children()
@@ -185,6 +189,101 @@ func _part_for(property: StringName) -> SentencePart:
 			return part
 	return null
 
+## Dragging a placed block carries the node itself, so dragging out of a
+## slot and dragging between slots are one code path.
+func _get_drag_data(_at_position: Vector2) -> Variant:
+	var preview := Label.new()
+	preview.text = definition.block_label if definition != null else "condition"
+	set_drag_preview(preview)
+	return {"source": "build", "node": self}
+
+## Drop targeting asks the innermost Control under the cursor first and walks
+## up the parent chain, skipping MOUSE_FILTER_IGNORE nodes. Every container
+## in this scene is IGNORE and the root is STOP, so a nested block is asked
+## before the block containing it -- which is exactly the nesting behavior
+## wanted, with no depth bookkeeping. Returning false here lets the query
+## bubble to the parent.
+func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+	if not data is Dictionary:
+		return false
+	if not _is_over_body(at_position):
+		return false
+	return _accepts_condition(data)
+
+func _drop_data(at_position: Vector2, data: Variant) -> void:
+	if not _is_over_body(at_position):
+		return
+
+	_remove_body_placeholder()
+
+	if data.get("source") == "palette":
+		var block: ConditionBlock = load(SCENE_PATH).instantiate()
+		# setup() populates @onready containers, so it must run after the
+		# node is in the tree.
+		body.add_child(block)
+		block.setup(data["definition"])
+		block.structure_changed.connect(_on_child_structure_changed)
+	else:
+		var moved: ConditionBlock = data["node"]
+		moved.get_parent().remove_child(moved)
+		body.add_child(moved)
+		if not moved.structure_changed.is_connected(_on_child_structure_changed):
+			moved.structure_changed.connect(_on_child_structure_changed)
+
+	structure_changed.emit()
+
+func _on_child_structure_changed() -> void:
+	structure_changed.emit()
+
+## Global rects, not local ones. `body` sits inside a MarginContainer, so
+## body.position is margin-relative while at_position is block-relative --
+## subtracting one from the other would be off by the margin. Comparing
+## global rects against the global cursor is correct at any nesting depth.
+func _is_over_body(_at_position: Vector2) -> bool:
+	return body.get_global_rect().has_point(get_global_mouse_position())
+
+## A wrapper's body takes exactly one leaf condition, and that condition
+## takes no body children of its own. Without this, a block nested inside a
+## NOT would flatten into the rule's conditions[] and escape the negation --
+## "not (A and B)" on screen compiling to "not A and B", which are not
+## equal. Refusing the drop is what keeps the drawing honest.
+func _accepts_condition(data: Dictionary) -> bool:
+	var dragged: Variant = data.get("node")
+
+	if dragged == self:
+		return false
+
+	# Reparenting a block into its own descendant would make a cycle.
+	if dragged is Node and dragged.is_ancestor_of(self):
+		return false
+
+	if is_wrapper():
+		return body_children().is_empty() and _is_condition_payload(data)
+
+	if _is_inside_wrapper():
+		return false
+
+	return _is_condition_payload(data)
+
+func _is_condition_payload(data: Dictionary) -> bool:
+	if data.has("definition"):
+		return true
+	return data.get("source") == "build" and data.get("node") is ConditionBlock
+
+func _is_inside_wrapper() -> bool:
+	var node: Node = get_parent()
+	while node != null:
+		if node is ConditionBlock and node.is_wrapper():
+			return true
+		node = node.get_parent()
+	return false
+
+func _remove_body_placeholder() -> void:
+	var placeholder: Node = body.get_node_or_null("BodyPlaceholder")
+	if placeholder != null:
+		body.remove_child(placeholder)
+		placeholder.queue_free()
+
 ## Test seam for headless verification -- drives a widget the way a click
 ## would, so build_condition()'s real read path is what gets exercised
 ## rather than a shortcut around it.
@@ -195,8 +294,8 @@ func set_property_for_test(property: StringName, value: Variant) -> void:
 
 	if widget is SpinBox:
 		var part: SentencePart = _part_for(property)
-		var scale: float = part.display_scale if part != null else 1.0
-		widget.value = float(value) / scale
+		var value_scale: float = part.display_scale if part != null else 1.0
+		widget.value = float(value) / value_scale
 	elif widget is OptionButton:
 		for i in widget.item_count:
 			if widget.get_item_metadata(i) == value:

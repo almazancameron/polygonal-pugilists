@@ -14,6 +14,8 @@ extends PanelContainer
 signal structure_changed
 signal delete_requested(segment: RuleSegment)
 
+const TECHNIQUE_BLOCK_SCENE: String = "res://scenes/priority_builder/technique_block.tscn"
+
 @onready var handle: Label = $Rows/Header/Handle
 @onready var index_label: Label = $Rows/Header/IndexLabel
 @onready var verdict_label: Label = $Rows/Header/VerdictLabel
@@ -99,6 +101,86 @@ func _collect(block: ConditionBlock, into: Array[Condition]) -> void:
 
 	for child in block.body_children():
 		_collect(child, into)
+
+## Only the header handle starts a reorder drag. Dragging anywhere on the
+## segment would fight with dragging the blocks inside it.
+func _get_drag_data(at_position: Vector2) -> Variant:
+	if not _is_over(handle, at_position):
+		return null
+	var preview := Label.new()
+	preview.text = "Priority %s" % index_label.text
+	set_drag_preview(preview)
+	return {"source": "build", "node": self}
+
+func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+	if not data is Dictionary:
+		return false
+
+	# A segment being dragged for reorder is the SegmentList's business, not
+	# a slot's -- refusing here lets the query bubble up to the list.
+	if data.get("node") is RuleSegment:
+		return false
+
+	if _is_over(technique_slot, at_position):
+		return _accepts_technique(data)
+
+	if _is_over(condition_body, at_position):
+		return _is_condition_payload(data)
+
+	return false
+
+func _drop_data(at_position: Vector2, data: Variant) -> void:
+	if _is_over(technique_slot, at_position):
+		_drop_technique(data)
+	elif _is_over(condition_body, at_position):
+		_drop_condition(data)
+
+	structure_changed.emit()
+
+## Global rects for the same reason as ConditionBlock._is_over_body() --
+## these containers are nested under Rows, so their local positions are not
+## in the same coordinate space as at_position.
+func _is_over(container: Control, _at_position: Vector2) -> bool:
+	return container.get_global_rect().has_point(get_global_mouse_position())
+
+func _is_condition_payload(data: Dictionary) -> bool:
+	if data.has("definition"):
+		return true
+	return data.get("source") == "build" and data.get("node") is ConditionBlock
+
+## One technique per slot.
+func _accepts_technique(data: Dictionary) -> bool:
+	if technique_block() != null:
+		return false
+	if data.has("technique"):
+		return true
+	return data.get("source") == "build" and data.get("node") is TechniqueBlock
+
+func _drop_technique(data: Dictionary) -> void:
+	if data.get("source") == "palette":
+		var block: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
+		technique_slot.add_child(block)
+		block.setup(data["technique"], _tooltip_layer)
+	else:
+		var moved: TechniqueBlock = data["node"]
+		moved.get_parent().remove_child(moved)
+		technique_slot.add_child(moved)
+
+func _drop_condition(data: Dictionary) -> void:
+	if data.get("source") == "palette":
+		var block: ConditionBlock = load(ConditionBlock.SCENE_PATH).instantiate()
+		condition_body.add_child(block)
+		block.setup(data["definition"])
+		block.structure_changed.connect(_on_block_structure_changed)
+	else:
+		var moved: ConditionBlock = data["node"]
+		moved.get_parent().remove_child(moved)
+		condition_body.add_child(moved)
+		if not moved.structure_changed.is_connected(_on_block_structure_changed):
+			moved.structure_changed.connect(_on_block_structure_changed)
+
+func _on_block_structure_changed() -> void:
+	structure_changed.emit()
 
 func set_index(index: int) -> void:
 	index_label.text = str(index)
