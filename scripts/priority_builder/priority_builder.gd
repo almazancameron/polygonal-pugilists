@@ -59,13 +59,36 @@ func _ready() -> void:
 	# no obvious first move.
 	_on_add_slot_pressed()
 
+## Clicking anywhere outside a focused input releases it.
+##
+## Godot keeps focus on a LineEdit until something else focusable takes it,
+## and almost nothing on this screen is focusable -- so without this the
+## caret stays parked in a spin box while you go on dragging blocks around.
+func _input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton and event.pressed):
+		return
+
+	var focused: Control = get_viewport().gui_get_focus_owner()
+	if focused == null:
+		return
+
+	# A SpinBox's LineEdit is a child of the SpinBox, and the up/down arrows
+	# sit outside the LineEdit's own rect -- measure against the SpinBox so
+	# that clicking its arrows doesn't drop focus mid-edit.
+	var region: Control = focused
+	if focused.get_parent() is SpinBox:
+		region = focused.get_parent()
+
+	if not region.get_global_rect().has_point(event.global_position):
+		focused.release_focus()
+
 func _definitions() -> Array[ConditionBlockDefinition]:
 	if not block_definitions.is_empty():
 		return block_definitions
 
 	var found: Array[ConditionBlockDefinition] = []
-	for name in DEFINITION_ORDER:
-		var definition: ConditionBlockDefinition = load("%s/%s.tres" % [BLOCK_DIR, name])
+	for definition_name in DEFINITION_ORDER:
+		var definition: ConditionBlockDefinition = load("%s/%s.tres" % [BLOCK_DIR, definition_name])
 		if definition != null:
 			found.append(definition)
 	return found
