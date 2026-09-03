@@ -324,13 +324,44 @@ single body child is compiled to a `Condition` and assigned via
 `rule.conditions` and **the child is not appended separately**.
 
 **A wrapper's body accepts exactly one condition, and that condition accepts no
-body children of its own.** Enforced in `_can_drop_data`. Without this rule a
-block nested inside a `not` would flatten into the rule's `conditions[]` and
-escape the negation, turning `not (A AND B)` into `not A AND B` — a silent
-semantic change.
+body children of its own.** Enforced in `_can_drop_data`.
 
-The consequence is that `not (A AND B)` is not expressible. This is acceptable:
-it equals `not A OR not B`, and there is no OR.
+There are two distinct levels here and only the inner one is restricted:
+
+- **The rule slot's condition list — unrestricted.** A wrapper is an ordinary
+  member of the slot's ANDed list. Conditions may precede and follow it freely,
+  and a wrapper may be nested inside a normal condition. A slot holding
+  `not(A)` then `B` compiles to `conditions = [not(A), B]`, meaning
+  "NOT A AND B".
+- **The wrapper's own body — one leaf condition, no further nesting.**
+
+The reason for the inner limit: normal AND-nesting works by *flattening* —
+nesting B inside A means "A AND B" and both land in the rule's flat
+`conditions[]`. `NotCondition` has one field, `wrapped_condition`, with room
+for one condition. So a B nested inside a wrapped A would have nowhere to go
+but the rule's list, producing `not A AND B` while the on-screen nesting reads
+as `not (A AND B)`. Those are not equal, so the picture would lie. Refusing the
+drop is what keeps the drawing honest.
+
+`not (not (A))` is refused by the same rule, and is a no-op anyway.
+
+**The refusal must be explained on screen, not merely enforced.** A drop that
+is silently rejected for a non-obvious reason reads as a bug. An empty wrapper
+body shows placeholder text naming its arity ("one condition"), and a wrapper
+body that already holds a condition renders as visibly full rather than as an
+available drop target.
+
+The consequence is that `not (A AND B)` is not expressible. Accepted: it equals
+`not A OR not B`, and there is no OR.
+
+**Alternative considered and declined:** an `AndCondition` (a ~10-line
+`Condition` subclass holding an ANDed `Array[Condition]`) would make a
+wrapper's body behave exactly like a rule slot — more than one child compiles
+to an `AndCondition`, one child compiles to itself — removing the special case
+entirely and making `not (A AND B)` expressible. Declined for now to hold the
+PoC to a single shared-code change (§9), since it adds genuinely new authored
+combat behavior rather than UI. Revisit if the refused drop turns out to be
+something you actually reach for while building.
 
 ## 8. The state probe
 
