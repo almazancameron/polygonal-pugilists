@@ -12,6 +12,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"technique_describe",
 	"block_definitions",
 	"condition_block",
+	"rule_segment",
 ]
 
 const CONDITION_BLOCK_SCENE: String = "res://scenes/priority_builder/condition_block.tscn"
@@ -34,6 +35,7 @@ func _run_checks() -> void:
 	_check_technique_describe()
 	_check_block_definitions()
 	_check_condition_block()
+	_check_rule_segment()
 
 	for check_name in EXPECTED_CHECKS:
 		if not _completed.has(check_name):
@@ -51,6 +53,108 @@ func _run_checks() -> void:
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
+
+## A segment holding only a technique -- the catch-all shape. Detached from
+## root so a caller can reparent it into a SegmentList.
+func _filled_segment(technique_path: String) -> RuleSegment:
+	var segment: RuleSegment = load(RULE_SEGMENT_SCENE).instantiate()
+	root.add_child(segment)
+	var block: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
+	segment.technique_slot.add_child(block)
+	block.setup(load(technique_path), null)
+	root.remove_child(segment)
+	return segment
+
+func _check_rule_segment() -> void:
+	var scene: PackedScene = load(RULE_SEGMENT_SCENE)
+	_expect(scene != null, "could not load rule_segment.tscn")
+	if scene == null:
+		return
+
+	var segment: RuleSegment = scene.instantiate()
+	root.add_child(segment)
+
+	_expect(segment.is_empty(), "a fresh segment should be empty")
+	_expect(not segment.is_complete(), "a fresh segment should be incomplete")
+
+	# A technique alone is the catch-all shape: non-empty, complete, and
+	# compiling to an empty conditions array (vacuously true, per
+	# priority_rule.gd's own comment).
+	var technique_block: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
+	segment.technique_slot.add_child(technique_block)
+	technique_block.setup(load("res://resources/techniques/attack.tres"), null)
+
+	_expect(not segment.is_empty(), "a segment with a technique is not empty")
+	_expect(segment.is_complete(), "a technique-only segment should be complete")
+
+	var catch_all: PriorityRule = segment.build_rule()
+	_expect(catch_all.conditions.is_empty(), "catch-all rule should have no conditions")
+	_expect(catch_all.technique != null, "catch-all rule should have a technique")
+
+	# Pre-order flatten: A holding B in its body, with C alongside A, must
+	# compile to [A, B, C]. Order does not change whether the rule fires --
+	# they are all ANDed -- but choose_technique() reports the FIRST failing
+	# condition, so pre-order is what makes the reported reason match
+	# top-to-bottom reading on screen.
+	var block_a: ConditionBlock = _new_condition_block("status_vs_value")
+	var block_b: ConditionBlock = _new_condition_block("hp_vs_percent")
+	var block_c: ConditionBlock = _new_condition_block("stat_vs_value")
+
+	root.remove_child(block_a)
+	root.remove_child(block_b)
+	root.remove_child(block_c)
+	segment.condition_body.add_child(block_a)
+	block_a.body.add_child(block_b)
+	segment.condition_body.add_child(block_c)
+
+	var rule: PriorityRule = segment.build_rule()
+	_expect(rule.conditions.size() == 3, "expected 3 flattened conditions, got %d" % rule.conditions.size())
+	if rule.conditions.size() == 3:
+		_expect(rule.conditions[0] is StatusComparisonCondition, "conditions[0] should be the status block (A)")
+		_expect(rule.conditions[1] is HpComparisonCondition, "conditions[1] should be the nested HP block (B)")
+		_expect(rule.conditions[2] is StatComparisonCondition, "conditions[2] should be the sibling stat block (C)")
+
+	# A wrapper assigns its child to body_property and must NOT also append
+	# it to conditions[] -- doing both would AND a condition alongside its
+	# own negation, which is never satisfiable.
+	var wrapper_segment: RuleSegment = scene.instantiate()
+	root.add_child(wrapper_segment)
+	var wrapper_technique: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
+	wrapper_segment.technique_slot.add_child(wrapper_technique)
+	wrapper_technique.setup(load("res://resources/techniques/attack.tres"), null)
+
+	var not_block: ConditionBlock = _new_condition_block("not")
+	root.remove_child(not_block)
+	wrapper_segment.condition_body.add_child(not_block)
+
+	_expect(not wrapper_segment.is_complete(), "a segment with an empty NOT must be incomplete")
+
+	var wrapped: ConditionBlock = _new_condition_block("hp_vs_percent")
+	root.remove_child(wrapped)
+	not_block.body.add_child(wrapped)
+
+	_expect(wrapper_segment.is_complete(), "a filled NOT should make the segment complete")
+
+	var wrapper_rule: PriorityRule = wrapper_segment.build_rule()
+	_expect(wrapper_rule.conditions.size() == 1,
+		"a NOT wrapping one condition should flatten to 1 condition, got %d" % wrapper_rule.conditions.size())
+	if wrapper_rule.conditions.size() == 1:
+		var not_condition: Condition = wrapper_rule.conditions[0]
+		_expect(not_condition is NotCondition, "conditions[0] should be the NotCondition")
+		if not_condition is NotCondition:
+			_expect(not_condition.wrapped_condition is HpComparisonCondition,
+				"NotCondition.wrapped_condition should be the HP block")
+
+			# And the negation must actually invert.
+			var pair: Array = _make_pair()
+			var user: Combatant = pair[0]
+			var target: Combatant = pair[1]
+			var inner: Condition = not_condition.wrapped_condition
+			_expect(not_condition.is_met(user, target) != inner.is_met(user, target),
+				"NotCondition should invert its wrapped condition")
+			print("  NOT describe: %s" % not_condition.describe())
+
+	_completed.append("rule_segment")
 
 func _definition(name: String) -> ConditionBlockDefinition:
 	return load("%s/%s.tres" % [BLOCK_DIR, name])
