@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" uid="uid://bngdwml8l72or" path="res://scripts/upgrade/add_technique_upgrade.gd" id="1_8q6bs"]
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_84t2h"]
-[ext_resource type="Script" uid="uid://baj0ejcs7vtt1" path="res://scripts/condition/self_hp_below_x_condition.gd" id="2_ysise"]
+[ext_resource type="Script" uid="uid://btc5hsdhdcrjj" path="res://scripts/condition/hp_comparison_condition.gd" id="2_ysise"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="3_gra7e"]
 [ext_resource type="Resource" uid="uid://da84lw5fqddnu" path="res://resources/techniques/gorge.tres" id="4_lkgf3"]
 
 [sub_resource type="Resource" id="Resource_iawn2"]
 script = ExtResource("2_ysise")
-hp_percent = 0.75
-metadata/_custom_type_script = "uid://baj0ejcs7vtt1"
+right_value = 0.75
+metadata/_custom_type_script = "uid://btc5hsdhdcrjj"
 
 [sub_resource type="Resource" id="Resource_4j4hq"]
 script = ExtResource("3_gra7e")

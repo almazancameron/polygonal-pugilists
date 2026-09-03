@@ -1,15 +1,16 @@
 [gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://64xcokc585vm"]
 
-[ext_resource type="Script" uid="uid://tlxwmpnfl88d" path="res://scripts/condition/target_status_stacks_below_x_condition.gd" id="1_1ksn2"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="1_1ksn2"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_1cw5u"]
 [ext_resource type="Resource" uid="uid://dk2il2vavbbkq" path="res://resources/techniques/acid_bath.tres" id="3_hvh48"]
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="4_cond"]
 
 [sub_resource type="Resource" id="Resource_1cw5u"]
 script = ExtResource("1_1ksn2")
-status_effect = 3
-stacks = 5
-metadata/_custom_type_script = "uid://tlxwmpnfl88d"
+left_status_effect = 3
+left_target = 1
+right_value = 5
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
 
 [resource]
 script = ExtResource("2_1cw5u")

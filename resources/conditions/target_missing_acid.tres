@@ -1,8 +1,10 @@
-[gd_resource type="Resource" script_class="TargetMissingStatusCondition" format=3 uid="uid://cb5ixnjty76te"]
+[gd_resource type="Resource" script_class="StatusComparisonCondition" format=3 uid="uid://cb5ixnjty76te"]
 
-[ext_resource type="Script" uid="uid://ci06ykedjo4w0" path="res://scripts/condition/target_missing_status_condition.gd" id="1"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-status_effect = 3
-target = 1
+left_status_effect = 3
+left_target = 1
+right_value = 1
+comparator = 2

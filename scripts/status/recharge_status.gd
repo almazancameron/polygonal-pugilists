@@ -18,7 +18,7 @@ func on_tick(target: Combatant) -> String:
     ]
 
 func preview_color() -> Color:
-    return Color(1.0, 1.0, 0.2, 1.0)
+    return Color(0.35, 0.25, 1.0, 1.0)
 
 func icon() -> Texture2D:
     return preload("res://assets/sprites/icons/recharge_icon.tres")

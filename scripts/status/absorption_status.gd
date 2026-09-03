@@ -8,8 +8,7 @@ func describe() -> String:
     return "Absorbs the next %d damage taken by the target." % [stacks]
 
 func preview_color() -> Color:
-    return Color(0.5, 1.0, 0.5, 1.0)
+    return Color(0.15, 0.7, 0.65, 1.0)
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/absorption_icon.tres")
-    return null # change after adding absorption_icon.tres
+    return preload("res://assets/sprites/icons/absorption_icon.tres")

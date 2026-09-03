@@ -39,6 +39,8 @@ var current_round: int = 0
 
 @onready var combat_log: CombatLog = $CombatLog
 
+@onready var tooltip_layer: TooltipLayer = $TooltipLayer/TooltipContainer
+
 @onready var player_name_label: Label = $Panels/PlayerPanel/NameLabel
 @onready var enemy_name_label: Label = $Panels/EnemyPanel/NameLabel
 
@@ -57,9 +59,18 @@ var enemy: Combatant
 
 var phase: Phase = Phase.PLAYER_TURN
 
+## Who opens the exchange currently in progress -- re-decided by
+## _determine_first_actor() every time an exchange completes (see
+## advance_turn()), not just once per fight, so a mid-fight Speed swing
+## (buff/debuff) can hand a side two turns in a row.
+var current_first_actor: Combatant
+
 func _ready() -> void:
 	player = Combatant.new(player_familiar_data)
 	enemy = Combatant.new(enemy_familiar_data)
+
+	player_status_row.tooltip_layer = tooltip_layer
+	enemy_status_row.tooltip_layer = tooltip_layer
 
 	player_name_label.text = player.familiar.familiar_name
 	enemy_name_label.text = enemy.familiar.familiar_name
@@ -80,7 +91,8 @@ func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") 
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.theme = preload("res://assets/themes/button_font.tres")
 	if tooltip != "":
-		button.tooltip_text = tooltip
+		button.mouse_entered.connect(func() -> void: tooltip_layer.hover_started(button, tooltip))
+		button.mouse_exited.connect(func() -> void: tooltip_layer.hover_ended(button))
 
 	button.pressed.connect(on_pressed)
 
@@ -110,15 +122,38 @@ func _on_upgrade_selected(upgrade: UpgradeOption) -> void:
 		upgrade_pool.erase(upgrade)
 	await begin_fight("Upgrade applied: %s. Let the battle continue!" % upgrade.describe(), CombatLog.Source.PLAYER)
 
+func _determine_first_actor(player: Combatant, enemy: Combatant) -> Combatant:
+	var player_override := player.has_first_act_override()
+	var enemy_override := enemy.has_first_act_override()
+
+	if player_override != enemy_override:
+		return player if player_override else enemy
+
+	var player_speed := player.effective_stat(Familiar.Stat.SPEED)
+	var enemy_speed := enemy.effective_stat(Familiar.Stat.SPEED)
+
+	if player_speed == enemy_speed:
+		return player
+	return player if player_speed > enemy_speed else enemy
+
+func _other(combatant: Combatant) -> Combatant:
+	return enemy if combatant == player else player
+
 ## Clears whichever choice screen is showing (build-select or
-## upgrade-select) and starts the player's first turn of the fight.
+## upgrade-select) and starts the fight's opening turn. No upkeep before
+## this first turn -- both Combatants are freshly created with no statuses
+## yet, same as before Speed-based ordering existed.
 func begin_fight(message: String, source: CombatLog.Source) -> void:
 	for child in build_select_panel.get_children():
 		child.queue_free()
 
 	combat_log.add_entry(message, source)
-	phase = Phase.PLAYER_TURN
-	await take_turn(player, enemy, CombatLog.Source.PLAYER)
+
+	current_first_actor = _determine_first_actor(player, enemy)
+	var opening_source: CombatLog.Source = CombatLog.Source.PLAYER if current_first_actor == player else CombatLog.Source.ENEMY
+
+	phase = Phase.PLAYER_TURN if current_first_actor == player else Phase.ENEMY_TURN
+	await take_turn(current_first_actor, _other(current_first_actor), opening_source)
 
 ## The one path for updating what a combatant's HPBar shows. The fill and
 ## the status-damage preview must always move together -- the preview's
@@ -150,26 +185,32 @@ func refresh_status_preview(combatant: Combatant, hp_bar: HPBar, status_row: Sta
 	hp_bar.set_status_preview_segments(segments)
 	status_row.set_status_icons(segments)
 
-func advance_turn() -> void:
+## actor is whoever just finished their turn. If they were the exchange's
+## first actor, the exchange isn't done yet -- the other side takes their
+## turn next, no re-determination. If they were the second actor, the
+## exchange just completed, so _determine_first_actor() runs again for the
+## next one: whoever's still faster (or still holds an override) opens it
+## again, which is what lets one side take two turns in a row.
+func advance_turn(actor: Combatant) -> void:
 	if await check_victory():
 		return
 
-	if phase == Phase.PLAYER_TURN:
-		phase = Phase.ENEMY_UPKEEP
-
-		if await run_upkeep(enemy, enemy_hp_bar, CombatLog.Source.ENEMY):
-			return
-
-		phase = Phase.ENEMY_TURN
-		await take_turn(enemy, player, CombatLog.Source.ENEMY)
+	var next_actor: Combatant
+	if actor == current_first_actor:
+		next_actor = _other(actor)
 	else:
-		phase = Phase.PLAYER_UPKEEP
+		current_first_actor = _determine_first_actor(player, enemy)
+		next_actor = current_first_actor
 
-		if await run_upkeep(player, player_hp_bar, CombatLog.Source.PLAYER):
-			return
+	var next_source: CombatLog.Source = CombatLog.Source.PLAYER if next_actor == player else CombatLog.Source.ENEMY
+	var next_hp_bar: HPBar = player_hp_bar if next_actor == player else enemy_hp_bar
 
-		phase = Phase.PLAYER_TURN
-		await take_turn(player, enemy, CombatLog.Source.PLAYER)
+	phase = Phase.PLAYER_UPKEEP if next_actor == player else Phase.ENEMY_UPKEEP
+	if await run_upkeep(next_actor, next_hp_bar, next_source):
+		return
+
+	phase = Phase.PLAYER_TURN if next_actor == player else Phase.ENEMY_TURN
+	await take_turn(next_actor, _other(next_actor), next_source)
 
 ## Ticks statuses for the side about to act. Returns whatever
 ## check_victory() returns, so the caller can stop the turn loop whenever
@@ -204,7 +245,7 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 	if actor.is_stunned:
 		actor.is_stunned = false
 		combat_log.add_entry("%s is stunned and skips its turn!" % actor.familiar.familiar_name, source)
-		await advance_turn()
+		await advance_turn(actor)
 		return
 
 	var decision: Dictionary = actor.choose_technique(target)
@@ -226,7 +267,7 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 
 		await get_tree().create_timer(0.6).timeout
 
-	await advance_turn()
+	await advance_turn(actor)
 
 ## get_tree().quit() only requests a quit at the end of the current frame --
 ## it does NOT stop this function from continuing to run. Each branch must
@@ -262,7 +303,6 @@ func check_victory() -> bool:
 func start_next_round() -> void:
 	current_round += 1
 	enemy_familiar_data = opponent_lineup[current_round]
-	phase = Phase.PLAYER_UPKEEP
 
 	populate_upgrade_select_buttons()
 

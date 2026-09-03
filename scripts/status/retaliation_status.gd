@@ -28,8 +28,7 @@ func on_applied(target: Combatant) -> String:
     ]
 
 func preview_color() -> Color:
-    return Color(0.5, 0.5, 0.5, 1.0)
+    return Color(0.8, 0.3, 0.1, 1.0)
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/retaliation_icon.tres")
-    return null # change after adding retaliation_icon.tres
+    return preload("res://assets/sprites/icons/retaliation_icon.tres")

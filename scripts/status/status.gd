@@ -5,9 +5,18 @@ extends RefCounted
 ## state, same reasoning as Combatant: never saved or edited in the
 ## Inspector, so RefCounted rather than Resource or Node.
 
-enum StatusEffect { NONE, POISON, BURN, ACID, BLEED, STAGGER, FORETELL, STUN, DEFENDING, INFESTATION, HONE, FORTIFY, ENLARGE, RECHARGE, THORNS, WARD, HEX, ABSORPTION, RUIN, RETALIATION }
+enum StatusEffect { NONE, POISON, BURN, ACID, BLEED, STAGGER, FORETELL, STUN, DEFENDING, INFESTATION, HONE, FORTIFY, ENLARGE, RECHARGE, THORNS, WARD, HEX, ABSORPTION, RUIN, RETALIATION, STASIS, RENEWAL, LIFESTEAL, REGENERATION, CLEANSE }
 
-var stacks: int = 1
+var stacks: int = 1:
+	set(value):
+		if value < stacks and owner != null and status_id() != Status.status_effect_id(Status.StatusEffect.STASIS):
+			var stasis: Status = owner.get_status(Status.StatusEffect.STASIS)
+			if stasis != null:
+				stasis.stacks -= 1
+				return
+		stacks = value
+
+var owner: Combatant = null
 
 func _init(initial_stacks: int = 1) -> void:
 	stacks = initial_stacks
@@ -75,6 +84,9 @@ func icon() -> Texture2D:
 func describe() -> String:
 	return "Status"
 
+func grants_first_act_override() -> bool:
+	return false
+
 ## Translates a StatusEffect enum value to the StringName a concrete
 ## Status subclass's own status_id() returns. Lets other classes
 ## (Technique, Condition subclasses) compare against StatusEffect
@@ -119,6 +131,16 @@ static func status_effect_id(effect: StatusEffect) -> StringName:
 			return &"ruin"
 		StatusEffect.RETALIATION:
 			return &"retaliation"
+		StatusEffect.STASIS:
+			return &"stasis"
+		StatusEffect.RENEWAL:
+			return &"renewal"
+		StatusEffect.LIFESTEAL:
+			return &"lifesteal"
+		StatusEffect.REGENERATION:
+			return &"regeneration"
+		StatusEffect.CLEANSE:
+			return &"cleanse"
 		_:
 			return &""
 
@@ -162,5 +184,25 @@ static func create(effect: StatusEffect, initial_stacks: int = 1) -> Status:
 			return RuinStatus.new(initial_stacks)
 		Status.StatusEffect.RETALIATION:
 			return RetaliationStatus.new(initial_stacks)
+		Status.StatusEffect.STASIS:
+			return StasisStatus.new(initial_stacks)
+		Status.StatusEffect.RENEWAL:
+			return RenewalStatus.new(initial_stacks)
+		Status.StatusEffect.LIFESTEAL:
+			return LifestealStatus.new(initial_stacks)
+		Status.StatusEffect.REGENERATION:
+			return RegenerationStatus.new(initial_stacks)
+		Status.StatusEffect.CLEANSE:
+			return CleanseStatus.new(initial_stacks)
 		_:
 			return null
+
+## Reverse of status_effect_id() -- looks up a StatusEffect by the
+## StringName its status_id() would return, so a BBCode-authored nested
+## tooltip reference (e.g. "[url=poison]Poison[/url]") can resolve back to
+## a real Status without a separate hardcoded name table.
+static func from_id(id: StringName, initial_stacks: int = 1) -> Status:
+	for effect in StatusEffect.values():
+		if status_effect_id(effect) == id:
+			return create(effect, initial_stacks)
+	return null

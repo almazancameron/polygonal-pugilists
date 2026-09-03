@@ -35,7 +35,7 @@ func on_applied(target: Combatant) -> String:
     ]
 
 func preview_color() -> Color:
-    return Color(0.55, 0.35, 0.15, 1.0)
+    return Color(0.6, 0.65, 0.75, 1.0)
 
 func icon() -> Texture2D:
     return preload("res://assets/sprites/icons/hone_icon.tres")

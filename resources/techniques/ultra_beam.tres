@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://bpvq2sx27wo6e"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_k8a02"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_ekiq5"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_nf3dr"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="4_ekiq5"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="4_y8al5"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="6_tk88x"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_s5u1i"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="8_nf3dr"]
+
+[sub_resource type="Resource" id="Resource_k8a02"]
+script = ExtResource("4_ekiq5")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_bi5l8"]
+script = ExtResource("8_nf3dr")
+effect = 13
+stacks = 3
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_ekiq5"]
+script = ExtResource("6_tk88x")
+left_status_effect = 13
+comparator = 3
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_o4ncq"]
+script = ExtResource("7_s5u1i")
+percent_bonus = 3.9
+metadata/_custom_type_script = "uid://3qq8130hhesh"
+
+[sub_resource type="Resource" id="Resource_2cfou"]
+script = ExtResource("2_ekiq5")
+actions = Array[ExtResource("3_nf3dr")]([SubResource("Resource_k8a02"), SubResource("Resource_bi5l8")])
+conditions = Array[ExtResource("4_y8al5")]([SubResource("Resource_ekiq5")])
+numeric_bonuses = Array[ExtResource("7_s5u1i")]([SubResource("Resource_o4ncq")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[sub_resource type="Resource" id="Resource_y8al5"]
+script = ExtResource("4_ekiq5")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_tk88x"]
+script = ExtResource("6_tk88x")
+left_status_effect = 13
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_nf3dr"]
+script = ExtResource("2_ekiq5")
+actions = Array[ExtResource("3_nf3dr")]([SubResource("Resource_y8al5")])
+conditions = Array[ExtResource("4_y8al5")]([SubResource("Resource_tk88x")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_k8a02")
+technique_name = "Ultra Beam"
+power_multiplier = 0.1
+step_groups = Array[ExtResource("2_ekiq5")]([SubResource("Resource_2cfou"), SubResource("Resource_nf3dr")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

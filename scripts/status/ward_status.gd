@@ -9,7 +9,7 @@ func status_id() -> StringName:
     return &"ward"
 
 func preview_color() -> Color:
-    return Color(0.5, 0.5, 1.0, 1.0)
+    return Color(0.45, 0.8, 0.85, 1.0)
 
 func describe() -> String:
     return "Absorbs the next %d stack%s of status effects that would be applied to the target." % [
@@ -22,5 +22,4 @@ func on_applied(target: Combatant) -> String:
     ]
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/ward_icon.tres")
-    return null # change after adding ward_icon.tres
+    return preload("res://assets/sprites/icons/ward_icon.tres")

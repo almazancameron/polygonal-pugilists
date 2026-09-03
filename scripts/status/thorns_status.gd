@@ -23,8 +23,7 @@ func preview_color() -> Color:
 	return Color(0.2, 0.5, 0.1, 1.0)
 
 func icon() -> Texture2D:
-	#return preload("res://assets/sprites/icons/thorns_icon.tres")
-	return null # change after adding thorns_icon.tres
+	return preload("res://assets/sprites/icons/thorns_icon.tres")
 
 func describe() -> String:
 	return "Deals %d damage to whoever hits the target. Loses 1 stack per hit." % [stacks]

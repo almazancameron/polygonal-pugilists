@@ -10,14 +10,13 @@ func modify_incoming_damage(value: int) -> int:
     return int(value * (1.0 + percent_increase))
 
 func preview_color() -> Color:
-    return Color(0.5, 0.0, 0.5, 1.0)
+    return Color(0.35, 0.02, 0.05, 1.0)
 
 func describe() -> String:
     return "Increases damage taken by %d%%." % [int(percent_increase * 100)]
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/ruin_icon.tres")
-    return null # change after adding ruin_icon.tres
+    return preload("res://assets/sprites/icons/ruin_icon.tres")
 
 func on_tick(target) -> String:
     stacks -= 1

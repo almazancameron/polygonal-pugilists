@@ -8,6 +8,11 @@ extends HBoxContainer
 ## used to make active tooltips flash/disappear.
 var _icon_containers: Dictionary = {}
 
+## Set once by whoever owns this row (battle_controller.gd) so hovering an
+## icon can route through the shared hand-rolled tooltip system instead of
+## the built-in tooltip_text popup.
+var tooltip_layer: TooltipLayer = null
+
 func set_status_icons(entries: Array[Dictionary]) -> void:
 	var seen_ids: Array[StringName] = []
 
@@ -51,11 +56,22 @@ func _build_status_container() -> HBoxContainer:
 	icon_texture_rect.custom_minimum_size = Vector2(16, 16)  # Set a minimum size for the icon
 	container.add_child(icon_texture_rect)
 
+	container.mouse_entered.connect(func() -> void:
+		if tooltip_layer != null:
+			tooltip_layer.hover_started(container, container.get_meta("tooltip_text", ""))
+	)
+	container.mouse_exited.connect(func() -> void:
+		if tooltip_layer != null:
+			tooltip_layer.hover_ended(container)
+	)
+
 	return container
 
-## Refreshes one status's displayed stacks/color/icon/tooltip in place.
-## tooltip_text lives on the container (not the icon alone) so hovering
-## either the icon or the stack count shows the description.
+## Refreshes one status's displayed stacks/color/icon/tooltip in place. The
+## tooltip text is stashed as metadata on the container (not the icon alone)
+## so hovering either the icon or the stack count shows the description --
+## the mouse_entered handler above reads it fresh at hover time, since the
+## same container gets reused across refreshes as stacks change.
 func _update_status_container(container: HBoxContainer, entry: Dictionary) -> void:
 	var stack_label: Label = container.get_node("StackLabel")
 	var icon_texture_rect: TextureRect = container.get_node("Icon")
@@ -63,4 +79,4 @@ func _update_status_container(container: HBoxContainer, entry: Dictionary) -> vo
 	stack_label.text = str(entry.get("stacks", 1))
 	icon_texture_rect.texture = entry.get("icon", null)
 	icon_texture_rect.modulate = entry.get("color", Color(1, 1, 1, 1))
-	container.tooltip_text = entry.get("description", "")
+	container.set_meta("tooltip_text", entry.get("description", ""))

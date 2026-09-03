@@ -10,6 +10,7 @@ var familiar: Familiar
 var current_hp: int
 var is_stunned: bool = false
 var statuses: Array[Status] = []
+# var first_act_override: bool = false
 
 func _init(f: Familiar) -> void:
 	familiar = f
@@ -34,8 +35,13 @@ func take_damage(amount: int) -> int:
 	current_hp = max(current_hp - amount, 0)
 	return amount
 
-func heal(amount: int) -> void:
-	current_hp = min(current_hp + amount, familiar.max_hp)
+## Returns the amount actually added to current_hp, capped by max_hp -- same
+## reasoning as take_damage()'s return value, so callers logging a heal
+## message don't overstate one that was partially wasted overhealing.
+func heal(amount: int) -> int:
+	var actual: int = min(amount, familiar.max_hp - current_hp)
+	current_hp += actual
+	return actual
 
 func is_defeated() -> bool:
 	return current_hp <= 0
@@ -69,6 +75,7 @@ func add_status(new_status: Status) -> String:
 			return _combine_messages([settle_message, trigger_on_status_applied(existing)])
 
 	statuses.append(new_status)
+	new_status.owner = self
 	var appended_message: String = _combine_messages([absorb_message, _settle_status(new_status)])
 	return _combine_messages([appended_message, trigger_on_status_applied(new_status)])
 
@@ -106,6 +113,7 @@ func modify_status_stacks(effect: Status.StatusEffect, modifier: float, operator
 	if operator == ModifyStatusAction.Operator.SET and modifier > 0:
 		var new_status: Status = Status.create(effect, int(modifier))
 		statuses.append(new_status)
+		new_status.owner = self
 		return _settle_status(new_status)
 	else:
 		return ""
@@ -211,3 +219,13 @@ func get_status(effect: Status.StatusEffect) -> Status:
 		if status.status_id() == id:
 			return status
 	return null
+
+func has_first_act_override() -> bool:
+	# if first_act_override:
+	# 	return true
+
+	for status in statuses:
+		if status.grants_first_act_override():
+			return true
+
+	return false
