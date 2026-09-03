@@ -50,8 +50,9 @@ Single scene family under `res://scenes/` and `res://scripts/`, wired together i
   hit/heal/status sequence: `step_groups: Array[TechniqueStepGroup]`, each group gated by
   its own `conditions`, repeated `repeat_count` times, running a list of
   `TechniqueAction` subtypes (`HitAction`, `HealAction`, `StatusApplicationAction`,
-  `ModifyStatusAction`) and optionally adding situational `DamageBonus`es
-  (`ConditionalDamageBonus`, `StackCountDamageBonus`). `execute()` returns
+  `ModifyStatusAction`) and optionally adding situational `NumericBonus`es
+  (`ConditionalNumericBonus`, `StackCountNumericBonus`, `StatusCountNumericBonus`,
+  each tagged via `applies_to` for which action kind sums it in). `execute()` returns
   `Array[Callable]` (one per action) rather than one combined message, so
   `battle_controller.gd` can log and pace each step individually. `Familiar.techniques:
   Array[Technique]` holds each familiar's moveset. See `DECISIONS.md`.
@@ -94,7 +95,9 @@ constantly, but always written by Claude and deleted after use — see §7).
 
 | Concept | Status | Evidence |
 |---|---|---|
-| Scene composition (Control/VBox/HBox, anchors, Containers) | Practicing | Restructured `HPBar`'s root from a bare `ProgressBar` into a composite `Control` via "Reparent to New Node"/"Save Branch as Scene"; still needed guidance on *why* `custom_minimum_size` and "Full Rect" anchors must be set at every level of a hierarchy, not just the top, so not yet independent here |
+| Scene composition (Control/VBox/HBox, anchors, Containers) | Practicing | Restructured `HPBar`'s root from a bare `ProgressBar` into a composite `Control` via "Reparent to New Node"/"Save Branch as Scene"; still needed guidance on *why* `custom_minimum_size` and "Full Rect" anchors must be set at every level of a hierarchy, not just the top, so not yet independent here. The priority builder added a five-scene three-column layout (Claude-built), which surfaced the same lesson twice more concretely: a non-scrolling panel's minimum size propagates up and starves its siblings, and an empty `Container` has zero size — so a drop target needs `custom_minimum_size` or it is literally unhittable |
+| Drag-and-drop (`_get_drag_data`/`_can_drop_data`/`_drop_data`) | Introduced | Claude-built for the priority builder. Worth knowing before touching it: `at_position` is in the *receiving* control's space (transform it rather than doing local rect math across a `MarginContainer`, and never substitute `get_global_mouse_position()`); drop targeting asks the innermost `MOUSE_FILTER_STOP` control and does **not** reliably bubble past one, so a parent that expects a refused query to reach it will simply never be asked — that bug made segment reordering silently do nothing |
+| `HFlowContainer` vs `HBoxContainer` | Introduced | A row of dropdowns in a narrow column has to wrap, and an `HBox` can't — it forces the whole list to scroll sideways instead |
 | Basic GDScript (functions, typed vars, `@onready`) | Demonstrated | Used correctly and independently across `BurnStatus`, `AcidStatus`, and multiple self-found bug fixes |
 | `enum` | Demonstrated | Confidently expanded `Phase` from 3 to 5 states for the upkeep-phase redesign |
 | Custom signals (declare + `emit` + `.connect()`) | Demonstrated | `CombatLog.entry_added` reused and extended correctly multiple times |
@@ -109,7 +112,7 @@ constantly, but always written by Claude and deleted after use — see §7).
 | State machines | Practicing | A real enum-driven `Phase` state machine (not the old informal array+index), extended by the developer for the upkeep-phase redesign |
 | Async/coroutines (`await`) | Practicing | Implemented the upkeep-phase pacing after a detailed design conversation; understands the "calling a coroutine without awaiting it still runs it" behavior and the `get_tree().quit()` timing gotcha it exposed |
 | Save/persistence | Not introduced | — |
-| Automated tests | Not introduced | The headless-script verification pattern (see `CLAUDE.md`) has been used constantly this session, but always written by Claude — writing one independently would be a good future exercise |
+| Automated tests | Not introduced | The headless-script verification pattern (see `CLAUDE.md`) has been used constantly, but always written by Claude — writing one independently would be a good future exercise. The priority builder sharpened two rules that any such script needs: a GDScript runtime error aborts only its own function, so a harness without a per-check completion marker will report success for a check that crashed (observed), and any `SCRIPT ERROR` in the output has to be treated as a failure at the shell level since GDScript can't see its own runtime errors |
 | Data vs. subclass judgment (parameterize vs. subtype) | Demonstrated | Correctly challenged Claude's own over-subclassed first pass at `Technique` (one subclass per status-applying move) as unearned, since the cases were parametrically identical rather than behaviorally different — led directly to the enum+fields redesign now in `DECISIONS.md` |
 | Typed `Array[CustomResourceClass]` exports | Demonstrated | `Array[Technique]`, `Array[PriorityRule]`, `Array[Condition]` authored and edited correctly and independently via the Inspector across many resource files this session, including nested/embedded sub-resource arrays |
 | Godot resource save/dirty-tracking mechanics | Introduced | Diagnosed (with Claude, via live MCP introspection) why a deeply-nested resource edit made through a scene's Inspector didn't persist to the underlying `.tres` file — a real, reusable debugging lesson, not yet independently applied |
@@ -206,7 +209,7 @@ accumulation loop the bracket will eventually sit on top of.
 Bulk status/technique/passive authoring toward the full 16-familiar roster
 (`GAME_DESIGN.md` §8.4/§8.5, tracked loosely in `CONTENT_IDEAS.md`): 19 statuses now
 exist, `Technique` reworked into composable `TechniqueStepGroup`/`TechniqueAction` steps
-with situational `DamageBonus`es, and `scripts/` reorganized into per-category
+with situational `NumericBonus`es, and `scripts/` reorganized into per-category
 subfolders. Unlike every earlier step in this roadmap, the developer designed and wrote
 nearly all of this independently — see §2's "Design ownership" note and `DEVLOG.md`'s
 latest entry for the full attribution. None of the newest statuses are wired into a real

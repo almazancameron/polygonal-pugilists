@@ -1,5 +1,26 @@
 # Development Log
 
+## 2026-09-02 to 2026-09-03 (session 5) — Priority builder PoC: the real rule editor's design, settled
+
+Built and played a standalone block editor for composing `priority_rules` — `scenes/priority_builder/priority_builder.tscn`, on branch `feat/priority-builder-poc`. Claude-implemented end to end at the developer's request, after a design conversation in which the developer overrode Claude's recommended approach.
+
+**Outcome: the design question is closed.** The developer played it and confirmed it as the standard for the real in-run editor, singling out the mock battle-state probe as "perfectly simple". `GAME_DESIGN.md` §6.2 previously said composing rules directly "isn't decided yet"; it now records the validated shape, and §9.4's replacement for the `PriorityBuild` stopgap has a known target instead of a hypothesis. Four decisions written up in `DECISIONS.md`.
+
+**Approach — the developer's call, against Claude's advice.** Claude recommended one hand-written block script per condition kind, arguing a descriptor table was premature at three kinds. The developer chose the descriptor-driven design ("I've been leaning more towards making things durable, reusable, easily constructible"). That was correct and Claude's objection was weak: `StatusComparisonCondition`/`HpComparisonCondition`/`StatComparisonCondition` are structurally isomorphic, so a table names a symmetry the code already has. Result: nine `.tres` palette blocks, one generic `ConditionBlock`, zero per-kind code — adding a condition kind is now a resource, not a script. The developer also pushed back twice more productively, correcting Claude on which part was actually hardest (raw-value HP wasn't — noticing that collapsed three numeric part kinds into one) and on the block metaphor (Scratch-style nesting, dropdowns inside blocks rather than blocks-in-slots).
+
+**What it does.** Draggable technique/condition palettes; conditions as fill-in-the-blank sentences from descriptors; nesting blocks to mean AND, flattened pre-order into `PriorityRule.conditions`; a reorderable slot list; and a probe where you set either side's HP and statuses and see each rule badged FIRES / skipped (naming the failed condition) / unreached / incomplete. `Technique.describe()` was added along the way — the only content class that lacked one, which also fixes the reward screen's bare "Learn <name>" tooltip.
+
+**Bugs that only running it could find**, worth remembering as a pattern: five defects survived a design doc, an implementation plan, a plan self-review, and eight headless checks, and were caught by playing the thing. The two worst were structural — "complete" meaning node-present rather than configured (a drop *must* `add_child` before `setup()`, and `child_entered_tree` fires in between, so every drop compiled a rule with a null technique and crashed), and reordering silently doing nothing because `_can_drop_data` does not reliably bubble past a `MOUSE_FILTER_STOP` ancestor. Also: `describe()` ignoring `numeric_bonuses`, so Ultra Beam's tooltip claimed 10% damage for a ~400% hit; empty `Container`s having zero size, making nesting literally unhittable; and `SpinBox` rejecting typed input on its parse-on-unfocus path, reverting the field and looking exactly like the number vanishing. Six reusable engine gotchas are now in `CLAUDE.md`.
+
+**Verification note.** The throwaway harness reported `ALL CHECKS PASSED` with exit 0 while a check had crashed — a GDScript runtime error aborts only its own function, so the caller sails on and the failure list stays empty. Any future harness needs a per-check completion marker and a shell-level `SCRIPT ERROR` check.
+
+### Where to continue
+
+- **Integrate it.** The screen produces an in-memory `Array[PriorityRule]` and deliberately touches neither `battle.tscn` nor `battle_controller.gd`; nothing consumes it. That wiring — plus persistence, which is still `Not introduced` — is the remaining work before the bracket can be built on top.
+- **No regression coverage.** The verification harness was deleted per the throwaway convention, and drop routing changed three times afterwards (a `DropZone` refactor, reorder forwarding, focus handling), each verified by hand in the running game. Its eight checks would have caught three of the five bugs above. Worth restoring as something re-runnable before the real editor is built on this foundation — and writing it would be a good first independent test-script exercise.
+- **Nesting-as-AND is unproven.** It was built but never used as a player. Whether containment reads as AND to someone who didn't build it, versus a flat list with an explicit `AND` separator, is still open — cheap to switch, changing one scene and the tree walk.
+- **Minor:** the verdict label clips on narrow columns; moving it below the header would let it read in full.
+
 ## 2026-08-30 to 2026-09-01 (sessions 3–4) — Round loop, composable techniques, and a full status-content pass
 
 **Round loop + reward selection (session 3, committed `a495d5c`)**: multiple sequential fights now play out with an `UpgradeOption` reward pick between them (subclassed `AddTechniqueUpgrade`/`ModifyStatUpgrade`), replacing the old one-and-done single fight — Step 6 of the roadmap, in a lighter form than the bracket it was originally scoped as. Tooltips added for upgrades and status icons (`e439462`).
@@ -26,7 +47,7 @@
 
 - **Stasis status is next** (developer-requested; renamed mid-session from the brainstormed "Persistence" — whenever stacks would be removed from any other status, Stasis's own stacks are removed first instead). Needs its own design conversation before implementation — likely needs a `Status.owner: Combatant` back-reference plus a custom `stacks` property setter to intercept stack decrements across every *other* status, a cross-cutting change, not another independent `Status` subclass.
 - Wire at least one real `.tres` technique/build per new status so each actually gets exercised through a fight, not just a throwaway script.
-- `Recharge` has no consumer yet — nothing currently checks "is the user already Recharging" before applying more of it, so its intended cooldown-gating behavior doesn't exist in practice.
+- `Recharge` still has no consumer wired into any actual technique, but the blocker is gone: `StatusComparisonCondition` (built during the stats-comparison pass) makes "is the user already Recharging" a trivial condition to add to any technique's step group (self Recharge stacks < 1) — just needs a technique to actually use it.
 - Continue the content pass toward the full 16-familiar/3-status-tier/15–20-technique/traits/augments scope (see memory `pixel_pugilists_content_pass_scope`) before starting the bracket system (§9).
 
 ## 2026-08-29 (session 2) — Status icon row, techniques-as-data, and the priority/build system (Steps 4–5)

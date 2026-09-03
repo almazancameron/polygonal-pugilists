@@ -126,11 +126,21 @@ OPEN / PLAYTEST
 
 ## 5.1 Timing model
 
-**Current implementation:** sequential/fixed alternation — the player's familiar always acts first, then the enemy, repeat. One candidate under test, not a conclusion; revisit if a difficulty curve emerges across the bracket that this model doesn't support well.
+**Implemented:** Speed is the real turn-order driver, re-decided at the start of every exchange (not once per fight) — a mid-fight Speed swing can hand one side two turns in a row before alternation resumes. Equal Speed defaults to the player acting first. A `Status.grants_first_act_override()` hook lets a status force its side to open regardless of Speed; if both or neither side holds it, the Speed comparison decides as normal. See §5.2 for the stat-philosophy pass this came out of, and `DECISIONS.md` for the `battle_controller.gd` mechanics. Still an experiment per this section's OPEN/PLAYTEST status, not a locked answer — revisit if playtesting says otherwise.
 
 ## 5.2 Stat line
 
-**Current implementation:** HP, Power, Defense, Speed, Focus. Speed and Focus are both defined but functionally unused by any system — don't give either a job until a specific mechanic (an upgrade, a bracket-simulation formula) needs one. Keep the line this small unless a real need for more appears.
+**Current implementation:** HP, Power, Defense, Speed, Focus.
+
+**Design philosophy, decided but mostly not yet implemented beyond HP/Power/Defense's existing damage math:**
+
+- **HP** — a resource pool, the same "the resource" feel most games give it. Every build spends from or replenishes this pool somehow, even builds that aren't specifically HP-focused. Techniques built around HP treat it as a cost to pay and a resource to restore (Renewal/Regeneration/Lifesteal already lean into this).
+- **Power** — "big number go up." Drives direct-attack damage; should scale disproportionately hard relative to other stats via techniques. Techniques built around Power care about making it scale in absurd ways and applying that huge number to various effects, with little regard for what the opponent is doing.
+- **Defense** — "beat this number," a comparison stat. Even at baseline, its damage-reduction math already conveys a threshold to beat. Techniques built around Defense should mostly compare Power-vs-Defense (either direction) or Defense-vs-Defense directly, not just feed into the existing subtractive formula.
+- **Speed** — tempo. Higher Speed acts first by default (§5.1), but techniques shouldn't all hinge on the identical "did you go first" / "do you have higher Speed" check — a deliberate mix of the two (plus letting passives decouple them, e.g. a low-Speed familiar with an "always acts first" passive) keeps the design space from collapsing onto one axis and opens up rare double-dip combinations.
+- **Focus** — set thresholds, not comparisons. Unlike the other four's linear/comparative scaling, Focus acts like a built-in upgrade tree: fixed breakpoints unlock fixed bonuses (e.g. "5 Focus: +1 Foretell pop damage," "10 Focus: Burn deals +1 extra damage per tick," "15 Focus: +1 extra Poison stack per application"). Techniques built around Focus care about hitting specific goals — parity checks (odd/even), ranges ("15–20 Focus: double damage") — rather than raw magnitude.
+
+**Still open:** Focus's actual breakpoint table, and whether it's a universal table every familiar shares or authored per-familiar/per-build data — needs its own design pass before Focus is buildable.
 
 # 6. Behavior and autonomous decision-making
 
@@ -142,7 +152,19 @@ LOCKED
 
 ## 6.2 Where priority rules come from
 
-**Current implementation:** authored ahead of time as `PriorityRule`/`Condition`/`Technique` resources, assigned to a familiar's `priority_rules`/`techniques` via the Inspector. The player currently picks between whole pre-authored `PriorityBuild`s on a pre-fight screen (see §9.4) rather than composing individual rules themselves — composing rules directly (or from smaller building-block choices) during the between-round upgrade loop is the natural next step once §9's tournament structure exists, but isn't decided yet.
+**Current implementation:** authored ahead of time as `PriorityRule`/`Condition`/`Technique` resources, assigned to a familiar's `priority_rules`/`techniques` via the Inspector. The player currently picks between whole pre-authored `PriorityBuild`s on a pre-fight screen (see §9.4) rather than composing individual rules themselves.
+
+**Decided (playtested):** the player composes rules directly, from building-block choices. A standalone prototype — `scenes/priority_builder/priority_builder.tscn` — was built and played, and confirmed as the shape the real in-run editor should take. This closes what was previously an open question here.
+
+The validated shape:
+
+- **Draggable palette blocks.** Techniques come from the familiar's own `techniques`; conditions come from a palette grouped by kind (Status / HP / Stat / Logic).
+- **Conditions are fill-in-the-blank sentences**, built from `ConditionBlockDefinition`/`SentencePart` `.tres` descriptors — one descriptor per sentence *shape* rather than per `Condition` subclass, which is what avoids slots that hide and show (see `DECISIONS.md`).
+- **Nesting means AND**, flattened depth-first pre-order into `PriorityRule.conditions` — presentation only, since an ANDed array is already what that field means.
+- **An ordered list of reorderable slots**, since priority order is the whole mechanic.
+- **A live mock-state probe** — edit either side's HP and statuses and see which rule wins, with every rule badged FIRES / skipped (naming the failed condition) / unreached / incomplete. This is a required feature of the real editor, not a debug affordance: "unreached" is what makes a catch-all sitting above three conditional rules visibly the reason they're all dead.
+
+Still open: whether nesting genuinely reads as AND to someone who didn't build it, versus a flat ANDed list with an explicit separator. Cheap to switch — it changes one scene and the tree walk, nothing else.
 
 # 7. Techniques, tags, and statuses
 
@@ -229,6 +251,8 @@ Matches elsewhere in the bracket that the player doesn't take part in are *not* 
 
 The current pre-fight `PriorityBuild` picker (choose between whole pre-authored rule sets) is a deliberate stopgap built to avoid removing all player agency before this section existed — see the codebase's `DECISIONS.md`. Once this section is actually implemented, it should likely replace or absorb that picker: post-round upgrades are the real place build choices happen, and they should feel like real theorycrafting decisions (new technique, new priority rule, a stat bump, etc.) rather than picking a whole premade build each time.
 
+**The replacement's design is now settled**, not hypothetical: §6.2's block editor with its mock-state probe. So the picker is superseded by a known target rather than an unspecified one, and a reward that grants a technique or a condition has somewhere concrete to be arranged. The remaining work is integration — the prototype is a standalone screen that produces an in-memory `Array[PriorityRule]` and deliberately touches neither `battle.tscn` nor `battle_controller.gd`.
+
 ## 9.5 Loss ends the run
 
 Single elimination means losing a match ends the run — no Reputation-style buffer like the full game's career (`FAMILIAR_FIGHT_CLUB_VISION.md` §11.4). Worth confirming this feels right once there's a real run to lose; a bracket-flavored buffer (e.g. a rare "second chance" upgrade) is a reasonable thing to consider later if losses feel too punishing, but isn't planned now.
@@ -237,9 +261,11 @@ Single elimination means losing a match ends the run — no Reputation-style buf
 
 Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
 
-**Done:** combat engine, 19 statuses (Poison/Burn/Acid/Bleed/Stagger/Stun/Foretell/Defending/Fortify/Hone/Enlarge/Recharge/Infestation/Ward/Hex/Absorption/Ruin/Thorns/Retaliation), techniques-as-composable-steps (`TechniqueStepGroup`/`TechniqueAction` — hit/heal/status-apply/status-modify actions, gated per-group by conditions, with situational `DamageBonus`es), the priority-rule behavior system for both sides, the pre-fight build-select stopgap, sequential per-step combat resolution (each hit/heal/status application gets its own paced log line rather than one batched turn summary).
+**Done:** combat engine, 19 statuses (Poison/Burn/Acid/Bleed/Stagger/Stun/Foretell/Defending/Fortify/Hone/Enlarge/Recharge/Infestation/Ward/Hex/Absorption/Ruin/Thorns/Retaliation), techniques-as-composable-steps (`TechniqueStepGroup`/`TechniqueAction` — hit/heal/status-apply/status-modify actions, gated per-group by conditions, with situational `NumericBonus`es), the priority-rule behavior system for both sides, the pre-fight build-select stopgap, sequential per-step combat resolution (each hit/heal/status application gets its own paced log line rather than one batched turn summary).
 
-**Next:** finish the current content-pass milestone (more familiars/techniques/traits, tracked in `LEARNING_ROADMAP.md`), then build a real in-run priority-rule editor -- the §9.4 replacement for the `PriorityBuild` stopgap. Picking up a new technique between rounds with no way to see or arrange whether it'll actually trigger is a real gap, and the bracket shouldn't be built on top of it.
+**Prototyped:** the priority-rule editor (§6.2, the §9.4 replacement for the `PriorityBuild` stopgap) exists as a standalone, playable screen — `scenes/priority_builder/priority_builder.tscn` — and its design has been confirmed as the standard to build the real one to. It produces an in-memory `Array[PriorityRule]`; nothing consumes it yet, and it touches neither `battle.tscn` nor `battle_controller.gd`.
+
+**Next:** finish the current content-pass milestone (more familiars/techniques/traits, tracked in `LEARNING_ROADMAP.md`), then integrate the editor into the run loop — the remaining gap is that picking up a new technique between rounds still has no way to see or arrange whether it'll actually trigger, and the bracket shouldn't be built on top of that. The editor's own design is no longer the unknown; wiring it to a real run is.
 
 **After that:** the tournament/bracket structure (§9) itself, then whatever its open questions resolve into, and playtesting/balance passes.
 
