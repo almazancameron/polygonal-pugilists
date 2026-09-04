@@ -4,7 +4,7 @@ extends Status
 ## Adds a flat value to defense for a number of turns based on the stacks.
 
 var stack_value: int = 1
-var stacks_lost_per_turn: int = 2
+var stacks_lost_per_tick: int = 2
 
 func defense_bonus() -> int:
     return stack_value * stacks
@@ -19,7 +19,7 @@ func modify_stat(stat: Familiar.Stat, value: int) -> int:
         return value
 
 func on_tick(target: Combatant) -> String:
-    stacks -= stacks_lost_per_turn
+    stacks -= stacks_lost_per_tick
     if stacks <= 0:
         return "%s's fortification fades." % [target.familiar.familiar_name]
     else:
@@ -35,7 +35,7 @@ func preview_color() -> Color:
 
 func describe() -> String:
     return ("Increases target's defense by %d per stack. Loses %d stack%s per turn.") % [
-        stack_value, stacks_lost_per_turn, "s" if stacks_lost_per_turn != 1 else ""
+        stack_value, stacks_lost_per_tick, "s" if stacks_lost_per_tick != 1 else ""
     ]
 
 func on_applied(target: Combatant) -> String:

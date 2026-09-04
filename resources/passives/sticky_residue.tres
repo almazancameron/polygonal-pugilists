@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://7doar52d84rn"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_t4voj"]
+[ext_resource type="Resource" uid="uid://c5u4tkn36vnth" path="res://resources/techniques/sticky_residue.tres" id="2_68g87"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_aygog"]
+
+[resource]
+script = ExtResource("2_aygog")
+operation = ExtResource("2_68g87")
+triggers_hooks = true
+trigger = 5
+trigger_target = 0
+limiter = 1
+metadata/_custom_type_script = "uid://c4jawah678pod"

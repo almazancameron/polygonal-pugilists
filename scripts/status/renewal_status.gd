@@ -5,12 +5,15 @@ extends Status
 ## 2 stacks, until it runs out -- mirror of Poison's shape but healing
 ## instead of damaging.
 
+var heal_per_stack: int = 1
+var stacks_lost_per_tick: int = 2
+
 func status_id() -> StringName:
     return &"renewal"
 
 func on_tick(target: Combatant) -> String:
-    var healed: int = target.heal(stacks)
-    stacks -= 2
+    var healed: int = target.heal(heal_per_stack * stacks)
+    stacks -= stacks_lost_per_tick
     return "%s is renewed, recovering %d HP. (%d stacks remain)" % [
         target.familiar.familiar_name, healed, stacks
     ]
@@ -24,7 +27,7 @@ func icon() -> Texture2D:
 
 func describe() -> String:
     return ("Heals %d HP (based on stacks) at the start of target's turn.\n" +
-    "Loses 2 stacks per turn.") % [stacks]
+    "Loses %d stack%s per turn.") % [heal_per_stack * stacks, stacks_lost_per_tick, "s" if stacks_lost_per_tick != 1 else ""]
 
 func on_applied(target: Combatant) -> String:
     return "%s is bathed in renewal! (%d stack%s)" % [

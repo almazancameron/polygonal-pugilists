@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://b76rnaybjpn8t"]
+
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_c2o5t"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_0a4kv"]
+[ext_resource type="Resource" uid="uid://dfgq0dl24owof" path="res://resources/passives/ashen_down.tres" id="2_e8sf1"]
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="3_xqrsv"]
+[ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="4_0a4kv"]
+[ext_resource type="Resource" uid="uid://bsngkcepu008p" path="res://resources/priority_rules/ashwing_roc_rule.tres" id="4_q8lrs"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_ww7uc"]
+[ext_resource type="Resource" uid="uid://bmx3vo7iohaql" path="res://resources/priority_rules/ashwing_stoke_rule.tres" id="5_fv546"]
+[ext_resource type="Resource" uid="uid://blh627cxop8ng" path="res://resources/techniques/red_roc.tres" id="7_e5nmj"]
+[ext_resource type="Resource" uid="uid://buer6sg31xofm" path="res://resources/techniques/stoke.tres" id="8_q8lrs"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e8sf1"]
+atlas = ExtResource("4_0a4kv")
+region = Rect2(32, 32, 16, 16)
+
+[resource]
+script = ExtResource("3_xqrsv")
+familiar_name = "Ashwing"
+sprite = SubResource("AtlasTexture_e8sf1")
+max_hp = 55
+power = 8
+defense = 6
+focus = 15
+techniques = Array[ExtResource("4_ww7uc")]([ExtResource("7_e5nmj"), ExtResource("8_q8lrs")])
+priority_rules = Array[ExtResource("2_0a4kv")]([ExtResource("4_q8lrs"), ExtResource("5_fv546")])
+passives = Array[ExtResource("1_c2o5t")]([ExtResource("2_e8sf1")])
+metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

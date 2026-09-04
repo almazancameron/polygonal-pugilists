@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://dvbydu6pi14ki"]
+
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_7yons"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_8qas8"]
+[ext_resource type="Resource" uid="uid://bfjju3nkr50x2" path="res://resources/priority_rules/guubal_corrosive_rule.tres" id="2_o8bs3"]
+[ext_resource type="Resource" uid="uid://rmae50poa21" path="res://resources/priority_rules/guubal_culture_rule.tres" id="3_dx6x3"]
+
+[resource]
+script = ExtResource("2_7yons")
+build_name = "Guubal Default"
+priority_rules = Array[ExtResource("2_8qas8")]([ExtResource("2_o8bs3"), ExtResource("3_dx6x3")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

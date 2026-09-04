@@ -9,6 +9,7 @@ extends Status
 
 var heal_per_hit: int = 2
 var heal_per_tick: int = 2
+var stacks_lost_per_tick: int = 1
 
 func status_id() -> StringName:
     return &"regeneration"
@@ -19,7 +20,7 @@ func on_hit(target: Combatant, attacker: Combatant) -> String:
 
 func on_tick(target: Combatant) -> String:
     var healed: int = target.heal(heal_per_tick)
-    stacks -= 1
+    stacks -= stacks_lost_per_tick
     return "%s steadily regenerates %d HP. (%d stack%s remain)" % [
         target.familiar.familiar_name, healed, stacks, "s" if stacks != 1 else ""
     ]

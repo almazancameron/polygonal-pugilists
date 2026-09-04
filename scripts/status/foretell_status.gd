@@ -8,6 +8,7 @@ extends Status
 ## turn, which can trigger the burst immediately if that was its last turn.
 
 var burst_damage: int = 15  # TODO: tune once there's a real technique using this
+var stacks_lost_per_tick: int = 1  # also spent by a reapply -- see on_reapply()
 
 func status_id() -> StringName:
 	return &"foretell"
@@ -18,13 +19,13 @@ func stack_with(_other: Status) -> void:
 	pass
 
 func on_tick(target: Combatant) -> String:
-	stacks -= 1
+	stacks -= stacks_lost_per_tick
 	if stacks <= 0:
 		return _trigger_burst(target)
 	return ""
 
 func on_reapply(target: Combatant) -> String:
-	stacks -= 1
+	stacks -= stacks_lost_per_tick
 	if stacks <= 0:
 		return _trigger_burst(target)
 	return "%s's foretold fate draws nearer. (%d turn%s remaining.)" % [

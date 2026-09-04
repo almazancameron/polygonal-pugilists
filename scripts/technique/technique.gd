@@ -16,7 +16,16 @@ extends Resource
 ## counts. Override this entirely for a technique whose control flow doesn't
 ## fit that loop shape at all (e.g. one that reaches into priority_rules or
 ## turn order).
-func execute(user: Combatant, target: Combatant) -> Array[Callable]:
+## trigger_hooks controls whether this run's hit/status actions cascade into
+## the action-level ambient triggers (HIT/ATTACK/STATUS_APPLIED, see
+## apply_hit()/apply_status()) -- true for every real turn (the default an
+## ordinary take_turn() call relies on), false when a PassiveEffect's own
+## operation is what's executing, unless that passive explicitly opts in via
+## PassiveEffect.triggers_hooks. Turn-level triggers (TECHNIQUE_USED, etc.)
+## are unaffected either way -- those aren't wired inside apply_hit()/
+## apply_status() at all, so a passive's operation can never reach them
+## regardless of this flag.
+func execute(user: Combatant, target: Combatant, trigger_hooks: bool = true) -> Array[Callable]:
 	var steps: Array[Callable] = []
 
 	for step_group in step_groups:
@@ -25,7 +34,7 @@ func execute(user: Combatant, target: Combatant) -> Array[Callable]:
 			if not condition.is_met(user, target):
 				conditions_met = false
 				break
-		
+
 		if not conditions_met:
 			continue
 
@@ -34,12 +43,12 @@ func execute(user: Combatant, target: Combatant) -> Array[Callable]:
 
 				if action is HitAction:
 					var step = func() -> String:
-						return apply_hit(user, target, step_group.numeric_bonuses)
+						return apply_hit(user, target, step_group.numeric_bonuses, trigger_hooks)
 					steps.append(step)
 
 				elif action is StatusApplicationAction:
 					var step = func() -> String:
-						return apply_status(user, target, action, step_group.numeric_bonuses)
+						return apply_status(user, target, action, step_group.numeric_bonuses, trigger_hooks)
 					steps.append(step)
 
 				elif action is ModifyStatusAction:
@@ -65,7 +74,7 @@ func _sum_bonuses(bonuses: Array[NumericBonus], action_type: NumericBonus.Action
 			total += bonus.compute(user, target)
 	return total
 
-func apply_hit(user: Combatant, target: Combatant, numeric_bonuses: Array[NumericBonus]) -> String:
+func apply_hit(user: Combatant, target: Combatant, numeric_bonuses: Array[NumericBonus], trigger_hooks: bool = true) -> String:
 	if target.is_defeated():
 		return ""
 
@@ -75,51 +84,94 @@ func apply_hit(user: Combatant, target: Combatant, numeric_bonuses: Array[Numeri
 	var raw_technique_damage: int = int(user_power * power_multiplier)
 	var bonuses_total: int = _sum_bonuses(numeric_bonuses, NumericBonus.ActionType.HIT, user, target)
 	var raw_damage: int = raw_technique_damage + bonuses_total
-	
+
 	var post_mit_damage: int = (raw_damage * raw_damage / (raw_damage + target_defense))
 	var damage = max(post_mit_damage, 1)
 
 	var message: String = ""
-	
+
 	if damage > 0:
 		var actual_damage: int = target.take_damage(damage)
 		message += "%s uses %s on %s for %d damage!" % [
 			user.familiar.familiar_name, technique_name, target.familiar.familiar_name, actual_damage
 		]
 
-		var attack_message: String = user.trigger_on_attack()
-		if attack_message != "":
-			message += " " if message != "" else ""
-			message += attack_message
+		if trigger_hooks:
+			var attack_message: String = user.trigger_on_attack()
+			if attack_message != "":
+				message += " " if message != "" else ""
+				message += attack_message
 
-		var hit_message: String = target.trigger_on_hit(user)
-		if hit_message != "":
-			message += " " if message != "" else ""
-			message += hit_message
+			var hit_message: String = target.trigger_on_hit(user)
+			if hit_message != "":
+				message += " " if message != "" else ""
+				message += hit_message
+
+			# Scoped to direct technique hits only, same as HIT/ATTACK -- not
+			# take_damage() generically, since DoT ticks have no real
+			# "dealer" to attribute DAMAGE_DEALT/DAMAGE_TAKEN to.
+			var damage_message: String = Combatant._combine_messages([
+				user.check_passives(PassiveEffect.Trigger.DAMAGE_DEALT, user),
+				target.check_passives(PassiveEffect.Trigger.DAMAGE_TAKEN, target),
+			])
+			if damage_message != "":
+				message += " " if message != "" else ""
+				message += damage_message
 
 	return message
 
-func apply_status(user: Combatant, target: Combatant, status_application: StatusApplicationAction, numeric_bonuses: Array[NumericBonus]) -> String:
+func apply_status(user: Combatant, target: Combatant, status_application: StatusApplicationAction, numeric_bonuses: Array[NumericBonus], trigger_hooks: bool = true) -> String:
 	if status_application.target == StatusApplicationAction.Target.TARGET and target.is_defeated():
 		return ""
 
 	var message: String = ""
 
-	var bonus_total: int = _sum_bonuses(numeric_bonuses, NumericBonus.ActionType.STATUS, user, target)
-	var status: Status = Status.create(status_application.effect, status_application.stacks + bonus_total)
 	var status_target: Combatant = user if status_application.target == StatusApplicationAction.Target.SELF else target
+	var opponent: Combatant = target if status_target == user else user
+
+	# Path B (PassiveEffect.stack_bonus_*): runs unconditionally, unlike the
+	# STATUS_APPLIED notification below -- it's a computation input like
+	# numeric_bonuses, not a cascade, so it applies to every status
+	# application regardless of trigger_hooks.
+	var bonus_total: int = _sum_bonuses(numeric_bonuses, NumericBonus.ActionType.STATUS, user, target)
+	bonus_total += status_target.passive_stack_bonus(status_application.effect, status_target)
+	bonus_total += opponent.passive_stack_bonus(status_application.effect, status_target)
+
+	var status: Status = Status.create(status_application.effect, status_application.stacks + bonus_total)
 
 	if status:
-		var reapply_message: String = status_target.add_status(status)
+		status_target.pre_application_snapshot = status_target.snapshot_statuses()
+		var add_result: Dictionary = status_target.add_status(status)
+		var reapply_message: String = add_result.message
 		if reapply_message != "":
 			message += " " if message != "" else ""
 			message += reapply_message
 		else:
 			message += "%spplied %d stack%s of %s." % [
 				" Also a" if message != "" else "A",
-				status.stacks, "s" if status.stacks != 1 else "", 
+				status.stacks, "s" if status.stacks != 1 else "",
 				String(status.status_id()).capitalize()
 			]
+
+		if trigger_hooks:
+			# STATUS_APPLIED is inclusive (fresh or merged); STATUS_CREATED
+			# fires additionally, as the more exclusive subset, only when
+			# add_status() reports a genuinely new status -- same
+			# inclusive/exclusive relationship STATUS_REDUCED/STATUS_REMOVED
+			# already have for the opposite direction.
+			var triggers: Array[PassiveEffect.Trigger] = [PassiveEffect.Trigger.STATUS_APPLIED]
+			if add_result.created:
+				triggers.append(PassiveEffect.Trigger.STATUS_CREATED)
+
+			var passive_messages: Array[String] = []
+			for trigger in triggers:
+				passive_messages.append(status_target.check_passives(trigger, status_target))
+				passive_messages.append(opponent.check_passives(trigger, status_target))
+
+			var passive_message: String = Combatant._combine_messages(passive_messages)
+			if passive_message != "":
+				message += " " if message != "" else ""
+				message += passive_message
 
 	return message
 
@@ -145,6 +197,7 @@ func apply_heal(user: Combatant, target: Combatant, heal: HealAction, numeric_bo
 	var message: String = ""
 
 	var bonus_total: int = _sum_bonuses(numeric_bonuses, NumericBonus.ActionType.HEAL, user, target)
+	bonus_total += user.passive_heal_bonus(user)
 	var heal_amount: int = int(damage * heal.heal_percent) + heal.heal_flat + bonus_total
 
 	if heal_amount > 0:
@@ -180,19 +233,10 @@ func describe() -> String:
 				group_parts.append("deals %d%% damage%s" % [int(power_multiplier * 100), hit_bonus])
 
 			elif action is StatusApplicationAction:
-				group_parts.append("applies %d%s %s to %s" % [
-					action.stacks,
-					status_bonus,
-					_status_link(action.effect),
-					"self" if action.target == StatusApplicationAction.Target.SELF else "target",
-				])
+				group_parts.append(_status_application_phrase(action, step_group.numeric_bonuses, status_bonus))
 
 			elif action is ModifyStatusAction:
-				group_parts.append("%s %s's %s" % [
-					_operator_phrase(action.operator, action.modifier),
-					"self" if action.target == ModifyStatusAction.Target.SELF else "target",
-					_status_link(action.effect),
-				])
+				group_parts.append(_modify_status_phrase(action))
 
 			elif action is HealAction:
 				if action.heal_percent > 0.0 and action.heal_flat > 0:
@@ -227,66 +271,81 @@ func describe() -> String:
 
 	return "%s: %s." % [technique_name, "; ".join(parts)]
 
-## Wraps a status name in the [url=...] markup TooltipPanel resolves, so a
-## technique tooltip's status names get their own nested tooltips.
-func _status_link(effect: Status.StatusEffect) -> String:
-	var id: StringName = Status.status_effect_id(effect)
-	return "[url=%s]%s[/url]" % [id, String(id).capitalize()]
-
 ## Summarizes whichever of a group's bonuses are tagged for one action type,
-## as a trailing fragment ("" when there are none). Reads the base class's
-## static flat_bonus/percent_bonus rather than calling compute(), which
-## needs live combatants describe() doesn't have.
-##
-## Only the base NumericBonus appears in authored content today (ultra_beam
-## is the sole user). The subclasses -- Conditional/StackCount/
-## StackComparison/StatComparison/StatusCount -- change how compute() scales
-## that base, so once one of them gets authored this will understate it, and
-## the fix is a describe() on NumericBonus that subclasses override rather
-## than more branching here.
+## as a trailing fragment ("" when there are none). Delegates each bonus's
+## own fragment to NumericBonus.describe_bonus(), which subclasses override
+## to describe how they scale the base flat/percent amount (e.g.
+## StackCountNumericBonus adding "for each X stack on..."), rather than
+## branching per subclass here.
 func _bonus_summary(bonuses: Array[NumericBonus], action_type: NumericBonus.ActionType) -> String:
 	var fragments: Array[String] = []
 
 	for bonus in bonuses:
 		if bonus.applies_to != action_type:
 			continue
-		if bonus.flat_bonus != 0:
-			fragments.append("+%d" % bonus.flat_bonus)
-		if not is_zero_approx(bonus.percent_bonus):
-			fragments.append("+%d%% of %s" % [
-				int(bonus.percent_bonus * 100), _percent_source_phrase(bonus)
-			])
+
+		var fragment: String = bonus.describe_bonus()
+		if fragment != "":
+			fragments.append(fragment)
 
 	if fragments.is_empty():
 		return ""
 
-	return " " + " ".join(fragments)
+	# Leading ", " rather than a bare space -- a multiplicative fragment
+	# (StackCount/StackComparison's "times (...)") only multiplies its own
+	# bonus amount, not the base damage/heal/stacks that came before it, and
+	# a bare space made that easy to misread as one continuous expression.
+	return ", " + " ".join(fragments)
 
-func _percent_source_phrase(bonus: NumericBonus) -> String:
-	var whose: String = "user's" if bonus.percent_target == NumericBonus.Target.SELF else "target's"
+## Normally "applies N Status to X[, bonus clause]" -- but when stacks is
+## authored as 0, the count comes entirely from a numeric_bonus (e.g.
+## Sticky Residue's self-Absorption, scaled purely off the target's status
+## stacks), and "applies 0 Status to self, +1 for each..." would misleadingly
+## read as a separate 0 base plus a bonus rather than one combined amount.
+## In that case the first usable bonus's own lead ("+1") takes the position
+## the count normally holds, with its qualifier following directly instead
+## of trailing the whole sentence. Only decomposes bonuses that split
+## cleanly into lead+qualifier; a bonus that overrides describe_bonus()
+## directly instead (StatComparisonNumericBonus) would only contribute its
+## lead here, not its always-on difference term -- not a concern for any
+## currently-authored content, but worth knowing if that combination ever
+## gets authored.
+func _status_application_phrase(action: StatusApplicationAction, numeric_bonuses: Array[NumericBonus], status_bonus: String) -> String:
+	var whose: String = "self" if action.target == StatusApplicationAction.Target.SELF else "target"
+	var status_text: String = Status.status_link(action.effect)
 
-	match bonus.percent_source:
-		NumericBonus.ValueSource.STAT:
-			return "%s %s" % [whose, Familiar.stat_name(bonus.percent_stat)]
-		NumericBonus.ValueSource.STATUS_STACKS:
-			if bonus.percent_check_all:
-				return "%s total status stacks" % whose
-			return "%s %s stacks" % [whose, _status_link(bonus.percent_status_effect)]
-		NumericBonus.ValueSource.STATUS_COUNT:
-			return "%s active status count" % whose
-		NumericBonus.ValueSource.HP:
-			return "%s current HP" % whose
+	if action.stacks == 0:
+		for bonus in numeric_bonuses:
+			if bonus.applies_to != NumericBonus.ActionType.STATUS:
+				continue
 
-	return whose
+			var lead: String = bonus.describe_lead()
+			if lead == "":
+				continue
 
-func _operator_phrase(operator: ModifyStatusAction.Operator, modifier: float) -> String:
-	match operator:
+			var qualifier: String = bonus.describe_qualifier()
+			if qualifier == "":
+				return "applies %s %s to %s" % [lead, status_text, whose]
+			return "applies %s %s to %s %s" % [lead, status_text, whose, qualifier]
+
+	return "applies %d %s to %s%s" % [action.stacks, status_text, whose, status_bonus]
+
+func _modify_status_phrase(action: ModifyStatusAction) -> String:
+	var is_self: bool = action.target == ModifyStatusAction.Target.SELF
+	var possessive: String = "its own" if is_self else "target's"
+	var object_form: String = "itself" if is_self else "the target"
+	var status_text: String = Status.status_link(action.effect)
+
+	match action.operator:
 		ModifyStatusAction.Operator.MULTIPLY:
-			return "multiplies by %s" % modifier
-		ModifyStatusAction.Operator.SUBTRACT:
-			return "removes %d from" % int(modifier)
+			return "multiplies %s current %s stacks by %s" % [possessive, status_text, action.modifier]
 		ModifyStatusAction.Operator.DIVIDE:
-			return "divides by %s" % modifier
+			return "divides %s current %s stacks by %s" % [possessive, status_text, action.modifier]
+		ModifyStatusAction.Operator.SUBTRACT:
+			return "removes %d %s stack%s from %s" % [
+				int(action.modifier), status_text, "s" if int(action.modifier) != 1 else "", object_form
+			]
 		ModifyStatusAction.Operator.SET:
-			return "sets to %d" % int(modifier)
-	return "changes"
+			return "sets %s %s stacks to %d" % [possessive, status_text, int(action.modifier)]
+
+	return "changes %s %s stacks" % [possessive, status_text]

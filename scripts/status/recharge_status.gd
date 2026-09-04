@@ -6,15 +6,15 @@ extends Status
 ## to the user has extremely diminshed effect (if any) if the user is already recharging.
 ## Some techniques might also apply recharge to the target as a debuff, but this is less common.
 
-var tick_magnitude: int = 1
+var stacks_lost_per_tick: int = 1
 
 func status_id() -> StringName:
     return &"recharge"
 
 func on_tick(target: Combatant) -> String:
-    stacks -= tick_magnitude
+    stacks -= stacks_lost_per_tick
     return "%s recharges its energy %d time%s. (%d stack%s remaining.)" % [
-        target.familiar.familiar_name, tick_magnitude, "s" if tick_magnitude != 1 else "", stacks, "s" if stacks != 1 else ""
+        target.familiar.familiar_name, stacks_lost_per_tick, "s" if stacks_lost_per_tick != 1 else "", stacks, "s" if stacks != 1 else ""
     ]
 
 func preview_color() -> Color:
@@ -25,7 +25,7 @@ func icon() -> Texture2D:
 
 func describe() -> String:
     return ("Loses %d stack%s per turn. While recharging, abilities that apply recharge to the target are significantly weaker.") % [
-        tick_magnitude, "s" if tick_magnitude != 1 else ""
+        stacks_lost_per_tick, "s" if stacks_lost_per_tick != 1 else ""
     ]
 
 func on_applied(target: Combatant) -> String:

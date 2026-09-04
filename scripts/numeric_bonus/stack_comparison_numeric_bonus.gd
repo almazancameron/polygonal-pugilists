@@ -41,3 +41,19 @@ func compute(user: Combatant, target: Combatant) -> int:
 		right = _resolve(right_combatant, right_status_effect)
 
 	return (left_val - right) * base_amount(user, target)
+
+## Multiplicative, like StackCountNumericBonus -- describe_bonus()'s default
+## "" when describe_lead() is empty is correct here, since the whole bonus
+## is 0 regardless of the stack difference in that case (unlike
+## StatComparisonNumericBonus's additive difference term, which survives on
+## its own and so has to override describe_bonus() directly instead).
+func describe_qualifier() -> String:
+	var left_str: String = _stack_phrase(left_target, left_status_effect)
+	var right_str: String = str(right_value) if compare_mode == CompareMode.FLAT_VALUE else _stack_phrase(right_target, right_status_effect)
+	return "times (%s minus %s)" % [left_str, right_str]
+
+func _stack_phrase(stack_target: Target, status_effect: Status.StatusEffect) -> String:
+	var whose: String = "the user's" if stack_target == Target.SELF else "the target's"
+	if check_all:
+		return "%s total status stacks" % whose
+	return "%s %s stacks" % [whose, Status.status_link(status_effect)]

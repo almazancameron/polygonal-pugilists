@@ -29,3 +29,21 @@ func compute(user: Combatant, target: Combatant) -> int:
 		right = right_combatant.effective_stat(right_stat)
 
 	return base_amount(user, target) + (left_val - right)
+
+## The difference term is additive and independent of flat_bonus/percent_bonus
+## (a pure-difference bonus leaves both at 0), so unlike the multiplicative
+## subclasses this never returns "" -- there's always something real to
+## describe even when super.describe_bonus() itself is empty.
+func describe_bonus() -> String:
+	var base: String = super.describe_bonus()
+	var left_str: String = _stat_phrase(left_target, left_stat)
+	var right_str: String = str(right_value) if compare_mode == CompareMode.FLAT_VALUE else _stat_phrase(right_target, right_stat)
+	var diff_str: String = "(%s minus %s)" % [left_str, right_str]
+
+	if base == "":
+		return "plus %s" % diff_str
+	return "%s plus %s" % [base, diff_str]
+
+func _stat_phrase(stat_target: Target, stat: Familiar.Stat) -> String:
+	var whose: String = "the user's" if stat_target == Target.SELF else "the target's"
+	return "%s %s" % [whose, Familiar.stat_name(stat)]

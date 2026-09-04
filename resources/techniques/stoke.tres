@@ -1,0 +1,70 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://buer6sg31xofm"]
+
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_xol3d"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_kci13"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="4_ihf1l"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_kci13"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_uaqfa"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="6_a60wh"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_jb7g7"]
+[ext_resource type="Script" uid="uid://6w0wvj8mfwna" path="res://scripts/technique/modify_status_action.gd" id="8_ihf1l"]
+
+[sub_resource type="Resource" id="Resource_hlldr"]
+script = ExtResource("4_ihf1l")
+target = 1
+effect = 2
+stacks = 5
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_lw0mf"]
+script = ExtResource("6_a60wh")
+left_status_effect = 2
+left_target = 1
+comparator = 3
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_yg1h2"]
+script = ExtResource("2_xol3d")
+actions = Array[ExtResource("3_kci13")]([SubResource("Resource_hlldr")])
+conditions = Array[ExtResource("5_uaqfa")]([SubResource("Resource_lw0mf")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[sub_resource type="Resource" id="Resource_uaqfa"]
+script = ExtResource("4_ihf1l")
+target = 1
+effect = 2
+stacks = 5
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_vceff"]
+script = ExtResource("4_ihf1l")
+target = 1
+effect = 2
+stacks = 5
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_a60wh"]
+script = ExtResource("8_ihf1l")
+effect = 2
+operator = 3
+metadata/_custom_type_script = "uid://6w0wvj8mfwna"
+
+[sub_resource type="Resource" id="Resource_ihf1l"]
+script = ExtResource("6_a60wh")
+left_status_effect = 2
+left_target = 1
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_kci13"]
+script = ExtResource("2_xol3d")
+actions = Array[ExtResource("3_kci13")]([SubResource("Resource_uaqfa"), SubResource("Resource_vceff"), SubResource("Resource_a60wh")])
+conditions = Array[ExtResource("5_uaqfa")]([SubResource("Resource_ihf1l")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("4_kci13")
+technique_name = "Stoke"
+step_groups = Array[ExtResource("2_xol3d")]([SubResource("Resource_yg1h2"), SubResource("Resource_kci13")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

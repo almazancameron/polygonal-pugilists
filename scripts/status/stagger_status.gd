@@ -5,21 +5,21 @@ extends Status
 ## MAX_STACKS -- from a single application or from merging onto an existing
 ## Stagger -- it resets to 0 and arms a StunStatus on the target instead.
 
-const MAX_STACKS: int = 5
+var max_stack_count: int = 5
 
 func max_stacks() -> int:
-	return MAX_STACKS
+	return max_stack_count
 
 func status_id() -> StringName:
 	return &"stagger"
 
 func stack_with(other: Status) -> void:
-	stacks = min(stacks + other.stacks, MAX_STACKS)
+	stacks = min(stacks + other.stacks, max_stack_count)
 
 func on_applied(target: Combatant) -> String:
-	if stacks < MAX_STACKS:
+	if stacks < max_stack_count:
 		return "%s is staggered! (%d/%d stacks)" % [
-			target.familiar.familiar_name, stacks, MAX_STACKS
+			target.familiar.familiar_name, stacks, max_stack_count
 		]
 
 	stacks = 0
@@ -33,5 +33,5 @@ func icon() -> Texture2D:
 	return preload("res://assets/sprites/icons/stagger_icon.tres")
 
 func describe() -> String:
-	return ("Stacks up to %d times. At max stacks, resets to 0 and stuns the target,\n" + 
-	"causing it to skip its next turn.") % MAX_STACKS
+	return ("Stacks up to %d times. At max stacks, resets to 0 and stuns the target,\n" +
+	"causing it to skip its next turn.") % max_stack_count

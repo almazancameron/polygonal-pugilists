@@ -5,12 +5,15 @@ extends Status
 ## attack, then loses a stack -- same on_attack() shape as Hone, healing
 ## instead of buffing.
 
+var heal_percent_of_power: float = 1.0
+var stacks_lost_per_hit: int = 1
+
 func status_id() -> StringName:
     return &"lifesteal"
 
 func on_attack(user: Combatant) -> String:
-    var healed: int = user.heal(user.effective_power())
-    stacks -= 1
+    var healed: int = user.heal(int(user.effective_power() * heal_percent_of_power))
+    stacks -= stacks_lost_per_hit
     return "%s drains %d HP from its own strike! (%d stack%s remain)" % [
         user.familiar.familiar_name, healed, stacks, "s" if stacks != 1 else ""
     ]
@@ -23,7 +26,9 @@ func icon() -> Texture2D:
     return null # change after adding lifesteal_icon.tres
 
 func describe() -> String:
-    return "Heals the user for their own Power whenever they attack. Loses 1 stack per attack."
+    return "Heals the user for %d%% of their own Power whenever they attack. Loses %d stack%s per attack." % [
+        int(heal_percent_of_power * 100), stacks_lost_per_hit, "s" if stacks_lost_per_hit != 1 else ""
+    ]
 
 func on_applied(target: Combatant) -> String:
     return "%s's strikes begin draining life! (%d stack%s)" % [

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://bmx3vo7iohaql"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_s6m1o"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_a4kd4"]
+[ext_resource type="Resource" uid="uid://buer6sg31xofm" path="res://resources/techniques/stoke.tres" id="3_a4kd4"]
+
+[resource]
+script = ExtResource("2_a4kd4")
+technique = ExtResource("3_a4kd4")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

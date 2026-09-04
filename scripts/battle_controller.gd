@@ -68,6 +68,8 @@ var current_first_actor: Combatant
 func _ready() -> void:
 	player = Combatant.new(player_familiar_data)
 	enemy = Combatant.new(enemy_familiar_data)
+	player.opponent = enemy
+	enemy.opponent = player
 
 	player_status_row.tooltip_layer = tooltip_layer
 	enemy_status_row.tooltip_layer = tooltip_layer
@@ -149,6 +151,15 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 
 	combat_log.add_entry(message, source)
 
+	var player_start_message: String = player.check_passives(PassiveEffect.Trigger.BATTLE_START, player)
+	if player_start_message != "":
+		combat_log.add_entry(player_start_message, CombatLog.Source.PLAYER)
+	var enemy_start_message: String = enemy.check_passives(PassiveEffect.Trigger.BATTLE_START, enemy)
+	if enemy_start_message != "":
+		combat_log.add_entry(enemy_start_message, CombatLog.Source.ENEMY)
+	update_hp_display(player)
+	update_hp_display(enemy)
+
 	current_first_actor = _determine_first_actor(player, enemy)
 	var opening_source: CombatLog.Source = CombatLog.Source.PLAYER if current_first_actor == player else CombatLog.Source.ENEMY
 
@@ -205,6 +216,8 @@ func advance_turn(actor: Combatant) -> void:
 	var next_source: CombatLog.Source = CombatLog.Source.PLAYER if next_actor == player else CombatLog.Source.ENEMY
 	var next_hp_bar: HPBar = player_hp_bar if next_actor == player else enemy_hp_bar
 
+	next_actor.reset_turn_passive_limits()
+
 	phase = Phase.PLAYER_UPKEEP if next_actor == player else Phase.ENEMY_UPKEEP
 	if await run_upkeep(next_actor, next_hp_bar, next_source):
 		return
@@ -221,7 +234,11 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 		return false
 
 	for status in combatant.statuses.duplicate():
-		var message: String = status.on_tick(combatant)
+		var stacks_before: int = status.stacks
+		var message: String = Combatant._combine_messages([
+			status.on_tick(combatant),
+			combatant._notify_stack_change(status, stacks_before),
+		])
 		if message != "":
 			combat_log.add_entry(message, source)
 
@@ -241,6 +258,11 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 ## technique the same way now (Combatant.choose_technique()), so there's no
 ## reason left for a player-specific and an enemy-specific version of this.
 func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) -> void:
+	var turn_start_message: String = actor.check_passives(PassiveEffect.Trigger.TURN_START, actor)
+	if turn_start_message != "":
+		combat_log.add_entry(turn_start_message, source)
+		update_hp_display(actor)
+		update_hp_display(target)
 
 	if actor.is_stunned:
 		actor.is_stunned = false
@@ -254,6 +276,13 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 			combat_log.add_entry(reason, source)
 
 	var technique: Technique = decision.technique
+
+	var technique_used_message: String = actor.check_passives(PassiveEffect.Trigger.TECHNIQUE_USED, actor)
+	if technique_used_message != "":
+		combat_log.add_entry(technique_used_message, source)
+		update_hp_display(actor)
+		update_hp_display(target)
+
 	var steps: Array[Callable] = technique.execute(actor, target)
 
 	for step in steps:
@@ -267,7 +296,27 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 
 		await get_tree().create_timer(0.6).timeout
 
+	var turn_end_message: String = actor.check_passives(PassiveEffect.Trigger.TURN_END, actor)
+	if turn_end_message != "":
+		combat_log.add_entry(turn_end_message, source)
+		update_hp_display(actor)
+		update_hp_display(target)
+
 	await advance_turn(actor)
+
+## Fires once per battle conclusion (guarded by the is_defeated() check at
+## check_victory()'s only two call-return points -- once either side is
+## defeated, start_next_round()/get_tree().quit() replaces or ends the
+## fight before check_victory() would ever see this same defeated pair
+## again, so there's no risk of firing this twice for one battle).
+func _fire_battle_end_passives() -> void:
+	var player_message: String = player.check_passives(PassiveEffect.Trigger.BATTLE_END, player)
+	if player_message != "":
+		combat_log.add_entry(player_message, CombatLog.Source.PLAYER)
+
+	var enemy_message: String = enemy.check_passives(PassiveEffect.Trigger.BATTLE_END, enemy)
+	if enemy_message != "":
+		combat_log.add_entry(enemy_message, CombatLog.Source.ENEMY)
 
 ## get_tree().quit() only requests a quit at the end of the current frame --
 ## it does NOT stop this function from continuing to run. Each branch must
@@ -275,6 +324,9 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 ## guards never trigger and processing (and duplicate victory/defeat logs)
 ## continue for another full step before things settle.
 func check_victory() -> bool:
+	if enemy.is_defeated() or player.is_defeated():
+		_fire_battle_end_passives()
+
 	if enemy.is_defeated():
 		if current_round < opponent_lineup.size() - 1:
 			combat_log.add_entry("Victory! %s is defeated. Prepare for the next round!" % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
@@ -313,3 +365,6 @@ func start_next_round() -> void:
 	enemy_name_label.text = enemy.familiar.familiar_name
 	enemy_portrait.texture = enemy.familiar.sprite
 	update_hp_display(enemy)
+
+	player.opponent = enemy
+	enemy.opponent = player

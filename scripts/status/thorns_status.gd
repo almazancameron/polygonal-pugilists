@@ -5,6 +5,9 @@ extends Status
 ## had *before* that stack was consumed -- same shape as Bleed's on_hit(),
 ## just retaliating against the attacker instead of the owner.
 
+var damage_per_stack: int = 1
+var stacks_lost_per_hit: int = 1
+
 func status_id() -> StringName:
 	return &"thorns"
 
@@ -12,8 +15,8 @@ func on_hit(target: Combatant, attacker: Combatant) -> String:
 	if stacks <= 0:
 		return ""
 
-	var damage: int = attacker.take_damage(stacks)
-	stacks -= 1
+	var damage: int = attacker.take_damage(damage_per_stack * stacks)
+	stacks -= stacks_lost_per_hit
 
 	return "%s's thorns retaliate, dealing %d damage to %s! (%d stacks remain)" % [
 		target.familiar.familiar_name, damage, attacker.familiar.familiar_name, stacks
@@ -26,7 +29,9 @@ func icon() -> Texture2D:
 	return preload("res://assets/sprites/icons/thorns_icon.tres")
 
 func describe() -> String:
-	return "Deals %d damage to whoever hits the target. Loses 1 stack per hit." % [stacks]
+	return "Deals %d damage to whoever hits the target. Loses %d stack%s per hit." % [
+		damage_per_stack * stacks, stacks_lost_per_hit, "s" if stacks_lost_per_hit != 1 else ""
+	]
 
 func on_applied(target: Combatant) -> String:
 	return "%s bristles with thorns! (%d stack%s)" % [

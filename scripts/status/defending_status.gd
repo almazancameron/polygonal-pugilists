@@ -4,17 +4,20 @@ extends Status
 ## Doubles defense for a number of hits equal to the stacks.
 ## Stacks are consumed on hit and the status is removed when stacks reach 0.
 
+var defense_multiplier: int = 2
+var stacks_lost_per_hit: int = 1
+
 func status_id() -> StringName:
 	return &"defending"
 
 func modify_stat(stat: Familiar.Stat, value: int) -> int:
 	if stat == Familiar.Stat.DEFENSE:
-		return value * 2
+		return value * defense_multiplier
 	else:
 		return value
 
 func on_hit(target: Combatant, _attacker: Combatant) -> String:
-	stacks -= 1
+	stacks -= stacks_lost_per_hit
 
 	if stacks <= 0:
 		return "%s's defense is broken!" % [target.familiar.familiar_name]
@@ -30,8 +33,9 @@ func icon() -> Texture2D:
 	return preload("res://assets/sprites/icons/defend_icon.tres")
 
 func describe() -> String:
-	return "Doubles target's defense for %d hit%s. Loses 1 stack per hit." % [
-		stacks, "s" if stacks != 1 else ""
+	return "Multiplies target's defense by %d for %d hit%s. Loses %d stack%s per hit." % [
+		defense_multiplier, stacks, "s" if stacks != 1 else "",
+		stacks_lost_per_hit, "s" if stacks_lost_per_hit != 1 else ""
 	]
 
 func on_applied(target: Combatant) -> String:

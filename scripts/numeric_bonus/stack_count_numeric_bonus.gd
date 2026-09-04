@@ -25,3 +25,9 @@ func compute(user: Combatant, target: Combatant) -> int:
 			return status.stacks * base_amount(user, target)
 		else:
 			return 0
+
+func describe_qualifier() -> String:
+	var whose: String = "the user" if count_on == Target.SELF else "the target"
+	if count_all:
+		return "for each active status stack on %s" % whose
+	return "for each %s stack on %s" % [Status.status_link(count_status_effect), whose]

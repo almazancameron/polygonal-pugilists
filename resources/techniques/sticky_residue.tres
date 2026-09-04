@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://c5u4tkn36vnth"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_5wcmu"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_p7rgd"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_cy1pp"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="4_ji318"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_351xb"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_2yixt"]
+[ext_resource type="Script" uid="uid://dmvhn5chatmco" path="res://scripts/numeric_bonus/stack_count_numeric_bonus.gd" id="7_fpx02"]
+
+[sub_resource type="Resource" id="Resource_ijfyg"]
+script = ExtResource("4_ji318")
+effect = 17
+stacks = 0
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_l5kvw"]
+script = ExtResource("7_fpx02")
+count_all = true
+applies_to = 1
+flat_bonus = 1
+metadata/_custom_type_script = "uid://dmvhn5chatmco"
+
+[sub_resource type="Resource" id="Resource_4tp0t"]
+script = ExtResource("2_p7rgd")
+actions = Array[ExtResource("3_cy1pp")]([SubResource("Resource_ijfyg")])
+numeric_bonuses = Array[ExtResource("6_2yixt")]([SubResource("Resource_l5kvw")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_5wcmu")
+technique_name = "Sticky Residue"
+step_groups = Array[ExtResource("2_p7rgd")]([SubResource("Resource_4tp0t")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

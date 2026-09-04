@@ -4,6 +4,7 @@ extends Status
 ## Multiplies power for a number of turns equal to the stacks.
 
 var stack_value: float = 1.5
+var stacks_lost_per_tick: int = 1
 
 func status_id() -> StringName:
     return &"enlarge"
@@ -15,7 +16,7 @@ func modify_stat(stat: Familiar.Stat, value: int) -> int:
         return value
 
 func on_tick(target: Combatant) -> String:
-    stacks -= 1
+    stacks -= stacks_lost_per_tick
 
     if stacks <= 0:
         return "%s returns to normal." % [target.familiar.familiar_name]
@@ -31,8 +32,8 @@ func icon() -> Texture2D:
     return preload("res://assets/sprites/icons/enlarge_icon.tres")
 
 func describe() -> String:
-    return ("Increases target's power by %.1fx. Loses 1 stack per turn.") % [
-        stack_value
+    return ("Increases target's power by %.1fx. Loses %d stack%s per turn.") % [
+        stack_value, stacks_lost_per_tick, "s" if stacks_lost_per_tick != 1 else ""
     ]
 
 func on_applied(target: Combatant) -> String:

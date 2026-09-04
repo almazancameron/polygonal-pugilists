@@ -15,6 +15,15 @@ enum Stat { MAX_HP, POWER, DEFENSE, SPEED, FOCUS }
 @export var focus: int = 10
 @export var techniques: Array[Technique] = []
 @export var priority_rules: Array[PriorityRule] = []
+@export var passives: Array[PassiveEffect] = []
+@export var focus_table: FocusTable
+
+## How much Focus each breakpoint tier requires (tier * focus_step_size),
+## read fresh by FocusBreakpointCondition rather than baked into each
+## breakpoint's own threshold -- lets a future passive that changes this
+## value (e.g. "your Focus breakpoints land at steps of 4 instead of 5")
+## retroactively reshape every breakpoint's actual threshold at once.
+@export var focus_step_size: int = 5
 
 ## Human-readable display name for a Stat value -- used by upgrade
 ## descriptions rather than exposing the raw enum name or property name.

@@ -182,6 +182,12 @@ Same vocabulary as the full game (`FAMILIAR_FIGHT_CLUB_VISION.md` §10.5): Poiso
 
 CURRENT DIRECTION. Needed, not optional -- part of the current content-pass scope (a dozen or so passives, authored as a new `UpgradeOption` subtype) and a core piece of how bracket entrants get their identity: each of the 16 starting familiars is meant to carry one species-bound passive (innate from the start, not drafted) alongside its base stats, using the same passive type the in-run upgrade pool later offers as a pickup.
 
+**Two categories, by design intent, not just by implementation convenience:**
+
+- **Rule-following passives** (the implementation target for now) -- a shared `PassiveEffect` base (`Trigger`, `Conditions`, `Limiter`) with three concrete subclasses covering everything short of engine-behavior changes: `OperationPassiveEffect` (fires its own separate consequence -- a full `Technique` as payload, e.g. "deal 3 damage to the enemy," "apply 3 stacks of Ward to yourself at battle start"), `ModifyStatusPassiveEffect` (adjusts a status application already in progress -- "+1 poison stack applied per application" -- resolved *before* the status is created rather than as a reaction, since bolting it on after would incorrectly re-trigger reapply-only effects like Burn's Flare), and `PermanentStatPassiveEffect` (a permanent, run-persistent stat change via the same `ModifyStatUpgrade` payload stat upgrades already use -- "gain 5 Focus permanently at the end of combat"). A wide survey of desired passive behaviors ("when status reaches X stacks," "when HP drops below X," "if your Speed beats the opponent's, gain a bonus every turn") turned out to already be expressible as Trigger + Conditions + one of these three payloads, with no new subclass needed -- see `DECISIONS.md` for the full mapping. Focus breakpoints (§5.2) are not a separate mechanism -- a Focus breakpoint is just a rule-following passive whose Conditions include a self-Focus threshold check, authored into a swappable per-familiar `focus_table` rather than a familiar's directly-owned `passives` (see `DECISIONS.md` for why those two containers stay separate even though they hold the same effect type).
+- **Rule-breaking passives** (deliberately deferred, case-by-case) -- abilities that change how the *engine itself* behaves rather than reacting to an event within it: "always acts first, full stop, no status involved"; "techniques ignore their own conditions and fire in raw priority order"; "the fallback technique also gets evaluated as a top-priority trigger, not just kept as the fallback"; "odd-numbered turns always use the fallback technique regardless of priority"; "give techniques extra repeats under a condition" (modifies a technique's own `repeat_count` mid-execution); "lock a stat so it can't be modified" (an interception effect, the same *class* of thing Ward/Absorption already needed a hardcoded interception point for). Each is expected to need its own bespoke implementation; no shared scaffolding is planned for this category until a specific one is actually being built.
+- **Continuously-live passives** (identified, not yet designed) -- a third category distinct from both of the above: a modifier that's never "fired" at all, just permanently re-checked every time it's relevant, the way `Status.modify_stat()` already is. E.g. "+20 Speed for as long as you have 5+ Poison stacks." Doesn't fit `PassiveEffect`'s `Trigger`-based shape (there's no event to react to), and would need `Combatant.effective_stat()` itself to consult a live modifier list the way it already consults active `Status`es -- which in turn needs `effective_stat()` to gain an opponent parameter so its `Condition`s can compare against both sides, a real signature change touching every current call site. Not part of the current implementation pass.
+
 # 8. Familiar construction — bracket entrants
 
 CURRENT DIRECTION
@@ -210,7 +216,7 @@ For Pixel Pugilists, Species should *seed* a Familiar once at creation time (cop
 
 ## 8.5 Minimum entrant build skeleton
 
-Each of the 16 (or 32) starting bracket entrants should have exactly: a species (base stats + its one bound passive), one conditioned priority rule (a condition plus the technique it gates), and one unconditioned fallback technique (an empty-conditions `PriorityRule`, the same catch-all shape already used today). That's enough for every starting entrant to already fight noticeably differently from the others, giving the player a wide variety of jumping-off points to build from.
+Each of the 16 starting bracket entrants should have exactly: a species (base stats + its one bound passive), one conditioned priority rule (a condition plus the technique it gates), and one unconditioned fallback technique (an empty-conditions `PriorityRule`, the same catch-all shape already used today). That's enough for every starting entrant to already fight noticeably differently from the others, giving the player a wide variety of jumping-off points to build from.
 
 Familiars filling that skeleton can come from either of two sources: procedurally constructed at runtime (randomly draw a species + a starting technique + a starting priority rule from their respective pools), or hand-authored as complete fixed variations (today's `guubal.tres`-style familiars) that get drawn from directly. Nothing rules out mixing both approaches in the same bracket.
 
@@ -220,23 +226,27 @@ CURRENT DIRECTION — the least-built part of this document; expect it to change
 
 ## 9.1 The bracket
 
-A single-elimination bracket of 16 or 32 entrants (exact size open), semi-randomly generated at the start of a run. The bracket screen doubles as the character-select screen — picking your entrant's spot in the bracket is how you start the run.
+**Settled:** a single-elimination bracket of 16 entrants, semi-randomly generated at the start of a run. The bracket screen doubles as the character-select screen — picking your entrant's spot in the bracket is how you start the run. Winning all 4 bracket rounds leads to a separate, fixed final boss encounter (§9.2) — a deliberately-authored showdown, not another random bracket match, and not resolved via the off-screen simulation (§9.3) the way matches the player doesn't take part in are.
 
 ## 9.2 Loop
 
-> 1\. Choose entrant (assume their spot in the bracket).
+**Settled**, including the reward cadence (see §9.4 for the reward details):
+
+> 1\. Draft a familiar (assume their spot in the bracket). Comes pre-built with one species-bound passive and two techniques — one gated behind a priority rule, one an unconditioned fallback.
 >
 > 2\. Fight your round's match, fully autonomously.
 >
-> 3\. Choose upgrade(s).
+> 3\. Choose that round's reward(s) — see §9.4 for exactly what's on offer each round.
 >
-> 4\. Inspect surrounding bracket results (see §9.3).
+> 4\. Arrange priority rules in the priority editor (§6.2), using whatever was just picked up alongside everything already owned. A distinct step from choosing the reward — the reward screen decides *what* you gain, the editor decides *how* it gets used.
 >
-> 5\. Repeat from step 2 until the final match.
+> 5\. Inspect surrounding bracket results (see §9.3).
 >
-> 6\. Absurd final showdown between two heavily-built familiars.
+> 6\. Repeat from step 2 for 4 rounds total.
+>
+> 7\. Face the fixed final boss encounter (§9.1) — an absurd showdown between two heavily-built familiars. No reward follows it; the run ends either way.
 
-Whether an upgrade choice also happens before the very first fight (in addition to after each round) is open — worth playtesting both ways once there's an upgrade pool to offer from.
+No separate upgrade choice happens before the very first fight beyond the draft itself — a freshly-drafted familiar's built-in loadout (one passive, two techniques) is the starting point step 3 then builds on.
 
 ## 9.3 Simulated off-screen fights
 
@@ -249,9 +259,22 @@ Matches elsewhere in the bracket that the player doesn't take part in are *not* 
 
 ## 9.4 Upgrade choices between rounds
 
-The current pre-fight `PriorityBuild` picker (choose between whole pre-authored rule sets) is a deliberate stopgap built to avoid removing all player agency before this section existed — see the codebase's `DECISIONS.md`. Once this section is actually implemented, it should likely replace or absorb that picker: post-round upgrades are the real place build choices happen, and they should feel like real theorycrafting decisions (new technique, new priority rule, a stat bump, etc.) rather than picking a whole premade build each time.
+The current pre-fight `PriorityBuild` picker (choose between whole pre-authored rule sets) is a deliberate stopgap built to avoid removing all player agency before this section existed — see the codebase's `DECISIONS.md`. This section replaces it: post-round rewards are the real place build choices happen.
 
-**The replacement's design is now settled**, not hypothetical: §6.2's block editor with its mock-state probe. So the picker is superseded by a known target rather than an unspecified one, and a reward that grants a technique or a condition has somewhere concrete to be arranged. The remaining work is integration — the prototype is a standalone screen that produces an in-memory `Array[PriorityRule]` and deliberately touches neither `battle.tscn` nor `battle_controller.gd`.
+**Reward cadence per round, settled:** a stat upgrade every round, plus one rotating second choice depending on which round just ended:
+
+| After... | Second choice (pick 1 of 3) |
+|---|---|
+| Round 1 | A technique |
+| Round 2 | A passive |
+| Round 3 | A technique |
+| Round 4 | Trade one currently-held passive for a different one |
+
+No reward follows the final boss fight (§9.1/§9.2) — the run ends either way.
+
+**The reward screen is not the priority editor.** They're separate steps (§9.2 step 3 vs. step 4), doing different jobs: the reward screen decides *what* the player gains (a stat bump, a new technique, a new or swapped passive); the priority editor decides *how* a technique actually gets used, by letting the player arrange priority rules with whatever's newly available. A reward without the editor step following it would grant a technique with no way to see or arrange whether it'll actually trigger.
+
+**The editor's design is settled**, not hypothetical: §6.2's block editor with its mock-state probe, prototyped as a standalone screen (`scenes/priority_builder/priority_builder.tscn`) that produces an in-memory `Array[PriorityRule]` and currently touches neither `battle.tscn` nor `battle_controller.gd`. The remaining work on it is integration — wiring it into the reward-screen-then-editor step of the loop above, not building a new editor.
 
 ## 9.5 Loss ends the run
 
@@ -265,9 +288,9 @@ Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
 
 **Prototyped:** the priority-rule editor (§6.2, the §9.4 replacement for the `PriorityBuild` stopgap) exists as a standalone, playable screen — `scenes/priority_builder/priority_builder.tscn` — and its design has been confirmed as the standard to build the real one to. It produces an in-memory `Array[PriorityRule]`; nothing consumes it yet, and it touches neither `battle.tscn` nor `battle_controller.gd`.
 
-**Next:** finish the current content-pass milestone (more familiars/techniques/traits, tracked in `LEARNING_ROADMAP.md`), then integrate the editor into the run loop — the remaining gap is that picking up a new technique between rounds still has no way to see or arrange whether it'll actually trigger, and the bracket shouldn't be built on top of that. The editor's own design is no longer the unknown; wiring it to a real run is.
+**Next:** finish the current content-pass milestone (more familiars/techniques/passives/Focus trees, tracked in `LEARNING_ROADMAP.md`). Then two separate pieces of loop work, in order: (1) build the actual reward screen — today there's only `upgrade_pool`/`populate_upgrade_select_buttons()` offering the whole stat-upgrade pool every round; the settled per-round cadence (§9.4 — stat upgrade always, plus a rotating technique/passive/technique/passive-trade choice) doesn't exist yet at all; (2) integrate the already-prototyped priority editor as the step that follows each reward screen, so a newly-granted technique has somewhere concrete to be arranged before the next fight. The editor's own design is no longer the unknown; wiring it in — after the reward screen exists to hand off to it — is.
 
-**After that:** the tournament/bracket structure (§9) itself, then whatever its open questions resolve into, and playtesting/balance passes.
+**After that:** the tournament/bracket structure (§9) itself — now settled at 16 entrants plus a fixed final boss (§9.1) rather than open — then whatever §9.3's remaining open questions (off-screen simulation odds/fidelity/cost) resolve into, and playtesting/balance passes.
 
 # 11. Playtest questions
 

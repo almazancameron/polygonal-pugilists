@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://dx02gcyx00krt"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_3iclx"]
+[ext_resource type="Resource" uid="uid://cwyrhd2s3rooj" path="res://resources/priority_rules/twerpent_pulse_rule.tres" id="2_e1teq"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_yl74u"]
+[ext_resource type="Resource" uid="uid://db1f2a6tuwo0d" path="res://resources/priority_rules/twerpent_fang_rule.tres" id="3_3dnmb"]
+
+[resource]
+script = ExtResource("2_yl74u")
+build_name = "Twerpent Default"
+priority_rules = Array[ExtResource("1_3iclx")]([ExtResource("2_e1teq"), ExtResource("3_3dnmb")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

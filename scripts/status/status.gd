@@ -206,3 +206,10 @@ static func from_id(id: StringName, initial_stacks: int = 1) -> Status:
 		if status_effect_id(effect) == id:
 			return create(effect, initial_stacks)
 	return null
+
+## Wraps a status name in the [url=...] markup TooltipPanel resolves into a
+## nested status tooltip -- shared by Technique.describe() and
+## NumericBonus.describe_bonus() so both quote status names the same way.
+static func status_link(effect: StatusEffect) -> String:
+	var id: StringName = status_effect_id(effect)
+	return "[url=%s]%s[/url]" % [id, String(id).capitalize()]

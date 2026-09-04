@@ -2,11 +2,14 @@
 
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_00pm7"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_kn4wb"]
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_tj0wc"]
 [ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="2_iskl7"]
+[ext_resource type="Resource" uid="uid://7doar52d84rn" path="res://resources/passives/sticky_residue.tres" id="2_xwf4l"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="3_kn4wb"]
-[ext_resource type="Resource" uid="uid://c4kkxcksl5g2b" path="res://resources/priority_rules/fallback_attack.tres" id="3_q8h7j"]
-[ext_resource type="Resource" uid="uid://dk2il2vavbbkq" path="res://resources/techniques/acid_bath.tres" id="4_00pm7"]
-[ext_resource type="Resource" uid="uid://dnuicifi5lm2y" path="res://resources/techniques/attack.tres" id="6_7ffue"]
+[ext_resource type="Resource" uid="uid://bfjju3nkr50x2" path="res://resources/priority_rules/guubal_corrosive_rule.tres" id="4_xwf4l"]
+[ext_resource type="Resource" uid="uid://rmae50poa21" path="res://resources/priority_rules/guubal_culture_rule.tres" id="5_wpb83"]
+[ext_resource type="Resource" uid="uid://hcbpxomwrm58" path="res://resources/techniques/corrosive_ooze.tres" id="8_wpb83"]
+[ext_resource type="Resource" uid="uid://cp1w34fm2ry5v" path="res://resources/techniques/culture.tres" id="9_gl1u3"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m4hsq"]
 atlas = ExtResource("2_iskl7")
@@ -16,11 +19,10 @@ region = Rect2(16, 0, 16, 16)
 script = ExtResource("1_00pm7")
 familiar_name = "Guubal"
 sprite = SubResource("AtlasTexture_m4hsq")
-max_hp = 80
-power = 18
-defense = 4
-speed = 6
-focus = 6
-techniques = Array[ExtResource("3_kn4wb")]([ExtResource("4_00pm7"), ExtResource("6_7ffue")])
-priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("3_q8h7j")])
+max_hp = 60
+power = 8
+speed = 5
+techniques = Array[ExtResource("3_kn4wb")]([ExtResource("8_wpb83"), ExtResource("9_gl1u3")])
+priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("4_xwf4l"), ExtResource("5_wpb83")])
+passives = Array[ExtResource("1_tj0wc")]([ExtResource("2_xwf4l")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

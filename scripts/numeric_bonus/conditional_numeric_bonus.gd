@@ -11,3 +11,8 @@ func compute(user: Combatant, target: Combatant) -> int:
 		return base_amount(user, target)
 	else:
 		return 0
+
+func describe_qualifier() -> String:
+	if condition == null:
+		return ""
+	return "if %s" % condition.describe()

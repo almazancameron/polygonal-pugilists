@@ -2,6 +2,7 @@ class_name RuinStatus
 extends Status
 
 var percent_increase: float = 0.5
+var stacks_lost_per_tick: int = 1
 
 func status_id() -> StringName:
     return &"ruin"
@@ -19,7 +20,7 @@ func icon() -> Texture2D:
     return preload("res://assets/sprites/icons/ruin_icon.tres")
 
 func on_tick(target) -> String:
-    stacks -= 1
+    stacks -= stacks_lost_per_tick
 
     if stacks <= 0:
         return "The ruin effect fades."

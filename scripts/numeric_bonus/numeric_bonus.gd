@@ -60,3 +60,56 @@ func base_amount(user: Combatant, target: Combatant) -> int:
 
 func compute(user: Combatant, target: Combatant) -> int:
 	return base_amount(user, target)
+
+## Human-readable summary of this bonus's own flat+percent amount, for
+## Technique.describe() -- separate from compute(), which needs live
+## combatants describe() doesn't have. "" if this bonus wouldn't show up in
+## a description at all (both flat_bonus and percent_bonus are zero).
+func describe_lead() -> String:
+	var fragments: Array[String] = []
+	if flat_bonus != 0:
+		fragments.append("+%d" % flat_bonus)
+	if not is_zero_approx(percent_bonus):
+		fragments.append("+%d%% of %s" % [int(percent_bonus * 100), _percent_source_phrase()])
+	return " ".join(fragments)
+
+## The part of describe_bonus() explaining *how* describe_lead()'s amount
+## scales (e.g. "for each X stack on Y") -- "" for the base class and any
+## subclass with nothing to add. Kept separate from describe_lead() so a
+## caller can reposition just the amount within its own sentence without
+## the qualifier trailing it (see Technique's zero-stacks
+## StatusApplicationAction case, where the bonus's lead has to stand in for
+## the count itself).
+func describe_qualifier() -> String:
+	return ""
+
+## Subclasses whose bonus doesn't fit "optional lead + optional qualifier"
+## (StatComparisonNumericBonus's difference term is never optional, even
+## when flat_bonus/percent_bonus both are) override this directly instead --
+## call super.describe_bonus() to get describe_lead()'s text alone.
+func describe_bonus() -> String:
+	var lead: String = describe_lead()
+	if lead == "":
+		return ""
+
+	var qualifier: String = describe_qualifier()
+	if qualifier == "":
+		return lead
+	return "%s %s" % [lead, qualifier]
+
+func _percent_source_phrase() -> String:
+	var whose: String = "user's" if percent_target == Target.SELF else "target's"
+
+	match percent_source:
+		ValueSource.STAT:
+			return "%s %s" % [whose, Familiar.stat_name(percent_stat)]
+		ValueSource.STATUS_STACKS:
+			if percent_check_all:
+				return "%s total status stacks" % whose
+			return "%s %s stacks" % [whose, Status.status_link(percent_status_effect)]
+		ValueSource.STATUS_COUNT:
+			return "%s active status count" % whose
+		ValueSource.HP:
+			return "%s current HP" % whose
+
+	return whose
