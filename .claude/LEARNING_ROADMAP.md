@@ -94,8 +94,20 @@ watching a fight felt thin — expected, since the real buildcrafting layer
 **What's conspicuously absent relative to Milestone 1:** no round/shop loop, no
 rematch/rebuild flow, no persistent build accumulation across fights, no targeting (only
 one possible opponent exists), no boss encounter, no save data, no permanent automated
-test suite (a reliable throwaway headless-verification pattern exists and has been used
-constantly, but always written by Claude and deleted after use — see §7).
+test suite beyond `scripts/tools/balance_test.gd`/`diagnose_matchup.gd` (both committed,
+not throwaway — everything else still follows the write-a-`_verify_*.gd`-script-and-
+delete-it pattern).
+
+**Session 7 update:** the 16-familiar roster is complete (Ashwing, Battabat, Berylazagor,
+Carapax, Guubal, Ignimite, Ironcap, Mallegrav, Mystbud, Omenfly, Pebbloq, Pyrewisp,
+Relikarn, Shrumbus, Thymoxen, Twerpent), each with two techniques, priority rules, and a
+species passive, and the shared `FocusTable` finally has real content (four tier-gated
+effects). A full-roster balance pass (manual tuning plus an automated stat-search tool,
+see `DECISIONS.md`) landed every familiar between roughly 40–60% win rate in the
+round-robin harness, none doomed. Four real engine bugs were found and fixed along the
+way (a Retaliation stack-overflow, Ward absorbing self-applications, a lethal hit that
+could heal itself back to life, Cleanse silently bypassing the passive-notification
+system) — see `DEVLOG.md`/`DECISIONS.md` for the mechanics.
 
 ## 2. Demonstrated knowledge
 
@@ -127,7 +139,9 @@ constantly, but always written by Claude and deleted after use — see §7).
 | Trigger/event-side matching (attacker vs. defender hooks, `trigger_target: SELF`/`TARGET`) | Demonstrated | After Claude explained why Taste for Blood's `HIT` trigger + default `trigger_target` never fired for Battabat's own attack, corrected both fields (`ATTACK`, `trigger_target = SELF`) independently and correctly on the first try |
 | Reasoning about event-ordering/scoping bugs in a cascading system | Demonstrated | Diagnosed the real mechanism behind a passive firing twice in one turn after Claude's first two hypotheses were wrong, correctly landing on "a turn is upkeep + execution together" — the fix `battle_controller.gd` now implements |
 
-**Design ownership — a milestone, not a checklist item**: session 2 recorded the developer's first substantive pushbacks on Claude's proposed designs (the `Technique` over-subclassing, and the Step-5 sequencing challenge). Sessions 3–4 went well beyond pushback: essentially the entire technique-rework-plus-eleven-statuses content wave was designed and typed by the developer, with Claude in a pure review/support role (enum wiring, resource migrations, bug fixes only when explicitly requested). That's the "developer designs and implements — Claude acts mainly as reviewer/debugging partner" end state `CLAUDE.md`'s north star describes, reached far earlier than the roadmap's original pacing expected. The one caution from this stretch: Claude implemented one full bug fix (the Ruin/Absorption damage-log bug) from a casual "let's fix X" without re-confirming first, a repeat of an already-flagged pattern — worth the developer continuing to watch for, not because the fix was wrong, but because the habit of asking first is what's actually being protected. Going forward, Claude's role for new content in this vein should default to review/wiring-support unless the developer specifically asks for an implementation.
+**Design ownership — a milestone, not a checklist item**: session 2 recorded the developer's first substantive pushbacks on Claude's proposed designs (the `Technique` over-subclassing, and the Step-5 sequencing challenge). Sessions 3–4 went well beyond pushback: essentially the entire technique-rework-plus-eleven-statuses content wave was designed and typed by the developer, with Claude in a pure review/support role (enum wiring, resource migrations, bug fixes only when explicitly requested). That's the "developer designs and implements — Claude acts mainly as reviewer/debugging partner" end state `CLAUDE.md`'s north star describes, reached far earlier than the roadmap's original pacing expected. The one caution from this stretch: Claude implemented one full bug fix (the Ruin/Absorption damage-log bug) from a casual "let's fix X" without re-confirming first, a repeat of an already-flagged pattern — worth the developer continuing to watch for, not because the fix was wrong, but because the habit of asking first is what's actually being protected.
+
+**Session 7 shifted the split back toward Claude-implemented**, specifically for the 16-familiar content pass and the engine bugs it exposed — a deliberate, explicit handoff (see the `pixel_pugilists_balance_tuning_workflow` memory), not a quiet regression from the sessions-3–4 high point. The developer's contribution this session was concentrated in design direction and judgment calls rather than typing: choosing between fix options Claude framed (e.g. "check death before Regeneration's heal fires" vs. "leave revival unconditional and compensate elsewhere"), asking for the impact of a candidate engine change to be simulated before committing to it, and — independently, before Claude had finished diagnosing it — correctly suspecting that "gain Absorption on any status removed" could re-trigger itself when Absorption's own depletion is itself a removal event. That last one is worth naming specifically: it's the same reentrancy-cascade pattern Claude had to hunt down as real bugs three separate times in session 6 (see `DECISIONS.md`), recognized on sight this time by the developer instead. Claude's default for new content in this vein should stay review/wiring-support once a specific piece is developer-owned again; this session's shift was to the content pass as a whole, not a permanent reset of that norm.
 
 ## 3. Current curriculum milestone
 
@@ -137,14 +151,14 @@ build is satisfying enough to justify the full game. Explicitly no movement/spat
 combat, no Ranch, no circuits, no campaign, no injury system.
 
 Progress so far: the combat engine, real stats, a 24-status effect system, a
-`PassiveEffect` system (Focus breakpoints included), composable multi-step techniques, a
+`PassiveEffect` system (Focus breakpoints, a real `FocusTable`, and the continuously-live
+`ModifyStatPassiveEffect` category all included), composable multi-step techniques, a
 combat log/explanation surface, a full behavioral-priority system driving *both* sides
 (Steps 4–5), and a round loop with post-fight reward selection (Step 6, in a lighter form
-than originally planned — see §4) all exist. A content pass toward the full 16-familiar
-roster is now underway (4 familiars exist: Guubal, Twerpent, Ashwing, Battabat). Still
-missing before Milestone 1 is complete: the actual bracket/draft structure, the real
-reward screen, integrating the already-prototyped priority editor, targeting, and a boss
-encounter.
+than originally planned — see §4) all exist. **The full 16-familiar roster is now built
+and balance-tested** (session 7). Still missing before Milestone 1 is complete: the actual
+bracket/draft structure, the real reward screen, integrating the already-prototyped
+priority editor, targeting, and a boss encounter.
 
 ## 4. Ordered learning/development steps
 
@@ -215,23 +229,23 @@ one session works fine — no explicit per-run build object needed yet). This is
 the bracket itself (§9) — no draft, no opponent scaling, no scouting/odds — just the
 accumulation loop the bracket will eventually sit on top of.
 
-### Content pass (current, not originally in this roadmap) — developer-led, Claude reviewing
+### Content pass — ✅ Done (16-familiar roster complete, session 7)
 Bulk status/technique/passive authoring toward the full 16-familiar roster
-(`GAME_DESIGN.md` §8.4/§8.5, tracked loosely in `CONTENT_IDEAS.md`): 24 statuses now
-exist, `Technique` reworked into composable `TechniqueStepGroup`/`TechniqueAction` steps
-with situational `NumericBonus`es, `scripts/` reorganized into per-category subfolders,
-and a full `PassiveEffect` system (see `DECISIONS.md`) gives species-bound passives and
-Focus breakpoints a real mechanism. Four familiars now exist (Guubal, Twerpent, Ashwing,
-Battabat), each with real techniques and at least one passive wired up and exercised
-through actual fights — a change from earlier in the pass, when new content was only
-verified via throwaway scripts. Unlike every earlier step in this roadmap, the developer
-designed and wrote nearly all of the status/technique content independently — see §2's
-"Design ownership" note and `DEVLOG.md`'s latest entries for the full attribution.
-Claude's role has shifted toward the passive-trigger *engine* itself (built the
-`PassiveEffect` system and found/fixed three real reentrancy bugs it exposed — see
-`DEVLOG.md` session 6), while the developer continues to own status/technique content and
-has started catching and fixing content-level passive bugs independently (Taste for
-Blood).
+(`GAME_DESIGN.md` §8.4/§8.5, tracked loosely in `CONTENT_IDEAS.md`): 24 statuses, a full
+`PassiveEffect` system (species-bound passives, Focus breakpoints, and now a real
+`FocusTable` with content), `Technique` built from composable `TechniqueStepGroup`/
+`TechniqueAction` steps — all 16 familiars now exist, each with two techniques, priority
+rules, and a passive, balance-tested against the full field (`DEVLOG.md` session 7). The
+collaborative shape that finished this pass: the developer describes a kit's theme,
+passive behavior, techniques, and priority rules in plain language; Claude picks the
+concrete numbers/triggers/limiters and iterates against `scripts/tools/balance_test.gd`
+until nothing is doomed (see the `pixel_pugilists_balance_tuning_workflow` memory) — a
+different split of labor than sessions 3–6's "developer designs and implements, Claude
+reviews," closer to the reverse for this specific category, though the developer still
+reviews Claude's numeric choices and does real hands-on tuning themselves (several
+sessions' worth of direct stat edits, plus independently spotting the Cleanse/`pick_random()`
+non-determinism risk before it was fully diagnosed). Traits/augments, if still wanted, are
+the one piece of the originally-scoped content pass not yet started.
 
 ### Step 7 (renumbered from the bracket) — Tournament bracket structure (higher-level, less detailed)
 The single-elimination bracket described in `GAME_DESIGN.md` §9 — a 16-or-32-entrant
@@ -282,18 +296,24 @@ Explicitly not being built yet, to avoid scope creep:
 
 ## 7. Next lesson
 
-The round loop (Step 6) shipped, Stasis's cross-cutting stack-loss interception was
-designed and built (`Status.owner` back-reference + a custom `stacks` property setter,
-exactly as this section once anticipated), and the `PassiveEffect` system now gives
-species passives and Focus breakpoints a real mechanism (`DECISIONS.md`, `DEVLOG.md`
-session 6). No new concept is queued up for the developer specifically right now — recent
-sessions have been content authoring (developer-led) and passive-engine bug-hunting
-(Claude-led, with the developer independently fixing at least one content-level passive
-bug themselves, a good sign the trigger/target vocabulary has landed).
+The round loop (Step 6), Stasis's cross-cutting stack-loss interception, the
+`PassiveEffect` system, and now the 16-familiar content pass are all done — see
+`DEVLOG.md` sessions 6–7. Session 7 was overwhelmingly Claude-implemented (five new
+familiars, four real engine bugs, two new `PassiveEffect` capabilities), with the
+developer's role concentrated in design direction, balance judgment calls, and reviewing
+Claude's proposed fixes/tradeoffs rather than hands-on GDScript — a different mode than
+sessions 3–6's independent content authoring, not a regression in it. Worth naming
+explicitly if a future session finds this pattern (Claude implementing engine/content at
+the developer's direction) becoming the default: the north star in `CLAUDE.md` still
+points toward the developer implementing ordinary features independently, so a stretch of
+sessions shaped like this one is worth revisiting if it keeps recurring rather than being
+treated as the new steady state.
 
-**Immediate next step, not a learning exercise**: no `FocusTable` content exists yet even
-though the mechanism is fully wired — author at least one familiar's Focus breakpoint
-table to actually exercise the system end-to-end. After that, keep filling out the
-content pass (more familiars/techniques/passives per `GAME_DESIGN.md` §8.4/§8.5's
-Species/entrant-skeleton shape) toward the full 16-familiar scope before starting the
-bracket system (§9).
+**Immediate next step, not a learning exercise**: the content pass is done, but the
+bracket (§9/Step 7) is not next — the reward screen and the priority-editor integration
+are, in that order (see `GAME_DESIGN.md` §10, unchanged this session). The reason to do
+these two first rather than jump straight to the bracket: both can be built and tested
+against the game's *current* shape (a simple sequential list of opponents progressed
+through one at a time) — the bracket structurally can't be, since there's no bracket to
+test against until it exists. If traits/augments are still wanted, they're the one
+unstarted piece of the original content-pass scope and can slot in whenever.
