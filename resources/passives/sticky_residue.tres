@@ -7,7 +7,6 @@
 [resource]
 script = ExtResource("2_aygog")
 operation = ExtResource("2_68g87")
-triggers_hooks = true
 trigger = 5
 trigger_target = 0
 limiter = 1

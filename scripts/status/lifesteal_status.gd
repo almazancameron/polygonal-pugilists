@@ -5,7 +5,7 @@ extends Status
 ## attack, then loses a stack -- same on_attack() shape as Hone, healing
 ## instead of buffing.
 
-var heal_percent_of_power: float = 1.0
+var heal_percent_of_power: float = 0.333
 var stacks_lost_per_hit: int = 1
 
 func status_id() -> StringName:
@@ -22,8 +22,7 @@ func preview_color() -> Color:
     return Color(0.55, 0.0, 0.2, 1.0)
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/lifesteal_icon.tres")
-    return null # change after adding lifesteal_icon.tres
+    return preload("res://assets/sprites/icons/lifesteal_icon.tres")
 
 func describe() -> String:
     return "Heals the user for %d%% of their own Power whenever they attack. Loses %d stack%s per attack." % [

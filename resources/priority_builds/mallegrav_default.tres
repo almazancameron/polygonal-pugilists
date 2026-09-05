@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://cks3aknoemy6h"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_5olgt"]
+[ext_resource type="Resource" uid="uid://wyp1qri7t1rd" path="res://resources/priority_rules/mallegrav_wind_up_rule.tres" id="2_l24nu"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_x761w"]
+[ext_resource type="Resource" uid="uid://cduxxxqksw2es" path="res://resources/priority_rules/mallegrav_concussive_rule.tres" id="3_q27qr"]
+
+[resource]
+script = ExtResource("2_x761w")
+build_name = "Mallegrav Default"
+priority_rules = Array[ExtResource("1_5olgt")]([ExtResource("2_l24nu"), ExtResource("3_q27qr")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

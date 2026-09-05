@@ -2,9 +2,18 @@
 
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_436se"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_7sie7"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="2_nqjqc"]
 [ext_resource type="Resource" uid="uid://cp1w34fm2ry5v" path="res://resources/techniques/culture.tres" id="3_4figk"]
+
+[sub_resource type="Resource" id="Resource_vuvsh"]
+script = ExtResource("2_nqjqc")
+left_status_effect = 9
+left_target = 1
+comparator = 3
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
 
 [resource]
 script = ExtResource("2_7sie7")
+conditions = Array[ExtResource("1_436se")]([SubResource("Resource_vuvsh")])
 technique = ExtResource("3_4figk")
 metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

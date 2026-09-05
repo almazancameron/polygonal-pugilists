@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FocusTable" format=3 uid="uid://f0jskvgqth6h"]
+
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_8bef4"]
+[ext_resource type="Script" uid="uid://d1hd2tjgo6hcd" path="res://scripts/passive/focus_table.gd" id="2_sr2m5"]
+
+[resource]
+script = ExtResource("2_sr2m5")
+metadata/_custom_type_script = "uid://d1hd2tjgo6hcd"

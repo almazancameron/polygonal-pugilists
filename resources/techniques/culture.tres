@@ -7,8 +7,6 @@
 [ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="5_f20ab"]
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="6_vbdbq"]
 [ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_vv3uf"]
-[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="8_f5haj"]
-[ext_resource type="Script" uid="uid://0ar2g64cti28" path="res://scripts/numeric_bonus/conditional_numeric_bonus.gd" id="9_14pwd"]
 
 [sub_resource type="Resource" id="Resource_16kt8"]
 script = ExtResource("4_mucye")
@@ -20,30 +18,14 @@ target = 1
 effect = 9
 metadata/_custom_type_script = "uid://1kkotxxun3j"
 
-[sub_resource type="Resource" id="Resource_qebao"]
-script = ExtResource("8_f5haj")
-left_status_effect = 9
-left_target = 1
-right_value = 5
-comparator = 1
-metadata/_custom_type_script = "uid://brxa3r56ukm5t"
-
-[sub_resource type="Resource" id="Resource_ao7ls"]
-script = ExtResource("9_14pwd")
-condition = SubResource("Resource_qebao")
-applies_to = 1
-flat_bonus = 2
-metadata/_custom_type_script = "uid://0ar2g64cti28"
-
 [sub_resource type="Resource" id="Resource_ehtfd"]
 script = ExtResource("2_vsyta")
 actions = Array[ExtResource("3_qebao")]([SubResource("Resource_16kt8"), SubResource("Resource_yo3ye")])
-numeric_bonuses = Array[ExtResource("7_vv3uf")]([SubResource("Resource_ao7ls")])
 metadata/_custom_type_script = "uid://bxo68i5nl228w"
 
 [resource]
 script = ExtResource("1_jo2qe")
 technique_name = "Culture"
-power_multiplier = 0.667
+power_multiplier = 0.333
 step_groups = Array[ExtResource("2_vsyta")]([SubResource("Resource_ehtfd")])
 metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

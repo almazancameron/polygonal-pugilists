@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://ufhboip8imib"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_660t3"]
+[ext_resource type="Resource" uid="uid://df85hx0pq7e2j" path="res://resources/priority_rules/omenfly_omen_rule.tres" id="2_00orp"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_528dl"]
+[ext_resource type="Resource" uid="uid://brsn88eknyg48" path="res://resources/priority_rules/omenfly_approach_rule.tres" id="3_0pbri"]
+
+[resource]
+script = ExtResource("2_528dl")
+build_name = "Omenfly Default"
+priority_rules = Array[ExtResource("1_660t3")]([ExtResource("2_00orp"), ExtResource("3_0pbri")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

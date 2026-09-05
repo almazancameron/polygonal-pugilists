@@ -22,8 +22,7 @@ func preview_color() -> Color:
     return Color(1.0, 0.75, 0.85, 1.0)
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/renewal_icon.tres")
-    return null # change after adding renewal_icon.tres
+    return preload("res://assets/sprites/icons/renewal_icon.tres")
 
 func describe() -> String:
     return ("Heals %d HP (based on stacks) at the start of target's turn.\n" +

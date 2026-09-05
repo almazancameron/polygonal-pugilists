@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://bshrumburstr1"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_condition"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="2_statuscond"]
+[ext_resource type="Script" uid="uid://btc5hsdhdcrjj" path="res://scripts/condition/hp_comparison_condition.gd" id="3_hpcond"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="4_rule"]
+[ext_resource type="Resource" uid="uid://dpuffballbst1" path="res://resources/techniques/puffball_burst.tres" id="5_technique"]
+
+[sub_resource type="Resource" id="Resource_enemy_infested"]
+script = ExtResource("2_statuscond")
+left_status_effect = 9
+left_target = 1
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_self_above_40"]
+script = ExtResource("3_hpcond")
+right_value = 0.2
+comparator = 0
+metadata/_custom_type_script = "uid://btc5hsdhdcrjj"
+
+[resource]
+script = ExtResource("4_rule")
+conditions = Array[ExtResource("1_condition")]([SubResource("Resource_enemy_infested"), SubResource("Resource_self_above_40")])
+technique = ExtResource("5_technique")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

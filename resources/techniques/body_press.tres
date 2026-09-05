@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://cg5vwqlaelrb0"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_c2j51"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_q8bjc"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_anoe5"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="4_dkt6g"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_8ics4"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_k47xn"]
+[ext_resource type="Script" uid="uid://1il13m4awg3h" path="res://scripts/numeric_bonus/stat_comparison_numeric_bonus.gd" id="7_r84xx"]
+
+[sub_resource type="Resource" id="Resource_8nmlt"]
+script = ExtResource("4_dkt6g")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_c12ep"]
+script = ExtResource("7_r84xx")
+left_stat = 2
+flat_bonus = 1
+metadata/_custom_type_script = "uid://1il13m4awg3h"
+
+[sub_resource type="Resource" id="Resource_tmyuq"]
+script = ExtResource("2_q8bjc")
+actions = Array[ExtResource("3_anoe5")]([SubResource("Resource_8nmlt")])
+numeric_bonuses = Array[ExtResource("6_k47xn")]([SubResource("Resource_c12ep")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_c2j51")
+technique_name = "Body Press"
+step_groups = Array[ExtResource("2_q8bjc")]([SubResource("Resource_tmyuq")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

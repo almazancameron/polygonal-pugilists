@@ -16,10 +16,9 @@ func on_hit(target: Combatant, attacker: Combatant) -> String:
 		return ""
 
 	var damage: int = attacker.take_damage(damage_per_stack * stacks)
-	stacks -= stacks_lost_per_hit
 
-	return "%s's thorns retaliate, dealing %d damage to %s! (%d stacks remain)" % [
-		target.familiar.familiar_name, damage, attacker.familiar.familiar_name, stacks
+	return "%s's thorns retaliate, dealing %d damage to %s!" % [
+		target.familiar.familiar_name, damage, attacker.familiar.familiar_name
 	]
 
 func preview_color() -> Color:

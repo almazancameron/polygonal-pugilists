@@ -3,7 +3,7 @@ extends Status
 
 ## Multiplies power for a number of turns equal to the stacks.
 
-var stack_value: float = 1.5
+var stack_value: float = 2.0
 var stacks_lost_per_tick: int = 1
 
 func status_id() -> StringName:

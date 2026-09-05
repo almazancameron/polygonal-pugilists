@@ -90,11 +90,16 @@ func is_defeated() -> bool:
 ## STATUS_CREATED (the exclusive "brand new" case) from STATUS_APPLIED (the
 ## inclusive "applied at all, fresh or merged" case) the same way
 ## STATUS_REDUCED/STATUS_REMOVED already distinguish the opposite direction.
-func add_status(new_status: Status) -> Dictionary:
+## is_self_applied is true when whoever is receiving new_status is the same
+## combatant who chose to apply it (a technique/passive targeting SELF) --
+## Ward only screens out effects imposed by someone else, not stacks a
+## combatant is voluntarily giving itself, so it never eats a self-buff
+## like Pebbloq's own Chronoparry/Sentinel Strike applications.
+func add_status(new_status: Status, is_self_applied: bool = false) -> Dictionary:
 	var absorb_message: String = ""
 	var ward: Status = get_status(Status.StatusEffect.WARD)
 
-	if ward != null and new_status.status_id() != Status.status_effect_id(Status.StatusEffect.WARD):
+	if ward != null and not is_self_applied and new_status.status_id() != Status.status_effect_id(Status.StatusEffect.WARD):
 		var absorbed: int = min(ward.stacks, new_status.stacks)
 		if absorbed > 0:
 			var ward_stacks_before: int = ward.stacks
@@ -185,6 +190,21 @@ func modify_status_stacks(effect: Status.StatusEffect, modifier: float, operator
 	else:
 		return ""
 
+## Halves every active status's stacks (integer division, so a 1-stack status
+## is removed entirely) -- Reclaim Byproducts' "cut all status stacks in
+## half" effect. Settled through the same _settle_status() choke point every
+## other stack decrease uses, so STATUS_REDUCED/REMOVED passives fire
+## correctly for each status actually reduced, and Stasis's own "stacks would
+## be removed from something else? take it from me instead" interception
+## (Status.stacks's setter) applies transparently, same as any other decrease.
+func halve_all_statuses() -> String:
+	var messages: Array[String] = []
+	for status in statuses.duplicate():
+		var stacks_before: int = status.stacks
+		status.stacks = int(status.stacks / 2.0)
+		messages.append(_settle_status(status, stacks_before))
+	return _combine_messages(messages)
+
 ## Fires on_hit() on every active status, mirroring how run_upkeep() fires
 ## on_tick(). attacker is whoever dealt the hit, passed through for statuses
 ## like Thorns that retaliate against them. Returns every triggered message
@@ -194,8 +214,13 @@ func trigger_on_hit(attacker: Combatant) -> String:
 
 	for status in statuses.duplicate():
 		var stacks_before: int = status.stacks
+		var hp_before: int = current_hp
 		message = _combine_messages([message, status.on_hit(self, attacker)])
 		message = _combine_messages([message, _notify_stack_change(status, stacks_before)])
+
+		if current_hp > hp_before:
+			message = _combine_messages([message, check_passives(PassiveEffect.Trigger.HEALED, self)])
+
 		if status.is_expired():
 			statuses.erase(status)
 
@@ -300,13 +325,13 @@ func _notify_stack_change(status: Status, stacks_before: int) -> String:
 		return ""
 
 	var messages: Array[String] = [
-		check_passives(PassiveEffect.Trigger.STATUS_REDUCED, self),
-		opponent.check_passives(PassiveEffect.Trigger.STATUS_REDUCED, self),
+		check_passives(PassiveEffect.Trigger.STATUS_REDUCED, self, status),
+		opponent.check_passives(PassiveEffect.Trigger.STATUS_REDUCED, self, status),
 	]
 
 	if status.is_expired():
-		messages.append(check_passives(PassiveEffect.Trigger.STATUS_REMOVED, self))
-		messages.append(opponent.check_passives(PassiveEffect.Trigger.STATUS_REMOVED, self))
+		messages.append(check_passives(PassiveEffect.Trigger.STATUS_REMOVED, self, status))
+		messages.append(opponent.check_passives(PassiveEffect.Trigger.STATUS_REMOVED, self, status))
 
 	return _combine_messages(messages)
 
@@ -349,21 +374,34 @@ func has_first_act_override() -> bool:
 ## reaction, so it's never matched here. affected is who the event concerns
 ## (e.g. who a status was just applied to) -- opponent is always read from
 ## this combatant's own opponent field, since every caller was already
-## passing exactly that value.
-func check_passives(trigger: PassiveEffect.Trigger, affected: Combatant) -> String:
+## passing exactly that value. relevant_status is the specific Status this
+## event concerns, when there is one (STATUS_APPLIED/CREATED/REDUCED/REMOVED)
+## -- lets a passive's status_effect_filter react to one status by name (e.g.
+## "when Recharge is removed, gain Enlarge") instead of matching every status
+## that hits the same trigger. Left null for triggers with no specific status
+## (BATTLE_START, HIT, TURN_START, ...), where a filter simply never matches.
+func check_passives(trigger: PassiveEffect.Trigger, affected: Combatant, relevant_status: Status = null) -> String:
 	var message: String = ""
 
-	for passive in _matching_passives(trigger, affected):
-		var fired_message: String = ""
-
-		if passive is OperationPassiveEffect:
-			fired_message = _fire_operation(passive)
-		elif passive is PermanentStatPassiveEffect:
-			fired_message = _fire_stat_passive(passive)
-		else:
+	for passive in _matching_passives(trigger, affected, relevant_status):
+		if not (passive is OperationPassiveEffect or passive is PermanentStatPassiveEffect):
 			continue
 
+		# Recorded before firing, not after -- passive.operation can itself
+		# cascade back into this same trigger (e.g. an OperationPassiveEffect
+		# with triggers_hooks = true whose own trigger is STATUS_APPLIED,
+		# applying a status). Recording afterward left a window where the
+		# limiter hadn't caught up yet, so the passive could match itself
+		# again inside its own cascade -- unbounded recursion instead of a
+		# single fire.
 		_record_passive_fire(passive)
+
+		var fired_message: String = ""
+		if passive is OperationPassiveEffect:
+			fired_message = _fire_operation(passive)
+		else:
+			fired_message = _fire_stat_passive(passive)
+
 		message = _combine_messages([message, fired_message])
 
 	return message
@@ -407,10 +445,11 @@ func passive_heal_bonus(affected: Combatant) -> int:
 ## concerns (e.g. who a status was just applied to); trigger_target compares
 ## against this combatant's own opponent, not affected, since a
 ## TARGET-scoped passive means "watching MY opponent's events," not
-## "watching whoever happened to be affected." Does not distinguish which
-## PassiveEffect subclass a match is -- callers filter for the payload
-## kind(s) they handle.
-func _matching_passives(trigger: PassiveEffect.Trigger, affected: Combatant) -> Array[PassiveEffect]:
+## "watching whoever happened to be affected." relevant_status is the specific
+## Status the event concerns, when there is one -- see check_passives(). Does
+## not distinguish which PassiveEffect subclass a match is -- callers filter
+## for the payload kind(s) they handle.
+func _matching_passives(trigger: PassiveEffect.Trigger, affected: Combatant, relevant_status: Status = null) -> Array[PassiveEffect]:
 	var matches: Array[PassiveEffect] = []
 
 	var candidates: Array[PassiveEffect] = familiar.passives.duplicate()
@@ -424,6 +463,10 @@ func _matching_passives(trigger: PassiveEffect.Trigger, affected: Combatant) -> 
 		var event_combatant: Combatant = self if passive.trigger_target == PassiveEffect.Target.SELF else opponent
 		if event_combatant != affected:
 			continue
+
+		if passive.status_effect_filter != Status.StatusEffect.NONE:
+			if relevant_status == null or relevant_status.status_id() != Status.status_effect_id(passive.status_effect_filter):
+				continue
 
 		var failed_condition: Condition = null
 		for condition in passive.conditions:

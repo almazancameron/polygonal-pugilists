@@ -19,6 +19,9 @@ func on_tick(target: Combatant) -> String:
         target.familiar.familiar_name, damage, stacks
     ]
 
+func next_tick_damage() -> int:
+    return tick_magnitude
+
 func preview_color() -> Color:
     return Color(0.3, 0.6, 0.1, 1.0)
 

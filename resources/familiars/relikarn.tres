@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://c4r3l1k4rnxax"]
+
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_familiar"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="2_technique"]
+[ext_resource type="Resource" uid="uid://cq2j8f4dxvta5" path="res://resources/techniques/grudge_strike.tres" id="3_grudge"]
+[ext_resource type="Resource" uid="uid://c8rk1n3vw2q1r" path="res://resources/techniques/mutual_devastation.tres" id="4_devastation"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="5_rule"]
+[ext_resource type="Resource" uid="uid://bvk3n8x2q4wte" path="res://resources/priority_rules/relikarn_devastation_rule.tres" id="6_devastation_rule"]
+[ext_resource type="Resource" uid="uid://dj7h2nax3q5rv" path="res://resources/priority_rules/relikarn_grudge_rule.tres" id="7_grudge_rule"]
+[ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="7_sajgt"]
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Resource" uid="uid://cyam2k4vw7lqe" path="res://resources/passives/reprisal.tres" id="9_reprisal"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dd63g"]
+atlas = ExtResource("7_sajgt")
+region = Rect2(32, 32, 16, 16)
+
+[resource]
+script = ExtResource("1_familiar")
+familiar_name = "Relikarn"
+sprite = SubResource("AtlasTexture_dd63g")
+max_hp = 45
+speed = 8
+techniques = Array[ExtResource("2_technique")]([ExtResource("4_devastation"), ExtResource("3_grudge")])
+priority_rules = Array[ExtResource("5_rule")]([ExtResource("6_devastation_rule"), ExtResource("7_grudge_rule")])
+passives = Array[ExtResource("8_passive")]([ExtResource("9_reprisal")])
+metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

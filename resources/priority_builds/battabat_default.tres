@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://b022g3x3lrpg2"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_nusoe"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_gvwca"]
+[ext_resource type="Resource" uid="uid://cbr4p1wol5k44" path="res://resources/priority_rules/battabat_wounds_rule.tres" id="2_yucp5"]
+[ext_resource type="Resource" uid="uid://s4r3v0o4b4wv" path="res://resources/priority_rules/battabat_assault_rule.tres" id="3_usryb"]
+
+[resource]
+script = ExtResource("2_gvwca")
+build_name = "Battabat Default"
+priority_rules = Array[ExtResource("1_nusoe")]([ExtResource("2_yucp5"), ExtResource("3_usryb")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

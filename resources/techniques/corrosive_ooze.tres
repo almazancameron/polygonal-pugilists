@@ -26,6 +26,5 @@ metadata/_custom_type_script = "uid://bxo68i5nl228w"
 [resource]
 script = ExtResource("1_taqmh")
 technique_name = "Corrosive Ooze"
-power_multiplier = 0.667
 step_groups = Array[ExtResource("2_wux5r")]([SubResource("Resource_urbyy")])
 metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

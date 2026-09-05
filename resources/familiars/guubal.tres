@@ -4,10 +4,10 @@
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_kn4wb"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_tj0wc"]
 [ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="2_iskl7"]
-[ext_resource type="Resource" uid="uid://7doar52d84rn" path="res://resources/passives/sticky_residue.tres" id="2_xwf4l"]
+[ext_resource type="Resource" uid="uid://dqr8x2mkf70p" path="res://resources/passives/corrosive_growth.tres" id="2_xwf4l"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="3_kn4wb"]
+[ext_resource type="Resource" uid="uid://di032vu67r5kt" path="res://resources/priority_rules/guubal_reclaim_rule.tres" id="4_wpb83"]
 [ext_resource type="Resource" uid="uid://bfjju3nkr50x2" path="res://resources/priority_rules/guubal_corrosive_rule.tres" id="4_xwf4l"]
-[ext_resource type="Resource" uid="uid://rmae50poa21" path="res://resources/priority_rules/guubal_culture_rule.tres" id="5_wpb83"]
 [ext_resource type="Resource" uid="uid://hcbpxomwrm58" path="res://resources/techniques/corrosive_ooze.tres" id="8_wpb83"]
 [ext_resource type="Resource" uid="uid://cp1w34fm2ry5v" path="res://resources/techniques/culture.tres" id="9_gl1u3"]
 
@@ -21,8 +21,8 @@ familiar_name = "Guubal"
 sprite = SubResource("AtlasTexture_m4hsq")
 max_hp = 60
 power = 8
-speed = 5
+speed = 8
 techniques = Array[ExtResource("3_kn4wb")]([ExtResource("8_wpb83"), ExtResource("9_gl1u3")])
-priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("4_xwf4l"), ExtResource("5_wpb83")])
+priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("4_wpb83"), ExtResource("4_xwf4l")])
 passives = Array[ExtResource("1_tj0wc")]([ExtResource("2_xwf4l")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

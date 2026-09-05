@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://cbyqy5artskww"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_tulsy"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_38ngt"]
+[ext_resource type="Resource" uid="uid://c7ld5tc4682sw" path="res://resources/techniques/siphon_energy.tres" id="3_38ngt"]
+
+[resource]
+script = ExtResource("2_38ngt")
+technique = ExtResource("3_38ngt")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

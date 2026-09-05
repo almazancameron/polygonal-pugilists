@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://cyam2k4vw7lqe"]
+
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
+[ext_resource type="Resource" uid="uid://dqx1sm6b7hkty" path="res://resources/techniques/reprisal.tres" id="2_technique"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="3_condition"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="4_statuscond"]
+
+[sub_resource type="Resource" id="Resource_self_ruined"]
+script = ExtResource("4_statuscond")
+left_status_effect = 18
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[resource]
+script = ExtResource("1_passive")
+operation = ExtResource("2_technique")
+trigger = 11
+trigger_target = 0
+conditions = Array[ExtResource("3_condition")]([SubResource("Resource_self_ruined")])
+limiter = 1
+metadata/_custom_type_script = "uid://c4jawah678pod"

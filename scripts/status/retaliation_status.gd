@@ -7,6 +7,9 @@ func status_id() -> StringName:
     return &"retaliation"
 
 func on_hit(target: Combatant, attacker: Combatant) -> String:
+    if stacks <= 0:
+        return ""
+
     var damage: int = attacker.take_damage(damage_per_stack * stacks)
     stacks = 0
 

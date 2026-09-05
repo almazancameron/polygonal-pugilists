@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://bsilmvpvj1gdj"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_pdmml"]
+[ext_resource type="Resource" uid="uid://hkj7iis7ha5y" path="res://resources/priority_rules/ironcap_press_rule.tres" id="2_4cqrx"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_vt0ld"]
+[ext_resource type="Resource" uid="uid://cnxb08v5x4r1x" path="res://resources/priority_rules/ironcap_ironclad_rule.tres" id="3_qlo18"]
+
+[resource]
+script = ExtResource("2_vt0ld")
+build_name = "Ironcap Default"
+priority_rules = Array[ExtResource("1_pdmml")]([ExtResource("2_4cqrx"), ExtResource("3_qlo18")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

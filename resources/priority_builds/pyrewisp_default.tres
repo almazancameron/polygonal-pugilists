@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://c5ldroi0158tw"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_582sy"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_0f457"]
+[ext_resource type="Resource" uid="uid://be5ocs1uxbtyr" path="res://resources/priority_rules/pyrewisp_veil_rule.tres" id="2_adocv"]
+[ext_resource type="Resource" uid="uid://cbyqy5artskww" path="res://resources/priority_rules/pyrewisp_siphon_rule.tres" id="3_jgv65"]
+
+[resource]
+script = ExtResource("2_0f457")
+priority_rules = Array[ExtResource("1_582sy")]([ExtResource("2_adocv"), ExtResource("3_jgv65")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

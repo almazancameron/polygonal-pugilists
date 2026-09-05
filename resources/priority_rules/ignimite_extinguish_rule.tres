@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://bignextrule1"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_condition"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="2_statuscond"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="3_rule"]
+[ext_resource type="Resource" uid="uid://dextinguish1" path="res://resources/techniques/extinguish.tres" id="4_technique"]
+
+[sub_resource type="Resource" id="Resource_self_burning"]
+script = ExtResource("2_statuscond")
+left_status_effect = 2
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[resource]
+script = ExtResource("3_rule")
+conditions = Array[ExtResource("1_condition")]([SubResource("Resource_self_burning")])
+technique = ExtResource("4_technique")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://s4r3v0o4b4wv"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_xr5ea"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_yi5i6"]
+[ext_resource type="Resource" uid="uid://bvg5dja8gnxp" path="res://resources/techniques/frenzied_assault.tres" id="3_yi5i6"]
+
+[resource]
+script = ExtResource("2_yi5i6")
+technique = ExtResource("3_yi5i6")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

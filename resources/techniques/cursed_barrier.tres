@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://k5n8r4g4d5of"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_7qovu"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_kwcc3"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_1u6qj"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="4_u552h"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_2k7qj"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_dhwl7"]
+
+[sub_resource type="Resource" id="Resource_xx8av"]
+script = ExtResource("4_u552h")
+target = 1
+effect = 16
+stacks = 6
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_m6k1g"]
+script = ExtResource("2_kwcc3")
+actions = Array[ExtResource("3_1u6qj")]([SubResource("Resource_xx8av")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_7qovu")
+technique_name = "Cursed Barrier"
+step_groups = Array[ExtResource("2_kwcc3")]([SubResource("Resource_m6k1g")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

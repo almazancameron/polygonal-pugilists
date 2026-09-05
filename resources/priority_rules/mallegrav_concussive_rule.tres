@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://cduxxxqksw2es"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_teq6c"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_0nrju"]
+[ext_resource type="Resource" uid="uid://c5g2lr1w6q6l5" path="res://resources/techniques/concussive_blow.tres" id="3_0nrju"]
+
+[resource]
+script = ExtResource("2_0nrju")
+technique = ExtResource("3_0nrju")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

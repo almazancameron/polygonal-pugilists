@@ -1,5 +1,30 @@
 # Development Log
 
+## 2026-09-03 to 2026-09-04 (session 6) — PassiveEffect system, Focus breakpoints, and three real reentrancy/timing bugs
+
+Built the whole rule-following passive system (`GAME_DESIGN.md` §7.3, committed as `b896760`), then spent most of the session hunting three genuine bugs the system's own cascading triggers made possible — each found via a real in-game report and confirmed with a headless reproduction before fixing, not guessed at.
+
+**`PassiveEffect` architecture**: a base class (`Trigger` — all thirteen values now wired, including a new `STATUS_CREATED` — `Target`, `Conditions`, `Limiter`) plus four payload subclasses (`OperationPassiveEffect`, `ModifyStatusPassiveEffect`, `ModifyHealPassiveEffect`, `PermanentStatPassiveEffect`). `FocusBreakpointCondition` + `Familiar.focus_step_size` make Focus breakpoints tier-based rather than hardcoded thresholds. Full writeup with the reasoning behind every subclass split is in `DECISIONS.md` — that's the durable reference, not this entry.
+
+**Bug 1 — Ashen Down fired on a fresh status application, not just a reapplication** (real in-game report): a `StatusComparisonCondition` reads state *after* `add_status()` already ran, so "target already has Burn" couldn't distinguish "already burning" from "just started burning via this exact hit." Fixed with `Combatant.pre_application_snapshot` + `StatusPresentBeforeApplicationCondition`, reading state frozen the instant before the application lands. See `DECISIONS.md`.
+
+**Bug 2 — Ruin applied twice from one Ashwing turn** (real in-game report, diagnosed collaboratively — the developer supplied the two actual contributing sources and, after Claude's first two theories were wrong, corrected the mechanism to the right one: *"a turn should be that combatant's upkeep + execution phase"*). Root cause: `reset_turn_passive_limits()` ran at the top of `battle_controller.take_turn()`, which happens *after* that actor's own upkeep already ran — so a limiter-consuming event during upkeep and one during the same turn's technique execution were treated as two different "turns." Fixed by moving the reset into `advance_turn()`, once, right before that actor's upkeep begins — covering upkeep and execution as the single window they actually are.
+
+**Bug 3 — stack overflow in a live Battabat vs. Ashwing fight**: Ashen Down (`STATUS_APPLIED`-triggered) had gained `triggers_hooks = true`, so its own Ruin application cascaded back into `STATUS_APPLIED` checks — including itself. `check_passives()` was recording a passive as "fired" (for its `ONCE_PER_TURN`/etc. limiter) *after* running it, leaving a window where the limiter hadn't caught up yet when the cascade looped back onto the same passive — genuine unbounded recursion, reproduced exactly via a headless Battabat-vs-Ashwing script (`--check-only` doesn't catch this kind of bug; only running a real fight does). Fixed by recording the fire *before* running the operation, closing the reentrancy window for this and any future passive shaped the same way.
+
+**Taste for Blood (Battabat's passive) fixed** — found by Claude (wrong `trigger`/`trigger_target` pairing: `HIT` fires on the defender, not the attacker; a passive reacting to its own owner's action needs `trigger_target = SELF`, which nothing had needed before since every existing self-reactive passive used a turn-level trigger, not `ATTACK`/`HIT`), fixed independently by the developer.
+
+**Status icon/preview gaps closed**: audited all 24 statuses — Cleanse, Lifesteal, Regeneration, and Renewal had no icon (`icon()` returning `null` with a `# change after adding X_icon.tres` placeholder); checked their `preview_color()` values against the other 20 by pairwise RGB distance and found each sat close enough to an already-iconed status (Cleanse/Stun nearly identical, Lifesteal near Bleed/Ruin, Regeneration near Ward, Renewal near Stasis) to be a real confusion risk without an icon. The developer added and wired real icons for all four the same session. Separately, Infestation's `next_tick_damage()` wasn't overridden despite `on_tick()` dealing real damage every turn (HP-bar preview silently always showed 0); Foretell's burst damage now previews on its final countdown turn, since that hit is fully deterministic.
+
+**Battabat** (new familiar) added — Frenzied Assault (4-hit technique), Open Wounds (Bleed applicator), Taste for Blood (lifesteal-on-attack passive).
+
+### Where to continue
+
+- **Confirm intent on `ashen_down.tres`'s `triggers_hooks = true`.** The engine fix makes it safe either way, but it was a silent edit (not something Claude changed) and it's what exposed the stack-overflow bug — worth the developer explicitly deciding whether Ashen Down's Ruin should visibly count as a real status application to other reactive passives, or whether that flag should go back to `false`.
+- **Focus breakpoint tables (`FocusTable` content) still don't exist** — the mechanism (`FocusBreakpointCondition`, `Familiar.focus_step_size`, `Familiar.focus_table`) is built and wired, but no familiar has an authored table yet. This was the reason the whole `PassiveEffect` system got built this session; the content itself is the natural next step.
+- Continue the content pass (more familiars/techniques/passives) toward the full 16-familiar scope before starting the bracket system (§9) — unchanged from session 5's note, still the standing sequencing call.
+- The reward screen and priority-editor integration (§9.4) are still both unbuilt — unchanged from session 5, not touched this session.
+
 ## 2026-09-02 to 2026-09-03 (session 5) — Priority builder PoC: the real rule editor's design, settled
 
 Built and played a standalone block editor for composing `priority_rules` — `scenes/priority_builder/priority_builder.tscn`, on branch `feat/priority-builder-poc`. Claude-implemented end to end at the developer's request, after a design conversation in which the developer overrode Claude's recommended approach.

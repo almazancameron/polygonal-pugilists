@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://bo74yk58gd5pr"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_gfr4s"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_72x2c"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_q7vuq"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="4_f612c"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="5_253nv"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="6_7pike"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="7_mmfmq"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="8_u4n2e"]
+
+[sub_resource type="Resource" id="Resource_3818l"]
+script = ExtResource("4_f612c")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_0kat6"]
+script = ExtResource("5_253nv")
+effect = 13
+stacks = 4
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_cl3ie"]
+script = ExtResource("7_mmfmq")
+left_status_effect = 13
+comparator = 3
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_iv6yn"]
+script = ExtResource("8_u4n2e")
+percent_bonus = 1.9
+metadata/_custom_type_script = "uid://3qq8130hhesh"
+
+[sub_resource type="Resource" id="Resource_jnryr"]
+script = ExtResource("2_72x2c")
+actions = Array[ExtResource("3_q7vuq")]([SubResource("Resource_3818l"), SubResource("Resource_0kat6")])
+conditions = Array[ExtResource("6_7pike")]([SubResource("Resource_cl3ie")])
+numeric_bonuses = Array[ExtResource("8_u4n2e")]([SubResource("Resource_iv6yn")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[sub_resource type="Resource" id="Resource_n22i6"]
+script = ExtResource("4_f612c")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_e1ynk"]
+script = ExtResource("7_mmfmq")
+left_status_effect = 13
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_dmr0d"]
+script = ExtResource("2_72x2c")
+actions = Array[ExtResource("3_q7vuq")]([SubResource("Resource_n22i6")])
+conditions = Array[ExtResource("6_7pike")]([SubResource("Resource_e1ynk")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_gfr4s")
+technique_name = "Meteor Rush"
+power_multiplier = 0.1
+step_groups = Array[ExtResource("2_72x2c")]([SubResource("Resource_jnryr"), SubResource("Resource_dmr0d")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

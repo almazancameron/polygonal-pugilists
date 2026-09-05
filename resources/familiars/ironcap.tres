@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://dsr3w7ld5ntij"]
+
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_72m2d"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_ttxf1"]
+[ext_resource type="Resource" uid="uid://bncsextcat56a" path="res://resources/passives/fungal_fortification.tres" id="2_v1y3b"]
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="3_y5cbo"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_6xij5"]
+[ext_resource type="Resource" uid="uid://hkj7iis7ha5y" path="res://resources/priority_rules/ironcap_press_rule.tres" id="4_en2pf"]
+[ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="4_ttxf1"]
+[ext_resource type="Resource" uid="uid://cnxb08v5x4r1x" path="res://resources/priority_rules/ironcap_ironclad_rule.tres" id="5_eia52"]
+[ext_resource type="Resource" uid="uid://cg5vwqlaelrb0" path="res://resources/techniques/body_press.tres" id="7_aliry"]
+[ext_resource type="Resource" uid="uid://cq6dfxe78q2yt" path="res://resources/techniques/ironclad.tres" id="8_en2pf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rj06v"]
+atlas = ExtResource("4_ttxf1")
+region = Rect2(0, 0, 16, 16)
+
+[resource]
+script = ExtResource("3_y5cbo")
+familiar_name = "Ironcap"
+sprite = SubResource("AtlasTexture_rj06v")
+max_hp = 55
+power = 8
+defense = 8
+speed = 6
+focus = 5
+techniques = Array[ExtResource("4_6xij5")]([ExtResource("7_aliry"), ExtResource("8_en2pf")])
+priority_rules = Array[ExtResource("2_ttxf1")]([ExtResource("4_en2pf"), ExtResource("5_eia52")])
+passives = Array[ExtResource("1_72m2d")]([ExtResource("2_v1y3b")])
+metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

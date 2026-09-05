@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://wyp1qri7t1rd"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_nwxlj"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="2_q8g0s"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_ubjnq"]
+[ext_resource type="Resource" uid="uid://cr01t1lg378wu" path="res://resources/techniques/wind_up_strike.tres" id="4_p4vos"]
+
+[sub_resource type="Resource" id="Resource_ndr5d"]
+script = ExtResource("2_q8g0s")
+left_status_effect = 5
+left_target = 1
+comparator = 3
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[resource]
+script = ExtResource("2_ubjnq")
+conditions = Array[ExtResource("1_nwxlj")]([SubResource("Resource_ndr5d")])
+technique = ExtResource("4_p4vos")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

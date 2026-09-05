@@ -48,5 +48,11 @@ Real incident, not hypothetical: `fallback_attack.tres` is referenced by both Gu
 ## GDScript pitfall: `int / int` truncates
 `(user.current_hp / user.familiar.max_hp) < hp_percent` always evaluated to `0 < hp_percent` (true) for any HP below max, because both operands were `int` and GDScript performs integer division unless at least one side is a `float`. Fix: `float(user.current_hp) / user.familiar.max_hp`.
 
+## A recurring event's hooks can be attacker-side or defender-side for the same physical moment
+Landing a hit and receiving a hit are two different trigger points even though they happen at the same instant — `Technique.apply_hit()` calls `user.trigger_on_attack()` (checks the attacker's own passives) and separately `target.trigger_on_hit(attacker)` (checks the defender's own passives). A passive meant to react to its *own* owner attacking needs the attacker-side trigger, not the "on hit" one — a natural but wrong-seeming-in-hindsight assumption to make from the name alone. Caught on a real passive (Taste for Blood used `HIT` when it needed `ATTACK`) and fixed correctly and independently once the distinction was explained.
+
+## A trigger match needs both the right event type and the right side (`trigger_target: SELF` vs. `TARGET`)
+Matching a `PassiveEffect.Trigger` value isn't enough on its own — `trigger_target` says whose event counts as a match: `SELF` for "something happening to my own owner," `TARGET` (the default) for "something happening to my owner's opponent." A passive meant to react to its own owner's action (e.g. gaining a buff when *I* attack) needs `trigger_target = SELF` set explicitly; leaving it at the default silently watches the opponent instead, and the passive simply never fires without any error to point at the mistake.
+
 ## `Callable.bind()` for one handler shared across many generated nodes
 `button.pressed.connect(_on_technique_button_pressed.bind(technique))` — `.bind()` wraps a method reference in a new `Callable` with extra trailing arguments baked in, so a signal that normally calls its handler with no arguments still delivers `technique` as if it were a parameter. This is what lets N runtime-generated buttons all connect to the *same* handler function while each still carrying its own captured value — the same role a closure plays in other languages.

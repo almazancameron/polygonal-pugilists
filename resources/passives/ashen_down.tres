@@ -13,6 +13,7 @@ metadata/_custom_type_script = "uid://c3d8cld0sohgy"
 [resource]
 script = ExtResource("2_xrcsc")
 operation = ExtResource("3_h408f")
+triggers_hooks = true
 conditions = Array[ExtResource("1_0rmst")]([SubResource("Resource_22uqi")])
 limiter = 1
 metadata/_custom_type_script = "uid://c4jawah678pod"

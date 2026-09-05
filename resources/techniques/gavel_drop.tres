@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://76mxxdbi3500"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_pmoin"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_44nwl"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_85dws"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="4_sbtgk"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_1qmmt"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_hv6sw"]
+
+[sub_resource type="Resource" id="Resource_ecdtl"]
+script = ExtResource("4_sbtgk")
+target = 1
+effect = 5
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_8dxyc"]
+script = ExtResource("2_44nwl")
+actions = Array[ExtResource("3_85dws")]([SubResource("Resource_ecdtl")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_pmoin")
+technique_name = "Gavel Drop"
+step_groups = Array[ExtResource("2_44nwl")]([SubResource("Resource_8dxyc")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

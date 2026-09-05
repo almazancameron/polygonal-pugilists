@@ -42,8 +42,10 @@ func execute(user: Combatant, target: Combatant, trigger_hooks: bool = true) -> 
 			for action in step_group.actions:
 
 				if action is HitAction:
+					var hit_action: HitAction = action
 					var step = func() -> String:
-						return apply_hit(user, target, step_group.numeric_bonuses, trigger_hooks)
+						var affected: Combatant = user if hit_action.target == HitAction.Target.SELF else target
+						return apply_hit(user, affected, step_group.numeric_bonuses, trigger_hooks, hit_action.ignore_power_and_defense)
 					steps.append(step)
 
 				elif action is StatusApplicationAction:
@@ -58,7 +60,27 @@ func execute(user: Combatant, target: Combatant, trigger_hooks: bool = true) -> 
 
 				elif action is HealAction:
 					var step = func() -> String:
-						return apply_heal(user, target, action, step_group.numeric_bonuses)
+						return apply_heal(user, target, action, step_group.numeric_bonuses, trigger_hooks)
+					steps.append(step)
+
+				elif action is HalveAllStatusesAction:
+					var halve_action: HalveAllStatusesAction = action
+					var step = func() -> String:
+						var affected: Combatant = user if halve_action.target == HalveAllStatusesAction.Target.SELF else target
+						return affected.halve_all_statuses()
+					steps.append(step)
+
+				elif action is RandomStatusApplicationAction:
+					var random_action: RandomStatusApplicationAction = action
+					var step = func() -> String:
+						# A fresh, throwaway StatusApplicationAction per execution --
+						# never mutate random_action itself (shared, authored data;
+						# see the resource's own doc comment for why).
+						var resolved := StatusApplicationAction.new()
+						resolved.target = random_action.target as StatusApplicationAction.Target
+						resolved.stacks = random_action.stacks
+						resolved.effect = random_action.pick_random_effect()
+						return apply_status(user, target, resolved, step_group.numeric_bonuses, trigger_hooks)
 					steps.append(step)
 
 	return steps
@@ -74,19 +96,29 @@ func _sum_bonuses(bonuses: Array[NumericBonus], action_type: NumericBonus.Action
 			total += bonus.compute(user, target)
 	return total
 
-func apply_hit(user: Combatant, target: Combatant, numeric_bonuses: Array[NumericBonus], trigger_hooks: bool = true) -> String:
+func apply_hit(user: Combatant, target: Combatant, numeric_bonuses: Array[NumericBonus], trigger_hooks: bool = true, ignore_power_and_defense: bool = false) -> String:
 	if target.is_defeated():
 		return ""
 
-	var target_defense: int = target.effective_defense()
-
-	var user_power: int = user.effective_power()
-	var raw_technique_damage: int = int(user_power * power_multiplier)
 	var bonuses_total: int = _sum_bonuses(numeric_bonuses, NumericBonus.ActionType.HIT, user, target)
-	var raw_damage: int = raw_technique_damage + bonuses_total
 
-	var post_mit_damage: int = (raw_damage * raw_damage / (raw_damage + target_defense))
-	var damage = max(post_mit_damage, 1)
+	var damage: int
+	if ignore_power_and_defense:
+		# No power scaling, no defense mitigation at all -- power_multiplier
+		# still sets the technique's own flat base (read as a plain int, not
+		# multiplied against Power), so the default 1.0 reproduces "1 base
+		# damage" without a hardcoded constant, and an author can raise or
+		# lower that base per technique the same way they already tune a
+		# normal hit's power_multiplier. A bonus stacks additively onto that
+		# base rather than replacing it.
+		damage = max(int(power_multiplier) + bonuses_total, 1)
+	else:
+		var target_defense: int = target.effective_defense()
+		var user_power: int = user.effective_power()
+		var raw_technique_damage: int = int(user_power * power_multiplier)
+		var raw_damage: int = raw_technique_damage + bonuses_total
+		var post_mit_damage: int = (raw_damage * raw_damage / (raw_damage + target_defense))
+		damage = max(post_mit_damage, 1)
 
 	var message: String = ""
 
@@ -102,17 +134,18 @@ func apply_hit(user: Combatant, target: Combatant, numeric_bonuses: Array[Numeri
 				message += " " if message != "" else ""
 				message += attack_message
 
-			var hit_message: String = target.trigger_on_hit(user)
-			if hit_message != "":
-				message += " " if message != "" else ""
-				message += hit_message
+			if not target.is_defeated():
+				var hit_message: String = target.trigger_on_hit(user)
+				if hit_message != "":
+					message += " " if message != "" else ""
+					message += hit_message
 
 			# Scoped to direct technique hits only, same as HIT/ATTACK -- not
 			# take_damage() generically, since DoT ticks have no real
 			# "dealer" to attribute DAMAGE_DEALT/DAMAGE_TAKEN to.
 			var damage_message: String = Combatant._combine_messages([
 				user.check_passives(PassiveEffect.Trigger.DAMAGE_DEALT, user),
-				target.check_passives(PassiveEffect.Trigger.DAMAGE_TAKEN, target),
+				"" if target.is_defeated() else target.check_passives(PassiveEffect.Trigger.DAMAGE_TAKEN, target),
 			])
 			if damage_message != "":
 				message += " " if message != "" else ""
@@ -141,7 +174,7 @@ func apply_status(user: Combatant, target: Combatant, status_application: Status
 
 	if status:
 		status_target.pre_application_snapshot = status_target.snapshot_statuses()
-		var add_result: Dictionary = status_target.add_status(status)
+		var add_result: Dictionary = status_target.add_status(status, user == status_target)
 		var reapply_message: String = add_result.message
 		if reapply_message != "":
 			message += " " if message != "" else ""
@@ -165,8 +198,8 @@ func apply_status(user: Combatant, target: Combatant, status_application: Status
 
 			var passive_messages: Array[String] = []
 			for trigger in triggers:
-				passive_messages.append(status_target.check_passives(trigger, status_target))
-				passive_messages.append(opponent.check_passives(trigger, status_target))
+				passive_messages.append(status_target.check_passives(trigger, status_target, status))
+				passive_messages.append(opponent.check_passives(trigger, status_target, status))
 
 			var passive_message: String = Combatant._combine_messages(passive_messages)
 			if passive_message != "":
@@ -190,7 +223,7 @@ func modify_status(user: Combatant, target: Combatant, modify_status_action: Mod
 
 	return message
 	
-func apply_heal(user: Combatant, target: Combatant, heal: HealAction, numeric_bonuses: Array[NumericBonus]) -> String:
+func apply_heal(user: Combatant, target: Combatant, heal: HealAction, numeric_bonuses: Array[NumericBonus], trigger_hooks: bool = true) -> String:
 	var mitigation: int = target.effective_defense()
 	var damage: int = max(int(user.effective_power() * power_multiplier) - mitigation, 1)
 
@@ -203,6 +236,11 @@ func apply_heal(user: Combatant, target: Combatant, heal: HealAction, numeric_bo
 	if heal_amount > 0:
 		var actual_heal: int = user.heal(heal_amount)
 		message += "%s heals for %d health!" % [user.familiar.familiar_name, actual_heal]
+
+		if trigger_hooks and actual_heal > 0:
+			var heal_message: String = user.check_passives(PassiveEffect.Trigger.HEALED, user)
+			if heal_message != "":
+				message += " " + heal_message
 
 	return message
 
@@ -230,7 +268,15 @@ func describe() -> String:
 
 		for action in step_group.actions:
 			if action is HitAction:
-				group_parts.append("deals %d%% damage%s" % [int(power_multiplier * 100), hit_bonus])
+				var self_suffix: String = " to itself" if action.target == HitAction.Target.SELF else ""
+				if action.ignore_power_and_defense:
+					var flat_base: int = int(power_multiplier)
+					if flat_base == 0:
+						group_parts.append(_flat_hit_phrase(step_group.numeric_bonuses) + self_suffix)
+					else:
+						group_parts.append("deals %d flat damage%s, ignoring power and defense%s" % [flat_base, hit_bonus, self_suffix])
+				else:
+					group_parts.append("deals %d%% damage%s%s" % [int(power_multiplier * 100), hit_bonus, self_suffix])
 
 			elif action is StatusApplicationAction:
 				group_parts.append(_status_application_phrase(action, step_group.numeric_bonuses, status_bonus))
@@ -250,6 +296,16 @@ func describe() -> String:
 				else:
 					group_parts.append("heals %d%s" % [action.heal_flat, heal_bonus])
 
+			elif action is HalveAllStatusesAction:
+				var whose: String = "its own" if action.target == HalveAllStatusesAction.Target.SELF else "the target's"
+				group_parts.append("halves %s active status stacks" % whose)
+
+			elif action is RandomStatusApplicationAction:
+				var whose: String = "self" if action.target == RandomStatusApplicationAction.Target.SELF else "target"
+				group_parts.append("applies %d stack%s of a random status to %s" % [
+					action.stacks, "s" if action.stacks != 1 else "", whose
+				])
+
 		if group_parts.is_empty():
 			continue
 
@@ -262,7 +318,7 @@ func describe() -> String:
 			var condition_texts: Array[String] = []
 			for condition in step_group.conditions:
 				condition_texts.append(condition.describe())
-			group_text = "%s, if %s" % [group_text, " and ".join(condition_texts)]
+			group_text = "if %s, %s" % [" and ".join(condition_texts), group_text]
 
 		parts.append(group_text)
 
@@ -329,6 +385,28 @@ func _status_application_phrase(action: StatusApplicationAction, numeric_bonuses
 			return "applies %s %s to %s %s" % [lead, status_text, whose, qualifier]
 
 	return "applies %d %s to %s%s" % [action.stacks, status_text, whose, status_bonus]
+
+## Mirrors _status_application_phrase()'s zero-count handling, for a flat hit
+## (ignore_power_and_defense) whose base -- power_multiplier read as a plain
+## int -- is 0: the first usable bonus's own lead takes the position the base
+## normally holds instead of reading "deals 0 flat damage, +300%...", which
+## would misleadingly read as a separate 0 base plus a bonus rather than one
+## combined amount.
+func _flat_hit_phrase(numeric_bonuses: Array[NumericBonus]) -> String:
+	for bonus in numeric_bonuses:
+		if bonus.applies_to != NumericBonus.ActionType.HIT:
+			continue
+
+		var lead: String = bonus.describe_lead()
+		if lead == "":
+			continue
+
+		var qualifier: String = bonus.describe_qualifier()
+		if qualifier == "":
+			return "deals %s as damage, ignoring power and defense" % lead
+		return "deals %s as damage %s, ignoring power and defense" % [lead, qualifier]
+
+	return "deals no damage, ignoring power and defense"
 
 func _modify_status_phrase(action: ModifyStatusAction) -> String:
 	var is_self: bool = action.target == ModifyStatusAction.Target.SELF

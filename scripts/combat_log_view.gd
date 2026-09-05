@@ -14,6 +14,7 @@ func _ready() -> void:
 func _on_entry_added(text: String, source: CombatLog.Source) -> void:
 	var label := Label.new()
 	label.text = text
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.modulate = Color.WHITE if source == CombatLog.Source.PLAYER else Color(0.9, 0.3, 0.3)
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1))
 	label.add_theme_constant_override("shadow_offset_x", 1)

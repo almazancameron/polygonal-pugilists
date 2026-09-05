@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://vng6vvklvcfi"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_7yprf"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_prusv"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_i4bmn"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="4_aowei"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_ngyp3"]
+[ext_resource type="Script" uid="uid://bouecnl8c2673" path="res://scripts/condition/stat_comparison_condition.gd" id="6_smr3n"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_t2sv2"]
+[ext_resource type="Script" uid="uid://1il13m4awg3h" path="res://scripts/numeric_bonus/stat_comparison_numeric_bonus.gd" id="8_aowei"]
+
+[sub_resource type="Resource" id="Resource_0vu3e"]
+script = ExtResource("4_aowei")
+effect = 17
+stacks = 0
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_anoe5"]
+script = ExtResource("6_smr3n")
+left_stat = 2
+right_stat = 1
+metadata/_custom_type_script = "uid://bouecnl8c2673"
+
+[sub_resource type="Resource" id="Resource_i4bmn"]
+script = ExtResource("8_aowei")
+left_stat = 2
+right_stat = 1
+applies_to = 1
+flat_bonus = 1
+metadata/_custom_type_script = "uid://1il13m4awg3h"
+
+[sub_resource type="Resource" id="Resource_stq61"]
+script = ExtResource("2_prusv")
+actions = Array[ExtResource("3_i4bmn")]([SubResource("Resource_0vu3e")])
+conditions = Array[ExtResource("5_ngyp3")]([SubResource("Resource_anoe5")])
+numeric_bonuses = Array[ExtResource("7_t2sv2")]([SubResource("Resource_i4bmn")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_7yprf")
+technique_name = "Fungal Fortification"
+step_groups = Array[ExtResource("2_prusv")]([SubResource("Resource_stq61")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

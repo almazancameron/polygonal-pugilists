@@ -54,22 +54,30 @@ var current_round: int = 0
 
 @onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
+@onready var speed_toggle_button: Button = $SpeedToggleButton
+
+## Cycles battle pacing 1x -> 2x -> 4x -> 1x. Every pause between turn/upkeep
+## steps goes through get_tree().create_timer(), which already scales with
+## Engine.time_scale by default -- nothing else needed to change for this.
+const SPEED_MULTIPLIERS: Array[int] = [1, 2, 4]
+var speed_index: int = 0
+
 var player: Combatant
 var enemy: Combatant
 
 var phase: Phase = Phase.PLAYER_TURN
 
-## Who opens the exchange currently in progress -- re-decided by
-## _determine_first_actor() every time an exchange completes (see
-## advance_turn()), not just once per fight, so a mid-fight Speed swing
-## (buff/debuff) can hand a side two turns in a row.
-var current_first_actor: Combatant
+## Owns turn order, upkeep, and technique resolution for the fight currently in
+## progress -- see scripts/battle_engine.gd. Rebuilt in _ready() and again in
+## start_next_round(), since it wraps those two specific Combatant references.
+var engine: BattleEngine
 
 func _ready() -> void:
 	player = Combatant.new(player_familiar_data)
 	enemy = Combatant.new(enemy_familiar_data)
 	player.opponent = enemy
 	enemy.opponent = player
+	engine = BattleEngine.new(player, enemy)
 
 	player_status_row.tooltip_layer = tooltip_layer
 	enemy_status_row.tooltip_layer = tooltip_layer
@@ -84,6 +92,13 @@ func _ready() -> void:
 	enemy_portrait.texture = enemy.familiar.sprite
 
 	populate_build_select_buttons()
+
+	speed_toggle_button.pressed.connect(_on_speed_toggle_pressed)
+
+func _on_speed_toggle_pressed() -> void:
+	speed_index = (speed_index + 1) % SPEED_MULTIPLIERS.size()
+	Engine.time_scale = SPEED_MULTIPLIERS[speed_index]
+	speed_toggle_button.text = "%dx" % SPEED_MULTIPLIERS[speed_index]
 
 ## Spawns a button on the shared choice panel (used for both build-select
 ## and upgrade-select) that calls on_pressed when clicked.
@@ -124,20 +139,6 @@ func _on_upgrade_selected(upgrade: UpgradeOption) -> void:
 		upgrade_pool.erase(upgrade)
 	await begin_fight("Upgrade applied: %s. Let the battle continue!" % upgrade.describe(), CombatLog.Source.PLAYER)
 
-func _determine_first_actor(player: Combatant, enemy: Combatant) -> Combatant:
-	var player_override := player.has_first_act_override()
-	var enemy_override := enemy.has_first_act_override()
-
-	if player_override != enemy_override:
-		return player if player_override else enemy
-
-	var player_speed := player.effective_stat(Familiar.Stat.SPEED)
-	var enemy_speed := enemy.effective_stat(Familiar.Stat.SPEED)
-
-	if player_speed == enemy_speed:
-		return player
-	return player if player_speed > enemy_speed else enemy
-
 func _other(combatant: Combatant) -> Combatant:
 	return enemy if combatant == player else player
 
@@ -151,16 +152,15 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 
 	combat_log.add_entry(message, source)
 
-	var player_start_message: String = player.check_passives(PassiveEffect.Trigger.BATTLE_START, player)
-	if player_start_message != "":
-		combat_log.add_entry(player_start_message, CombatLog.Source.PLAYER)
-	var enemy_start_message: String = enemy.check_passives(PassiveEffect.Trigger.BATTLE_START, enemy)
-	if enemy_start_message != "":
-		combat_log.add_entry(enemy_start_message, CombatLog.Source.ENEMY)
+	engine.begin_battle()
+	if engine.battle_start_player_message != "":
+		combat_log.add_entry(engine.battle_start_player_message, CombatLog.Source.PLAYER)
+	if engine.battle_start_enemy_message != "":
+		combat_log.add_entry(engine.battle_start_enemy_message, CombatLog.Source.ENEMY)
 	update_hp_display(player)
 	update_hp_display(enemy)
 
-	current_first_actor = _determine_first_actor(player, enemy)
+	var current_first_actor: Combatant = engine.current_first_actor
 	var opening_source: CombatLog.Source = CombatLog.Source.PLAYER if current_first_actor == player else CombatLog.Source.ENEMY
 
 	phase = Phase.PLAYER_TURN if current_first_actor == player else Phase.ENEMY_TURN
@@ -196,22 +196,15 @@ func refresh_status_preview(combatant: Combatant, hp_bar: HPBar, status_row: Sta
 	hp_bar.set_status_preview_segments(segments)
 	status_row.set_status_icons(segments)
 
-## actor is whoever just finished their turn. If they were the exchange's
-## first actor, the exchange isn't done yet -- the other side takes their
-## turn next, no re-determination. If they were the second actor, the
-## exchange just completed, so _determine_first_actor() runs again for the
-## next one: whoever's still faster (or still holds an override) opens it
-## again, which is what lets one side take two turns in a row.
+## actor is whoever just finished their turn. engine.advance_turn() decides who's
+## next -- the other side, unless actor's exchange just completed, in which case
+## whoever's still faster (or still holds an override) opens the next one, which
+## is what lets one side take two turns in a row.
 func advance_turn(actor: Combatant) -> void:
 	if await check_victory():
 		return
 
-	var next_actor: Combatant
-	if actor == current_first_actor:
-		next_actor = _other(actor)
-	else:
-		current_first_actor = _determine_first_actor(player, enemy)
-		next_actor = current_first_actor
+	var next_actor: Combatant = engine.advance_turn(actor)
 
 	var next_source: CombatLog.Source = CombatLog.Source.PLAYER if next_actor == player else CombatLog.Source.ENEMY
 	var next_hp_bar: HPBar = player_hp_bar if next_actor == player else enemy_hp_bar
@@ -230,20 +223,13 @@ func advance_turn(actor: Combatant) -> void:
 ## check_victory() says to -- not just when the battle is fully over, but
 ## also when paused for a mid-run upgrade choice.
 func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -> bool:
-	if combatant.statuses.is_empty():
-		return false
-
-	for status in combatant.statuses.duplicate():
-		var stacks_before: int = status.stacks
-		var message: String = Combatant._combine_messages([
-			status.on_tick(combatant),
-			combatant._notify_stack_change(status, stacks_before),
-		])
+	# Engine returns one entry per status ticked, not per message -- a "" entry
+	# still gets its own display update and pause below, matching how live play
+	# paced every tick before this refactor regardless of whether it had
+	# anything to log.
+	for message in engine.run_upkeep(combatant):
 		if message != "":
 			combat_log.add_entry(message, source)
-
-		if status.is_expired():
-			combatant.statuses.erase(status)
 
 		update_hp_display(combatant)
 
@@ -258,76 +244,43 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 ## technique the same way now (Combatant.choose_technique()), so there's no
 ## reason left for a player-specific and an enemy-specific version of this.
 func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) -> void:
-	var turn_start_message: String = actor.check_passives(PassiveEffect.Trigger.TURN_START, actor)
-	if turn_start_message != "":
-		combat_log.add_entry(turn_start_message, source)
+	# show_priority_skip_log logs the reasons after this turn's own messages now
+	# instead of interleaved right after choose_technique() -- a one-time ordering
+	# change to this off-by-default debug toggle, traded for engine.take_turn()
+	# being one call instead of the live UI re-implementing its sequencing.
+	for entry in engine.take_turn(actor, target):
+		combat_log.add_entry(entry.message, source)
 		update_hp_display(actor)
 		update_hp_display(target)
 
-	if actor.is_stunned:
-		actor.is_stunned = false
-		combat_log.add_entry("%s is stunned and skips its turn!" % actor.familiar.familiar_name, source)
-		await advance_turn(actor)
-		return
+		if entry.paced:
+			await get_tree().create_timer(0.6).timeout
 
-	var decision: Dictionary = actor.choose_technique(target)
 	if show_priority_skip_log:
-		for reason in decision.skip_reasons:
+		for reason in engine.last_skip_reasons:
 			combat_log.add_entry(reason, source)
 
-	var technique: Technique = decision.technique
-
-	var technique_used_message: String = actor.check_passives(PassiveEffect.Trigger.TECHNIQUE_USED, actor)
-	if technique_used_message != "":
-		combat_log.add_entry(technique_used_message, source)
-		update_hp_display(actor)
-		update_hp_display(target)
-
-	var steps: Array[Callable] = technique.execute(actor, target)
-
-	for step in steps:
-		var step_message: String = step.call()
-		if step_message == "":
-			continue
-
-		combat_log.add_entry(step_message, source)
-		update_hp_display(actor)
-		update_hp_display(target)
-
-		await get_tree().create_timer(0.6).timeout
-
-	var turn_end_message: String = actor.check_passives(PassiveEffect.Trigger.TURN_END, actor)
-	if turn_end_message != "":
-		combat_log.add_entry(turn_end_message, source)
-		update_hp_display(actor)
-		update_hp_display(target)
-
 	await advance_turn(actor)
-
-## Fires once per battle conclusion (guarded by the is_defeated() check at
-## check_victory()'s only two call-return points -- once either side is
-## defeated, start_next_round()/get_tree().quit() replaces or ends the
-## fight before check_victory() would ever see this same defeated pair
-## again, so there's no risk of firing this twice for one battle).
-func _fire_battle_end_passives() -> void:
-	var player_message: String = player.check_passives(PassiveEffect.Trigger.BATTLE_END, player)
-	if player_message != "":
-		combat_log.add_entry(player_message, CombatLog.Source.PLAYER)
-
-	var enemy_message: String = enemy.check_passives(PassiveEffect.Trigger.BATTLE_END, enemy)
-	if enemy_message != "":
-		combat_log.add_entry(enemy_message, CombatLog.Source.ENEMY)
 
 ## get_tree().quit() only requests a quit at the end of the current frame --
 ## it does NOT stop this function from continuing to run. Each branch must
 ## `return true` explicitly, or the caller's "battle's over, stop here"
 ## guards never trigger and processing (and duplicate victory/defeat logs)
 ## continue for another full step before things settle.
+##
+## engine.check_victory() is guarded the same way engine's own doc comment
+## describes: once it returns true here, this function always returns before
+## anything could call it again on the same (now-replaced-or-quit) pair.
 func check_victory() -> bool:
-	if enemy.is_defeated() or player.is_defeated():
-		_fire_battle_end_passives()
+	if not engine.check_victory():
+		return false
 
-	if enemy.is_defeated():
+	if engine.battle_end_player_message != "":
+		combat_log.add_entry(engine.battle_end_player_message, CombatLog.Source.PLAYER)
+	if engine.battle_end_enemy_message != "":
+		combat_log.add_entry(engine.battle_end_enemy_message, CombatLog.Source.ENEMY)
+
+	if engine.winner == player:
 		if current_round < opponent_lineup.size() - 1:
 			combat_log.add_entry("Victory! %s is defeated. Prepare for the next round!" % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
 
@@ -340,14 +293,11 @@ func check_victory() -> bool:
 		get_tree().quit()
 		return true
 
-	if player.is_defeated():
-		phase = Phase.BATTLE_OVER
-		combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
-		await get_tree().create_timer(1.0).timeout
-		get_tree().quit()
-		return true
-
-	return false
+	phase = Phase.BATTLE_OVER
+	combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
+	await get_tree().create_timer(1.0).timeout
+	get_tree().quit()
+	return true
 
 ## Advances to the next opponent, resets both Combatants (full heal, no
 ## statuses -- see DECISIONS.md), and shows the upgrade-choice screen.
@@ -368,3 +318,4 @@ func start_next_round() -> void:
 
 	player.opponent = enemy
 	enemy.opponent = player
+	engine = BattleEngine.new(player, enemy)

@@ -9,7 +9,7 @@
 
 [sub_resource type="Resource" id="Resource_6ni85"]
 script = ExtResource("4_wbfm6")
-effect = 10
+effect = 12
 stacks = 2
 metadata/_custom_type_script = "uid://1kkotxxun3j"
 

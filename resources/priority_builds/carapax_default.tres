@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PriorityBuild" format=3 uid="uid://bg3tnxa8s310"]
+
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_dii0i"]
+[ext_resource type="Resource" uid="uid://cil576q8khels" path="res://resources/priority_rules/carapax_shell_rule.tres" id="2_fed81"]
+[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="2_h3pjt"]
+[ext_resource type="Resource" uid="uid://b3rdaww1me0ul" path="res://resources/priority_rules/carapax_bash_rule.tres" id="3_tjgr2"]
+
+[resource]
+script = ExtResource("2_h3pjt")
+build_name = "Carapax Default"
+priority_rules = Array[ExtResource("1_dii0i")]([ExtResource("2_fed81"), ExtResource("3_tjgr2")])
+metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

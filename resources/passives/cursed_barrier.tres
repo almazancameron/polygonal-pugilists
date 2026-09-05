@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://bvps2wwuwohia"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_vvb2u"]
+[ext_resource type="Resource" uid="uid://k5n8r4g4d5of" path="res://resources/techniques/cursed_barrier.tres" id="2_lyaeh"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_vvb2u"]
+
+[resource]
+script = ExtResource("2_vvb2u")
+operation = ExtResource("2_lyaeh")
+triggers_hooks = true
+trigger = 2
+trigger_target = 0
+status_effect_filter = 15
+limiter = 1
+metadata/_custom_type_script = "uid://c4jawah678pod"

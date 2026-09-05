@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PriorityRule" format=3 uid="uid://be5ocs1uxbtyr"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_iw6cb"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_ksspq"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="2_y5tec"]
+[ext_resource type="Resource" uid="uid://o5mvjov4noxb" path="res://resources/techniques/inferno_veil.tres" id="4_om6v7"]
+
+[sub_resource type="Resource" id="Resource_7uuo0"]
+script = ExtResource("2_y5tec")
+left_status_effect = 15
+comparator = 3
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[resource]
+script = ExtResource("2_ksspq")
+conditions = Array[ExtResource("1_iw6cb")]([SubResource("Resource_7uuo0")])
+technique = ExtResource("4_om6v7")
+metadata/_custom_type_script = "uid://ck5xyovqw4lxy"

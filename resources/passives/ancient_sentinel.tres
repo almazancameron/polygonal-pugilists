@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://bdooje52atj47"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_5mcrr"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
+[ext_resource type="Resource" uid="uid://k0t7vvsbkm3c" path="res://resources/techniques/ancient_sentinel.tres" id="2_technique"]
+
+[resource]
+script = ExtResource("1_passive")
+operation = ExtResource("2_technique")
+trigger = 2
+trigger_target = 0
+status_effect_filter = 20
+limiter = 1
+metadata/_custom_type_script = "uid://c4jawah678pod"

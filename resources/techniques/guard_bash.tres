@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://dgcsa1wesjsgn"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_dg70c"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_a5xbw"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_n4jbt"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="4_e11me"]
+[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="5_rn3q8"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="6_br0se"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_itplo"]
+
+[sub_resource type="Resource" id="Resource_ws6ok"]
+script = ExtResource("4_e11me")
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_4kwkl"]
+script = ExtResource("5_rn3q8")
+effect = 8
+metadata/_custom_type_script = "uid://1kkotxxun3j"
+
+[sub_resource type="Resource" id="Resource_s142c"]
+script = ExtResource("2_a5xbw")
+actions = Array[ExtResource("3_n4jbt")]([SubResource("Resource_ws6ok"), SubResource("Resource_4kwkl")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_dg70c")
+technique_name = "Guard Bash"
+power_multiplier = 0.667
+step_groups = Array[ExtResource("2_a5xbw")]([SubResource("Resource_s142c")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

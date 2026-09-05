@@ -7,7 +7,7 @@ extends Status
 ## doesn't refresh or add to the duration; it costs the countdown one extra
 ## turn, which can trigger the burst immediately if that was its last turn.
 
-var burst_damage: int = 15  # TODO: tune once there's a real technique using this
+var burst_damage: int = 10  # TODO: tune once there's a real technique using this
 var stacks_lost_per_tick: int = 1  # also spent by a reapply -- see on_reapply()
 
 func status_id() -> StringName:
@@ -36,6 +36,9 @@ func _trigger_burst(target: Combatant) -> String:
 	stacks = 0
 	var damage: int = target.take_damage(burst_damage)
 	return "%s's foretold fate manifests, dealing %d burst damage!" % [target.familiar.familiar_name, damage]
+
+func next_tick_damage() -> int:
+	return burst_damage if stacks <= stacks_lost_per_tick else 0
 
 func preview_color() -> Color:
 	return Color(0.8, 0.1, 0.55, 1.0)

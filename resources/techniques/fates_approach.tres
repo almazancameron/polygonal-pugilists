@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://b5toage8mmi15"]
+
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_cayw6"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_pumwm"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_t0hse"]
+[ext_resource type="Script" uid="uid://6w0wvj8mfwna" path="res://scripts/technique/modify_status_action.gd" id="4_px3xg"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="5_a7rdy"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_kr8do"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="7_2nwpq"]
+[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="8_ylhyl"]
+[ext_resource type="Script" uid="uid://dmvhn5chatmco" path="res://scripts/numeric_bonus/stack_count_numeric_bonus.gd" id="9_px3xg"]
+
+[sub_resource type="Resource" id="Resource_dd63g"]
+script = ExtResource("4_px3xg")
+effect = 6
+modifier = 2.0
+operator = 1
+metadata/_custom_type_script = "uid://6w0wvj8mfwna"
+
+[sub_resource type="Resource" id="Resource_p0caf"]
+script = ExtResource("2_pumwm")
+actions = Array[ExtResource("3_t0hse")]([SubResource("Resource_dd63g")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[sub_resource type="Resource" id="Resource_bi5l8"]
+script = ExtResource("7_2nwpq")
+ignore_power_and_defense = true
+metadata/_custom_type_script = "uid://mrlrygvhn1v7"
+
+[sub_resource type="Resource" id="Resource_kl6ie"]
+script = ExtResource("8_ylhyl")
+left_status_effect = 6
+left_target = 1
+right_value = 1
+comparator = 1
+metadata/_custom_type_script = "uid://brxa3r56ukm5t"
+
+[sub_resource type="Resource" id="Resource_cxrw8"]
+script = ExtResource("9_px3xg")
+count_status_effect = 6
+flat_bonus = 1
+metadata/_custom_type_script = "uid://dmvhn5chatmco"
+
+[sub_resource type="Resource" id="Resource_fpf3k"]
+script = ExtResource("2_pumwm")
+actions = Array[ExtResource("3_t0hse")]([SubResource("Resource_bi5l8")])
+conditions = Array[ExtResource("5_a7rdy")]([SubResource("Resource_kl6ie")])
+numeric_bonuses = Array[ExtResource("6_kr8do")]([SubResource("Resource_cxrw8")])
+metadata/_custom_type_script = "uid://bxo68i5nl228w"
+
+[resource]
+script = ExtResource("1_cayw6")
+technique_name = "Fate's Approach"
+step_groups = Array[ExtResource("2_pumwm")]([SubResource("Resource_p0caf"), SubResource("Resource_fpf3k")])
+metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

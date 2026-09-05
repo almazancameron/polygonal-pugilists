@@ -27,12 +27,13 @@ func on_tick(target: Combatant) -> String:
         var victim: Status = candidates.pick_random()
         candidates.erase(victim)
         var victim_id: String = String(victim.status_id()).capitalize()
+        var victim_stacks_before: int = victim.stacks
         victim.stacks = 0
         if victim.is_expired():
-            target.statuses.erase(victim)
             messages.append("%s's cleanse washes away its %s!" % [target.familiar.familiar_name, victim_id])
         else:
             messages.append("%s's cleanse fails to wash away its %s!" % [target.familiar.familiar_name, victim_id])
+        messages.append(target._settle_status(victim, victim_stacks_before))
 
     stacks -= stacks_lost_per_tick
     return " ".join(messages)
@@ -41,8 +42,7 @@ func preview_color() -> Color:
     return Color(0.85, 1.0, 0.95, 1.0)
 
 func icon() -> Texture2D:
-    #return preload("res://assets/sprites/icons/cleanse_icon.tres")
-    return null # change after adding cleanse_icon.tres
+    return preload("res://assets/sprites/icons/cleanse_icon.tres")
 
 func describe() -> String:
     return "Removes %d other active status%s from the target at random. Loses %d stack%s per turn." % [

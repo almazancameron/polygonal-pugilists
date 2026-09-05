@@ -2,19 +2,26 @@
 
 [ext_resource type="Script" uid="uid://bm15uleb46vhy" path="res://scripts/battle_controller.gd" id="1_battle"]
 [ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/familiars/twerpent.tres" id="2_6vh42"]
+[ext_resource type="Resource" uid="uid://cm1amvxkagd68" path="res://resources/familiars/battabat.tres" id="2_ekamt"]
+[ext_resource type="Resource" uid="uid://c74tq7r2i71yt" path="res://resources/familiars/carapax.tres" id="2_fpf3k"]
 [ext_resource type="Script" uid="uid://cy44cok5wjn5a" path="res://scripts/combat_log.gd" id="2_log"]
+[ext_resource type="Resource" uid="uid://btyk8x5euimxt" path="res://resources/familiars/mallegrav.tres" id="2_p0caf"]
+[ext_resource type="Resource" uid="uid://b1sp7kg2vq1ts" path="res://resources/familiars/thymoxen.tres" id="2_saiin"]
 [ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="3_4k1nj"]
 [ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="3_djc8l"]
 [ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
 [ext_resource type="Resource" uid="uid://dvbydu6pi14ki" path="res://resources/priority_builds/guubal_default.tres" id="4_22uqi"]
 [ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
+[ext_resource type="Resource" uid="uid://bsilmvpvj1gdj" path="res://resources/priority_builds/ironcap_default.tres" id="4_p0caf"]
 [ext_resource type="FontFile" uid="uid://bq75qhujojfju" path="res://assets/fonts/BoldPixels.ttf" id="5_4k1nj"]
-[ext_resource type="Resource" uid="uid://dx02gcyx00krt" path="res://resources/priority_builds/twerpent_default.tres" id="5_6ni85"]
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="6_66ngm"]
-[ext_resource type="Resource" uid="uid://dsfbw21q1bq2m" path="res://resources/priority_builds/ashwing_default.tres" id="6_vceff"]
+[ext_resource type="Resource" uid="uid://26t0p2n00tt1" path="res://resources/priority_builds/thymoxen_default.tres" id="6_dd63g"]
 [ext_resource type="Resource" uid="uid://b76rnaybjpn8t" path="res://resources/familiars/ashwing.tres" id="7_6ni85"]
 [ext_resource type="PackedScene" uid="uid://wqprgejhrrw5" path="res://scenes/status_row.tscn" id="7_yahae"]
+[ext_resource type="Resource" uid="uid://ufhboip8imib" path="res://resources/priority_builds/omenfly_default.tres" id="9_saiin"]
+[ext_resource type="Resource" uid="uid://dfsdu8dwjh5s3" path="res://resources/familiars/omenfly.tres" id="15_dd63g"]
 [ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="18_fpf3k"]
+[ext_resource type="Theme" uid="uid://hkf2bxrjlau4" path="res://assets/themes/button_font.tres" id="19_p0caf"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
 
@@ -52,9 +59,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_battle")
-player_familiar_data = ExtResource("2_6vh42")
-available_builds = Array[ExtResource("3_djc8l")]([ExtResource("4_22uqi"), ExtResource("5_6ni85"), ExtResource("6_vceff")])
-opponent_lineup = Array[ExtResource("6_66ngm")]([ExtResource("3_4k1nj"), ExtResource("7_6ni85"), ExtResource("3_4k1nj"), ExtResource("3_4k1nj")])
+player_familiar_data = ExtResource("15_dd63g")
+available_builds = Array[ExtResource("3_djc8l")]([ExtResource("4_p0caf"), ExtResource("4_22uqi"), ExtResource("6_dd63g"), ExtResource("9_saiin")])
+opponent_lineup = Array[ExtResource("6_66ngm")]([ExtResource("2_saiin"), ExtResource("15_dd63g"), ExtResource("2_p0caf"), ExtResource("2_6vh42"), ExtResource("2_ekamt"), ExtResource("7_6ni85"), ExtResource("3_4k1nj"), ExtResource("2_fpf3k")])
 
 [node name="TooltipLayer" parent="." unique_id=1423614277 instance=ExtResource("18_fpf3k")]
 
@@ -139,6 +146,7 @@ offset_right = -16.0
 offset_bottom = -57.0
 grow_horizontal = 2
 grow_vertical = 2
+horizontal_scroll_mode = 0
 
 [node name="LogView" type="VBoxContainer" parent="LogScroll" unique_id=88184573]
 layout_mode = 2
@@ -155,3 +163,15 @@ offset_top = 600.0
 offset_right = -16.0
 offset_bottom = 640.0
 grow_horizontal = 2
+
+[node name="SpeedToggleButton" type="Button" parent="." unique_id=1985821346]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -96.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 48.0
+theme = ExtResource("19_p0caf")
+text = "1x"

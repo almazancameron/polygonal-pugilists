@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://cignimitefam1"]
+
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_familiar"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="2_technique"]
+[ext_resource type="Resource" uid="uid://cr0l5xod8ghtu" path="res://resources/techniques/mutual_combustion.tres" id="3_combustion"]
+[ext_resource type="Resource" uid="uid://dextinguish1" path="res://resources/techniques/extinguish.tres" id="4_extinguish"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="5_rule"]
+[ext_resource type="Resource" uid="uid://bignextrule1" path="res://resources/priority_rules/ignimite_extinguish_rule.tres" id="6_extinguish_rule"]
+[ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="7_2lfq5"]
+[ext_resource type="Resource" uid="uid://dsksf4fr4ttte" path="res://resources/priority_rules/ignimite_combustion_rule.tres" id="7_combustion_rule"]
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Resource" uid="uid://cproteanpasv1" path="res://resources/passives/protean_purge.tres" id="9_protean"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_edg5d"]
+atlas = ExtResource("7_2lfq5")
+region = Rect2(0, 32, 16, 16)
+
+[resource]
+script = ExtResource("1_familiar")
+familiar_name = "Ignimite"
+sprite = SubResource("AtlasTexture_edg5d")
+power = 9
+defense = 6
+speed = 7
+techniques = Array[ExtResource("2_technique")]([ExtResource("3_combustion"), ExtResource("4_extinguish")])
+priority_rules = Array[ExtResource("5_rule")]([ExtResource("6_extinguish_rule"), ExtResource("7_combustion_rule")])
+passives = Array[ExtResource("8_passive")]([ExtResource("9_protean")])
+metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

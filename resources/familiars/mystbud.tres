@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://donfipydyk0gq"]
+
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_familiar"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="2_technique"]
+[ext_resource type="Resource" uid="uid://cntuxectcsxmu" path="res://resources/techniques/vital_genesis.tres" id="3_genesis"]
+[ext_resource type="Resource" uid="uid://gujli8i6k1hw" path="res://resources/techniques/blooming_strike.tres" id="4_bloom"]
+[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="5_rule"]
+[ext_resource type="Resource" uid="uid://celavbw70ns3" path="res://resources/priority_rules/mystbud_genesis_rule.tres" id="6_genesis_rule"]
+[ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="7_8bghu"]
+[ext_resource type="Resource" uid="uid://s0ucalcbsf72" path="res://resources/priority_rules/mystbud_bloom_rule.tres" id="7_bloom_rule"]
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Resource" uid="uid://cwyspu5ecqut7" path="res://resources/passives/chlorophyll.tres" id="9_chlorophyll"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dd63g"]
+atlas = ExtResource("7_8bghu")
+region = Rect2(48, 32, 16, 16)
+
+[resource]
+script = ExtResource("1_familiar")
+familiar_name = "Mystbud"
+sprite = SubResource("AtlasTexture_dd63g")
+max_hp = 55
+power = 8
+defense = 7
+speed = 6
+techniques = Array[ExtResource("2_technique")]([ExtResource("3_genesis"), ExtResource("4_bloom")])
+priority_rules = Array[ExtResource("5_rule")]([ExtResource("6_genesis_rule"), ExtResource("7_bloom_rule")])
+passives = Array[ExtResource("8_passive")]([ExtResource("9_chlorophyll")])
+metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

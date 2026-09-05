@@ -39,12 +39,18 @@ Single scene family under `res://scenes/` and `res://scripts/`, wired together i
   Strike") / Burn ("Searing Spit") / Acid ("Acid Bath"), and ends the battle on
   victory/defeat. **No autoloads exist in this project** — a deliberate choice, not an
   oversight.
-- **`Status`** (`scripts/status/status.gd`, `RefCounted`) base class — now 19 concrete
+- **`Status`** (`scripts/status/status.gd`, `RefCounted`) base class — now 24 concrete
   subclasses covering damage-over-time, stat buffs/debuffs (`modify_stat()`, generalized
   from an Acid-only `modify_defense()` once Fortify/Hone/Enlarge needed it too),
   interception (Ward, Absorption — see `DECISIONS.md`), and retaliation (Thorns,
   Retaliation). See `DECISIONS.md` and `LEARNING.md` for the mechanics and hook-ordering
   lessons this produced.
+- **`PassiveEffect`** (`scripts/passive/passive_effect.gd`, `Resource`) base class — a
+  species-bound passive as Trigger + Conditions + Limiter, four payload subclasses
+  (`OperationPassiveEffect`, `ModifyStatusPassiveEffect`, `ModifyHealPassiveEffect`,
+  `PermanentStatPassiveEffect`). `FocusBreakpointCondition` ties a passive's activation to
+  a Focus tier rather than a hardcoded value. Full architecture and the reentrancy bugs it
+  took to get right are in `DECISIONS.md`.
 - **`Technique`** (`scripts/technique/technique.gd`, `Resource`) — a familiar's authored
   combat action, now built from composable steps rather than one hardcoded
   hit/heal/status sequence: `step_groups: Array[TechniqueStepGroup]`, each group gated by
@@ -118,6 +124,8 @@ constantly, but always written by Claude and deleted after use — see §7).
 | Godot resource save/dirty-tracking mechanics | Introduced | Diagnosed (with Claude, via live MCP introspection) why a deeply-nested resource edit made through a scene's Inspector didn't persist to the underlying `.tres` file — a real, reusable debugging lesson, not yet independently applied |
 | Large-scale data-driven architecture design | Demonstrated | Designed and implemented the entire composable `TechniqueStepGroup`/`TechniqueAction` rework of `Technique.execute()` independently (Claude reviewed and migrated existing `.tres` content afterward) — not an assigned exercise, a self-initiated redesign motivated by a real limitation hit while testing Enlarge. Re-derived the session-1 "subclass only when logic differs" rule unprompted while doing it (questioning whether `HealTechnique` still needed to be its own subclass) |
 | Independent content authoring (Status subclasses) | Demonstrated | Implemented 11 new `Status` subclasses independently (Infestation, Hone, Fortify, Enlarge, Recharge, Ward, Thorns, Hex, Absorption, Ruin, Retaliation) — including Ward and Absorption, which needed the harder "intercept inside `Combatant`" shape rather than a normal overridden hook — with Claude limited to review, `StatusEffect` enum/factory wiring, and design guidance only when directly asked (Ward's approach) |
+| Trigger/event-side matching (attacker vs. defender hooks, `trigger_target: SELF`/`TARGET`) | Demonstrated | After Claude explained why Taste for Blood's `HIT` trigger + default `trigger_target` never fired for Battabat's own attack, corrected both fields (`ATTACK`, `trigger_target = SELF`) independently and correctly on the first try |
+| Reasoning about event-ordering/scoping bugs in a cascading system | Demonstrated | Diagnosed the real mechanism behind a passive firing twice in one turn after Claude's first two hypotheses were wrong, correctly landing on "a turn is upkeep + execution together" — the fix `battle_controller.gd` now implements |
 
 **Design ownership — a milestone, not a checklist item**: session 2 recorded the developer's first substantive pushbacks on Claude's proposed designs (the `Technique` over-subclassing, and the Step-5 sequencing challenge). Sessions 3–4 went well beyond pushback: essentially the entire technique-rework-plus-eleven-statuses content wave was designed and typed by the developer, with Claude in a pure review/support role (enum wiring, resource migrations, bug fixes only when explicitly requested). That's the "developer designs and implements — Claude acts mainly as reviewer/debugging partner" end state `CLAUDE.md`'s north star describes, reached far earlier than the roadmap's original pacing expected. The one caution from this stretch: Claude implemented one full bug fix (the Ruin/Absorption damage-log bug) from a casual "let's fix X" without re-confirming first, a repeat of an already-flagged pattern — worth the developer continuing to watch for, not because the fix was wrong, but because the habit of asking first is what's actually being protected. Going forward, Claude's role for new content in this vein should default to review/wiring-support unless the developer specifically asks for an implementation.
 
@@ -128,13 +136,15 @@ build, defining simple autonomous priorities, and watching the familiar execute 
 build is satisfying enough to justify the full game. Explicitly no movement/spatial
 combat, no Ranch, no circuits, no campaign, no injury system.
 
-Progress so far: the combat engine, real stats, a 19-status effect system, composable
-multi-step techniques, a combat log/explanation surface, a full behavioral-priority
-system driving *both* sides (Steps 4–5), and a round loop with post-fight reward
-selection (Step 6, in a lighter form than originally planned — see §4) all exist. A
-content pass toward the full 16-familiar roster is now underway. Still missing before
-Milestone 1 is complete: the actual bracket/draft structure, an in-run priority-rule
-editor, targeting, and a boss encounter.
+Progress so far: the combat engine, real stats, a 24-status effect system, a
+`PassiveEffect` system (Focus breakpoints included), composable multi-step techniques, a
+combat log/explanation surface, a full behavioral-priority system driving *both* sides
+(Steps 4–5), and a round loop with post-fight reward selection (Step 6, in a lighter form
+than originally planned — see §4) all exist. A content pass toward the full 16-familiar
+roster is now underway (4 familiars exist: Guubal, Twerpent, Ashwing, Battabat). Still
+missing before Milestone 1 is complete: the actual bracket/draft structure, the real
+reward screen, integrating the already-prototyped priority editor, targeting, and a boss
+encounter.
 
 ## 4. Ordered learning/development steps
 
@@ -207,13 +217,21 @@ accumulation loop the bracket will eventually sit on top of.
 
 ### Content pass (current, not originally in this roadmap) — developer-led, Claude reviewing
 Bulk status/technique/passive authoring toward the full 16-familiar roster
-(`GAME_DESIGN.md` §8.4/§8.5, tracked loosely in `CONTENT_IDEAS.md`): 19 statuses now
+(`GAME_DESIGN.md` §8.4/§8.5, tracked loosely in `CONTENT_IDEAS.md`): 24 statuses now
 exist, `Technique` reworked into composable `TechniqueStepGroup`/`TechniqueAction` steps
-with situational `NumericBonus`es, and `scripts/` reorganized into per-category
-subfolders. Unlike every earlier step in this roadmap, the developer designed and wrote
-nearly all of this independently — see §2's "Design ownership" note and `DEVLOG.md`'s
-latest entry for the full attribution. None of the newest statuses are wired into a real
-`.tres` technique/build yet — verified individually via throwaway scripts only.
+with situational `NumericBonus`es, `scripts/` reorganized into per-category subfolders,
+and a full `PassiveEffect` system (see `DECISIONS.md`) gives species-bound passives and
+Focus breakpoints a real mechanism. Four familiars now exist (Guubal, Twerpent, Ashwing,
+Battabat), each with real techniques and at least one passive wired up and exercised
+through actual fights — a change from earlier in the pass, when new content was only
+verified via throwaway scripts. Unlike every earlier step in this roadmap, the developer
+designed and wrote nearly all of the status/technique content independently — see §2's
+"Design ownership" note and `DEVLOG.md`'s latest entries for the full attribution.
+Claude's role has shifted toward the passive-trigger *engine* itself (built the
+`PassiveEffect` system and found/fixed three real reentrancy bugs it exposed — see
+`DEVLOG.md` session 6), while the developer continues to own status/technique content and
+has started catching and fixing content-level passive bugs independently (Taste for
+Blood).
 
 ### Step 7 (renumbered from the bracket) — Tournament bracket structure (higher-level, less detailed)
 The single-elimination bracket described in `GAME_DESIGN.md` §9 — a 16-or-32-entrant
@@ -232,16 +250,18 @@ Developer-led by this point, Claude reviewing.
 
 For each, the smallest reversible experiment — none of these get a permanent answer yet:
 
-- **Combat timing (§5, §5.1):** Currently sequential/fixed alternation — `BattleController`'s
-  `Phase` enum lets the player fully resolve, then the enemy fully resolves, repeat. One
-  candidate among several, being observed rather than declared canon.
-- **Universal stat line size (§5.2):** `Familiar` currently exposes max_hp/power/defense/
-  speed/focus. Speed and Focus are both defined but functionally unused by any system —
-  don't give either a job until a specific mechanic needs one.
-- **Status/combo pacing (§18.3):** Now genuinely testable with three statuses in place.
-  Worth observing once Step 4/5 exist and statuses can interact without direct player
-  clicking: does a 2-status interaction feel like it needs more setup, or does even one
-  feel fiddly? Record the observation here rather than immediately tuning numbers.
+- **Combat timing (§5, §5.1):** No longer fixed alternation — Speed now drives turn order
+  dynamically, re-decided every exchange (`DECISIONS.md`), which can hand one side two
+  turns in a row on a mid-fight Speed swing. Still an experiment per §5's OPEN/PLAYTEST
+  status, not declared canon; watch whether this reads as intended once fights have more
+  varied Speed values to actually swing on.
+- **Universal stat line size (§5.2):** Both stats now have a job — Speed drives turn
+  order, Focus gates passive breakpoints (`FocusBreakpointCondition`) — closing the
+  previous open question of whether either would stay unused.
+- **Status/combo pacing (§11.3):** Genuinely testable now with 24 statuses across 4
+  familiars. Worth a real observation pass once more familiars exist and fights aren't
+  all still against the same one or two opponents: does a 2-status interaction feel like
+  it needs more setup, or does even one feel fiddly?
 
 ## 6. Deferred systems
 
@@ -255,26 +275,25 @@ Explicitly not being built yet, to avoid scope creep:
 - Postgame challenge-modifier system, medals/objectives beyond maybe a stub later.
 - Save/persistence — not needed until a session needs to survive being closed.
 - Any generalization still waiting on a second concrete case — see `DECISIONS.md` for
-  the ones already discussed and deliberately deferred (e.g. Persistence/Stasis's
-  cross-cutting stack-loss interception, not yet designed).
+  the ones already discussed and deliberately deferred.
 - Coaching/intervention system (§7) — priorities and a round loop both now exist (Steps
   4–6 done), but this is still Milestone-1-out-of-scope until the bracket (§9) gives
   coaching something structural to happen *between*.
 
 ## 7. Next lesson
 
-The round loop (Step 6) shipped; the content pass toward the full 16-familiar roster is
-now underway (19 statuses, composable technique steps, damage bonuses — see `DEVLOG.md`'s
-latest entry). **Developer-requested next item: a Stasis status** (renamed mid-session from the
-brainstormed "Persistence" — see `CONTENT_IDEAS.md`). Design not yet started: it needs to
-intercept stack decrements across *every* existing status, which likely means a
-`Status.owner: Combatant` back-reference plus a custom
-`stacks` property setter (a `var stacks: int: set(value): ...`, a pattern not yet used
-anywhere in this codebase) rather than an additive per-status change. Good candidate for
-a real design conversation before implementation, given it's cross-cutting rather than
-another independent `Status` subclass.
+The round loop (Step 6) shipped, Stasis's cross-cutting stack-loss interception was
+designed and built (`Status.owner` back-reference + a custom `stacks` property setter,
+exactly as this section once anticipated), and the `PassiveEffect` system now gives
+species passives and Focus breakpoints a real mechanism (`DECISIONS.md`, `DEVLOG.md`
+session 6). No new concept is queued up for the developer specifically right now — recent
+sessions have been content authoring (developer-led) and passive-engine bug-hunting
+(Claude-led, with the developer independently fixing at least one content-level passive
+bug themselves, a good sign the trigger/target vocabulary has landed).
 
-After Stasis: keep filling out the content pass (more familiars/techniques/traits per
-`GAME_DESIGN.md` §8.4/§8.5's Species/entrant-skeleton shape), then wire at least one real
-`.tres` per new status so each gets exercised through an actual fight rather than only a
-throwaway verification script.
+**Immediate next step, not a learning exercise**: no `FocusTable` content exists yet even
+though the mechanism is fully wired — author at least one familiar's Focus breakpoint
+table to actually exercise the system end-to-end. After that, keep filling out the
+content pass (more familiars/techniques/passives per `GAME_DESIGN.md` §8.4/§8.5's
+Species/entrant-skeleton shape) toward the full 16-familiar scope before starting the
+bracket system (§9).
