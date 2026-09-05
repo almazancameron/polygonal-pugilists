@@ -26,15 +26,23 @@ enum Trigger {
 	TECHNIQUE_USED,
 	DAMAGE_DEALT,
 	DAMAGE_TAKEN,
+
+	## Retired -- ModifyHealPassiveEffect now keys off HEALED instead (see
+	## below). Kept only because Trigger is append-only; no current content
+	## uses this value and nothing should be authored against it going forward.
 	HEAL_CAST,
 	STATUS_CREATED,
 
 	## Fires on whoever's HP actually went up, from a direct HealAction, a
 	## status's on_tick() (Renewal), or a status's on_hit() (Regeneration's
 	## heal-when-hit) alike -- unlike DAMAGE_DEALT/DAMAGE_TAKEN, which
-	## deliberately skip DoT ticks. Distinct from HEAL_CAST, which only feeds
-	## ModifyHealPassiveEffect's bonus math before a heal lands and never
-	## reaches check_passives().
+	## deliberately skip DoT ticks. Serves two different consultation paths
+	## that never cross-contaminate (each filters by passive type as well as
+	## trigger): check_passives() dispatches OperationPassiveEffect/
+	## PermanentStatPassiveEffect reactively after the heal has already
+	## landed, while Combatant.passive_heal_bonus() separately queries
+	## ModifyHealPassiveEffect *during* Technique.apply_heal(), before the
+	## heal amount is finalized, to fold in a bonus.
 	HEALED
 }
 

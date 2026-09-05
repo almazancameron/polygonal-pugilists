@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://b1sp7kg2vq1ts"]
 
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_cofse"]
+[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_tl37m"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_j7iov"]
 [ext_resource type="Resource" uid="uid://buqpf0n55ux50" path="res://resources/passives/short_temper.tres" id="2_kqxdv"]
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="3_n0qk1"]
@@ -26,4 +27,5 @@ focus = 5
 techniques = Array[ExtResource("4_oe2qu")]([ExtResource("9_uod64"), ExtResource("10_nxowd")])
 priority_rules = Array[ExtResource("2_j7iov")]([ExtResource("4_tl37m"), ExtResource("5_b0h8p")])
 passives = Array[ExtResource("1_cofse")]([ExtResource("2_kqxdv")])
+focus_table = ExtResource("1_tl37m")
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

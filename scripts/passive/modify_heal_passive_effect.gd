@@ -12,8 +12,12 @@ extends PassiveEffect
 ## nothing to do with a status -- that would just reintroduce the
 ## dead-field problem PassiveEffect's own subclass split was meant to fix.
 ##
-## Trigger should be HEAL_CAST; trigger_target should be SELF, since
+## Trigger should be HEALED; trigger_target should be SELF, since
 ## Technique.apply_heal() always heals user, never target -- there's no
-## "target's" heal event for a TARGET-scoped instance to ever match.
+## "target's" heal event for a TARGET-scoped instance to ever match. Sharing
+## HEALED with the reactive OperationPassiveEffect/PermanentStatPassiveEffect
+## use of that same trigger value is safe: check_passives() only ever
+## dispatches to those two types, passive_heal_bonus() only ever dispatches
+## to this one, so the two paths never see each other's passives.
 
 @export var heal_bonus: int = 0

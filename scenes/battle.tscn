@@ -59,7 +59,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_battle")
-player_familiar_data = ExtResource("15_dd63g")
+player_familiar_data = ExtResource("3_4k1nj")
 available_builds = Array[ExtResource("3_djc8l")]([ExtResource("4_p0caf"), ExtResource("4_22uqi"), ExtResource("6_dd63g"), ExtResource("9_saiin")])
 opponent_lineup = Array[ExtResource("6_66ngm")]([ExtResource("2_saiin"), ExtResource("15_dd63g"), ExtResource("2_p0caf"), ExtResource("2_6vh42"), ExtResource("2_ekamt"), ExtResource("7_6ni85"), ExtResource("3_4k1nj"), ExtResource("2_fpf3k")])
 

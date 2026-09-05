@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://c74tq7r2i71yt"]
 
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_7kv4c"]
+[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_a7xv7"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_b4qlj"]
 [ext_resource type="Resource" uid="uid://41wd0ji8cjnm" path="res://resources/passives/spiky_carapace.tres" id="2_ksqe8"]
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="3_17xnu"]
@@ -19,11 +20,12 @@ region = Rect2(0, 32, 16, 16)
 script = ExtResource("3_17xnu")
 familiar_name = "Carapax"
 sprite = SubResource("AtlasTexture_7kv4c")
-max_hp = 70
-power = 6
+max_hp = 74
+power = 5
 defense = 8
 speed = 5
 techniques = Array[ExtResource("4_qt3ek")]([ExtResource("9_15exf"), ExtResource("10_xcwdw")])
 priority_rules = Array[ExtResource("2_b4qlj")]([ExtResource("4_a7xv7"), ExtResource("5_f0bg4")])
 passives = Array[ExtResource("1_7kv4c")]([ExtResource("2_ksqe8")])
+focus_table = ExtResource("1_a7xv7")
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

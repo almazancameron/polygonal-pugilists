@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModifyStatPassiveEffect" format=3 uid="uid://cuk40vf6hq84m"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_rd62v"]
+[ext_resource type="Script" uid="uid://1w4ob6may3tr" path="res://scripts/condition/focus_breakpoint_condition.gd" id="2_2vm8p"]
+[ext_resource type="Script" uid="uid://500w33ndhcr5" path="res://scripts/passive/modify_stat_passive_effect.gd" id="2_rd62v"]
+
+[sub_resource type="Resource" id="Resource_bi5l8"]
+script = ExtResource("2_2vm8p")
+metadata/_custom_type_script = "uid://1w4ob6may3tr"
+
+[resource]
+script = ExtResource("2_rd62v")
+stat = 2
+flat_bonus = 1
+conditions = Array[ExtResource("1_rd62v")]([SubResource("Resource_bi5l8")])

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://dfsdu8dwjh5s3"]
 
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_amvpf"]
+[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_f6upb"]
 [ext_resource type="Resource" uid="uid://bmvva78vysipg" path="res://resources/passives/portents_toll.tres" id="2_165l7"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_guc8w"]
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="3_p0pv1"]
@@ -19,11 +20,12 @@ region = Rect2(48, 48, 16, 16)
 script = ExtResource("3_p0pv1")
 familiar_name = "Omenfly"
 sprite = SubResource("AtlasTexture_guc8w")
-power = 8
+power = 6
 defense = 4
-speed = 6
+speed = 5
 focus = 15
 techniques = Array[ExtResource("4_lto4f")]([ExtResource("9_xj7lh"), ExtResource("10_y3qhf")])
 priority_rules = Array[ExtResource("2_guc8w")]([ExtResource("4_f6upb"), ExtResource("5_telyf")])
 passives = Array[ExtResource("1_amvpf")]([ExtResource("2_165l7")])
+focus_table = ExtResource("1_f6upb")
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

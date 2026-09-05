@@ -7,7 +7,7 @@ extends Status
 ## doesn't refresh or add to the duration; it costs the countdown one extra
 ## turn, which can trigger the burst immediately if that was its last turn.
 
-var burst_damage: int = 10  # TODO: tune once there's a real technique using this
+var burst_damage: int = 9  # TODO: tune once there's a real technique using this
 var stacks_lost_per_tick: int = 1  # also spent by a reapply -- see on_reapply()
 
 func status_id() -> StringName:

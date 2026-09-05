@@ -260,6 +260,14 @@ func effective_stat(stat: Familiar.Stat) -> int:
 	for status in statuses:
 		base_value = status.modify_stat(stat, base_value)
 
+	var candidates: Array[PassiveEffect] = familiar.passives.duplicate()
+	if familiar.focus_table != null:
+		candidates.append_array(familiar.focus_table.effects)
+
+	for passive in candidates:
+		if passive is ModifyStatPassiveEffect and passive.stat == stat:
+			base_value += passive.flat_bonus
+
 	return base_value
 
 func effective_defense() -> int:
@@ -427,11 +435,13 @@ func passive_stack_bonus(status_effect: Status.StatusEffect, affected: Combatant
 ## ModifyHealPassiveEffect (see PassiveEffect) -- consulted by
 ## Technique.apply_heal() before the heal amount is finalized, the same way
 ## passive_stack_bonus() feeds apply_status(). Runs unconditionally, not
-## gated by OperationPassiveEffect.triggers_hooks.
+## gated by OperationPassiveEffect.triggers_hooks. Queries the HEALED trigger
+## like check_passives() does for reactive passives, but filtered to
+## ModifyHealPassiveEffect specifically -- the two never overlap.
 func passive_heal_bonus(affected: Combatant) -> int:
 	var total: int = 0
 
-	for passive in _matching_passives(PassiveEffect.Trigger.HEAL_CAST, affected):
+	for passive in _matching_passives(PassiveEffect.Trigger.HEALED, affected):
 		if not (passive is ModifyHealPassiveEffect):
 			continue
 

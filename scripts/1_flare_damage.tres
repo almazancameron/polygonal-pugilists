@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ModifyStatusPassiveEffect" format=3 uid="uid://dmrrr2dotg81h"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_31eb6"]
+[ext_resource type="Script" uid="uid://c5gfmyosppbco" path="res://scripts/passive/modify_status_passive_effect.gd" id="2_83q01"]
+
+[resource]
+script = ExtResource("2_83q01")
+metadata/_custom_type_script = "uid://c5gfmyosppbco"

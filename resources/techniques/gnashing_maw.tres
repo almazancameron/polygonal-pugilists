@@ -14,7 +14,7 @@ metadata/_custom_type_script = "uid://mrlrygvhn1v7"
 
 [sub_resource type="Resource" id="Resource_dep5c"]
 script = ExtResource("5_5fue5")
-heal_percent = 0.333
+heal_flat = 2
 metadata/_custom_type_script = "uid://b0y2qhaakxlsw"
 
 [sub_resource type="Resource" id="Resource_group"]

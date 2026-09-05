@@ -1,8 +1,13 @@
 [gd_resource type="Resource" script_class="FocusTable" format=3 uid="uid://f0jskvgqth6h"]
 
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_8bef4"]
+[ext_resource type="Resource" uid="uid://cuk40vf6hq84m" path="res://resources/passives/focus_passives/1_defense.tres" id="2_1joob"]
 [ext_resource type="Script" uid="uid://d1hd2tjgo6hcd" path="res://scripts/passive/focus_table.gd" id="2_sr2m5"]
+[ext_resource type="Resource" uid="uid://4frgu7oeuena" path="res://resources/passives/focus_passives/1_flare_damage.tres" id="3_6fusy"]
+[ext_resource type="Resource" uid="uid://qe2xhs4qw146" path="res://resources/passives/focus_passives/1_foretell_damage.tres" id="4_ockj6"]
+[ext_resource type="Resource" uid="uid://cavrayemvcm8n" path="res://resources/passives/focus_passives/1_heal_power.tres" id="5_wiu6u"]
 
 [resource]
 script = ExtResource("2_sr2m5")
+effects = Array[ExtResource("1_8bef4")]([ExtResource("2_1joob"), ExtResource("3_6fusy"), ExtResource("4_ockj6"), ExtResource("5_wiu6u")])
 metadata/_custom_type_script = "uid://d1hd2tjgo6hcd"

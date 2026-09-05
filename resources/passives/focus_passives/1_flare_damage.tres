@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ModifyStatusPassiveEffect" format=3 uid="uid://4frgu7oeuena"]
+
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_t7wqm"]
+[ext_resource type="Script" uid="uid://1w4ob6may3tr" path="res://scripts/condition/focus_breakpoint_condition.gd" id="2_cy5r4"]
+[ext_resource type="Script" uid="uid://c5gfmyosppbco" path="res://scripts/passive/modify_status_passive_effect.gd" id="2_lk83k"]
+
+[sub_resource type="Resource" id="Resource_8xs0k"]
+script = ExtResource("2_cy5r4")
+tier = 4
+metadata/_custom_type_script = "uid://1w4ob6may3tr"
+
+[resource]
+script = ExtResource("2_lk83k")
+status_effect = 2
+field_name = &"flare_damage"
+field_bonus = 1.0
+conditions = Array[ExtResource("1_t7wqm")]([SubResource("Resource_8xs0k")])
+metadata/_custom_type_script = "uid://c5gfmyosppbco"
