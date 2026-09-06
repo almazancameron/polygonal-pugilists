@@ -248,7 +248,7 @@ func _start_new_run() -> void:
 	log_view.clear()
 
 	await _wait_for_pre_fight_screen(enemy, false)
-	await begin_fight("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
+	await begin_fight("%s prepares for battle!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 
 ## Draws 5 distinct familiars from the full roster -- one for the player, four
 ## for opponent_lineup -- so every launch starts a different matchup instead
@@ -581,6 +581,12 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 		combat_log.add_entry(engine.battle_start_enemy_message, CombatLog.Source.ENEMY)
 	update_hp_display(player)
 	update_hp_display(enemy)
+
+	# A beat between clicking Begin Combat and the first actual move, so the
+	# player actually sees both HP bars sitting at full before either one
+	# starts moving -- without this the first hit lands the same frame the
+	# button gets clicked.
+	await get_tree().create_timer(1.0).timeout
 
 	var current_first_actor: Combatant = engine.current_first_actor
 	var opening_source: CombatLog.Source = CombatLog.Source.PLAYER if current_first_actor == player else CombatLog.Source.ENEMY
