@@ -1,3 +1,4 @@
+class_name CombatLogView
 extends VBoxContainer
 
 ## Subscribes to a CombatLog and renders each entry as a colored Label.
@@ -23,3 +24,9 @@ func _on_entry_added(text: String, source: CombatLog.Source) -> void:
 
 func _scroll_to_bottom() -> void:
 	scroll_container.scroll_vertical = int(scroll_container.get_v_scroll_bar().max_value)
+
+## Wipes every logged entry -- used when a run restarts, so the new run's
+## log doesn't start out scrolled past the previous run's entries.
+func clear() -> void:
+	for child in get_children():
+		child.queue_free()

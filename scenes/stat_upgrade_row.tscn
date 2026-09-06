@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/reward/stat_upgrade_row.gd" id="1_row"]
+
+[node name="StatUpgradeRow" type="HBoxContainer"]
+script = ExtResource("1_row")
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Stat"
+
+[node name="CurrentLabel" type="Label" parent="."]
+layout_mode = 2
+text = "0"
+
+[node name="Arrow" type="Label" parent="."]
+layout_mode = 2
+text = ">>"
+
+[node name="ResultingLabel" type="Label" parent="."]
+layout_mode = 2
+text = "0"
+
+[node name="MinusButton" type="Button" parent="."]
+layout_mode = 2
+text = "-"
+
+[node name="AllocatedLabel" type="Label" parent="."]
+layout_mode = 2
+text = "+0"
+
+[node name="PlusButton" type="Button" parent="."]
+layout_mode = 2
+text = "+"

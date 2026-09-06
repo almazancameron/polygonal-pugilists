@@ -2,26 +2,88 @@
 
 [ext_resource type="Script" uid="uid://bm15uleb46vhy" path="res://scripts/battle_controller.gd" id="1_battle"]
 [ext_resource type="Resource" uid="uid://bgocjaty20glq" path="res://resources/familiars/twerpent.tres" id="2_6vh42"]
-[ext_resource type="Resource" uid="uid://cm1amvxkagd68" path="res://resources/familiars/battabat.tres" id="2_ekamt"]
-[ext_resource type="Resource" uid="uid://c74tq7r2i71yt" path="res://resources/familiars/carapax.tres" id="2_fpf3k"]
+[ext_resource type="Resource" uid="uid://c86i6s1pi3tmf" path="res://resources/familiars/pyrewisp.tres" id="2_i3fbd"]
 [ext_resource type="Script" uid="uid://cy44cok5wjn5a" path="res://scripts/combat_log.gd" id="2_log"]
+[ext_resource type="Resource" uid="uid://cpebbloqfam1" path="res://resources/familiars/pebbloq.tres" id="2_nha6o"]
 [ext_resource type="Resource" uid="uid://btyk8x5euimxt" path="res://resources/familiars/mallegrav.tres" id="2_p0caf"]
-[ext_resource type="Resource" uid="uid://b1sp7kg2vq1ts" path="res://resources/familiars/thymoxen.tres" id="2_saiin"]
+[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="2_rrh2e"]
 [ext_resource type="Resource" uid="uid://cgi3li0cihksq" path="res://resources/familiars/guubal.tres" id="3_4k1nj"]
-[ext_resource type="Script" uid="uid://c1s5hv1nwpuep" path="res://scripts/priority_build.gd" id="3_djc8l"]
 [ext_resource type="PackedScene" uid="uid://dt3tc1j68we4u" path="res://scenes/hp_bar.tscn" id="3_hpbar"]
-[ext_resource type="Resource" uid="uid://dvbydu6pi14ki" path="res://resources/priority_builds/guubal_default.tres" id="4_22uqi"]
+[ext_resource type="Resource" uid="uid://donfipydyk0gq" path="res://resources/familiars/mystbud.tres" id="3_rrh2e"]
+[ext_resource type="Resource" uid="uid://cignimitefam1" path="res://resources/familiars/ignimite.tres" id="4_cqddr"]
 [ext_resource type="Script" uid="uid://dl1gil0qtj6q0" path="res://scripts/combat_log_view.gd" id="4_logview"]
-[ext_resource type="Resource" uid="uid://bsilmvpvj1gdj" path="res://resources/priority_builds/ironcap_default.tres" id="4_p0caf"]
 [ext_resource type="FontFile" uid="uid://bq75qhujojfju" path="res://assets/fonts/BoldPixels.ttf" id="5_4k1nj"]
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="6_66ngm"]
-[ext_resource type="Resource" uid="uid://26t0p2n00tt1" path="res://resources/priority_builds/thymoxen_default.tres" id="6_dd63g"]
+[ext_resource type="Resource" uid="uid://cshrumbusfam1" path="res://resources/familiars/shrumbus.tres" id="5_qnn43"]
+[ext_resource type="Resource" uid="uid://dsr3w7ld5ntij" path="res://resources/familiars/ironcap.tres" id="6_d2g17"]
 [ext_resource type="Resource" uid="uid://b76rnaybjpn8t" path="res://resources/familiars/ashwing.tres" id="7_6ni85"]
+[ext_resource type="Resource" uid="uid://c4r3l1k4rnxax" path="res://resources/familiars/relikarn.tres" id="7_uq7we"]
 [ext_resource type="PackedScene" uid="uid://wqprgejhrrw5" path="res://scenes/status_row.tscn" id="7_yahae"]
-[ext_resource type="Resource" uid="uid://ufhboip8imib" path="res://resources/priority_builds/omenfly_default.tres" id="9_saiin"]
-[ext_resource type="Resource" uid="uid://dfsdu8dwjh5s3" path="res://resources/familiars/omenfly.tres" id="15_dd63g"]
+[ext_resource type="Script" uid="uid://bjq6tglny5akc" path="res://scripts/upgrade/modify_stat_upgrade.gd" id="8_2mnj5"]
+[ext_resource type="Resource" path="res://resources/upgrades/increase_max_hp.tres" id="8_4gblq"]
+[ext_resource type="Resource" uid="uid://cm1amvxkagd68" path="res://resources/familiars/battabat.tres" id="8_hauko"]
+[ext_resource type="Resource" uid="uid://c74tq7r2i71yt" path="res://resources/familiars/carapax.tres" id="9_gt766"]
+[ext_resource type="Resource" path="res://resources/upgrades/increase_power.tres" id="9_sattt"]
+[ext_resource type="Resource" path="res://resources/upgrades/increase_defense.tres" id="10_jid5g"]
+[ext_resource type="Resource" uid="uid://b1sp7kg2vq1ts" path="res://resources/familiars/thymoxen.tres" id="10_oef1w"]
+[ext_resource type="Resource" path="res://resources/upgrades/increase_speed.tres" id="11_1i0gj"]
+[ext_resource type="Resource" uid="uid://dfsdu8dwjh5s3" path="res://resources/familiars/omenfly.tres" id="11_soua1"]
+[ext_resource type="Resource" path="res://resources/upgrades/increase_focus.tres" id="12_gmkwt"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="14_qrayh"]
+[ext_resource type="Resource" uid="uid://ctjusbdumiiq7" path="res://resources/techniques/bad_omen.tres" id="15_gs12l"]
+[ext_resource type="Resource" uid="uid://bvyuvsd1w14a2" path="res://resources/techniques/barbed_shell.tres" id="16_i3fbd"]
+[ext_resource type="Resource" uid="uid://gujli8i6k1hw" path="res://resources/techniques/blooming_strike.tres" id="17_rrh2e"]
+[ext_resource type="Resource" uid="uid://cg5vwqlaelrb0" path="res://resources/techniques/body_press.tres" id="18_cqddr"]
 [ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="18_fpf3k"]
 [ext_resource type="Theme" uid="uid://hkf2bxrjlau4" path="res://assets/themes/button_font.tres" id="19_p0caf"]
+[ext_resource type="Resource" uid="uid://dh0hc0b1gq0mk" path="res://resources/techniques/chronoparry.tres" id="19_qnn43"]
+[ext_resource type="Resource" uid="uid://c5g2lr1w6q6l5" path="res://resources/techniques/concussive_blow.tres" id="20_d2g17"]
+[ext_resource type="Resource" uid="uid://hcbpxomwrm58" path="res://resources/techniques/corrosive_ooze.tres" id="21_uq7we"]
+[ext_resource type="Resource" uid="uid://cp1w34fm2ry5v" path="res://resources/techniques/culture.tres" id="22_hauko"]
+[ext_resource type="Resource" uid="uid://dextinguish1" path="res://resources/techniques/extinguish.tres" id="23_gt766"]
+[ext_resource type="Resource" uid="uid://b5toage8mmi15" path="res://resources/techniques/fates_approach.tres" id="24_oef1w"]
+[ext_resource type="Resource" uid="uid://bvg5dja8gnxp" path="res://resources/techniques/frenzied_assault.tres" id="25_soua1"]
+[ext_resource type="Resource" uid="uid://dft0vrukqcuce" path="res://resources/techniques/fruiting_body.tres" id="26_8p3fd"]
+[ext_resource type="Resource" uid="uid://dgnashingmaw1" path="res://resources/techniques/gnashing_maw.tres" id="27_o2llt"]
+[ext_resource type="Resource" uid="uid://ce4jqxd7vs6d4" path="res://resources/techniques/growing_fury.tres" id="28_mx0ge"]
+[ext_resource type="Resource" uid="uid://cq2j8f4dxvta5" path="res://resources/techniques/grudge_strike.tres" id="29_dwymc"]
+[ext_resource type="Resource" uid="uid://dgcsa1wesjsgn" path="res://resources/techniques/guard_bash.tres" id="30_4rw15"]
+[ext_resource type="Resource" uid="uid://o5mvjov4noxb" path="res://resources/techniques/inferno_veil.tres" id="31_p48d8"]
+[ext_resource type="Resource" uid="uid://cq6dfxe78q2yt" path="res://resources/techniques/ironclad.tres" id="32_tip4j"]
+[ext_resource type="Resource" uid="uid://bo74yk58gd5pr" path="res://resources/techniques/meteor_rush.tres" id="33_mpjlb"]
+[ext_resource type="Resource" uid="uid://dmonstrendur1" path="res://resources/techniques/monstrous_endurance.tres" id="34_38w7l"]
+[ext_resource type="Resource" uid="uid://cr0l5xod8ghtu" path="res://resources/techniques/mutual_combustion.tres" id="35_o655g"]
+[ext_resource type="Resource" uid="uid://c8rk1n3vw2q1r" path="res://resources/techniques/mutual_devastation.tres" id="36_g1072"]
+[ext_resource type="Resource" uid="uid://b7kly11svcdq" path="res://resources/techniques/open_wounds.tres" id="37_pa3g0"]
+[ext_resource type="Resource" uid="uid://dpuffballbst1" path="res://resources/techniques/puffball_burst.tres" id="38_n4rad"]
+[ext_resource type="Resource" uid="uid://bxbtbn23rxcuk" path="res://resources/techniques/reclaim_byproducts.tres" id="39_bpy7r"]
+[ext_resource type="Resource" uid="uid://blh627cxop8ng" path="res://resources/techniques/red_roc.tres" id="40_58yg0"]
+[ext_resource type="Resource" uid="uid://c57i335kerhra" path="res://resources/techniques/serpent_fang.tres" id="41_0c1oo"]
+[ext_resource type="Resource" uid="uid://c7ld5tc4682sw" path="res://resources/techniques/siphon_energy.tres" id="42_m2s26"]
+[ext_resource type="Resource" uid="uid://buer6sg31xofm" path="res://resources/techniques/stoke.tres" id="43_cm72k"]
+[ext_resource type="Resource" uid="uid://cliuohjsm1p0u" path="res://resources/techniques/timeline_collapse.tres" id="44_67q2c"]
+[ext_resource type="Resource" uid="uid://cofuibiikbrun" path="res://resources/techniques/venom_pulse.tres" id="45_hh0b5"]
+[ext_resource type="Resource" uid="uid://cntuxectcsxmu" path="res://resources/techniques/vital_genesis.tres" id="46_wi1sw"]
+[ext_resource type="Resource" uid="uid://cr01t1lg378wu" path="res://resources/techniques/wind_up_strike.tres" id="47_0yd4v"]
+[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="48_aom6h"]
+[ext_resource type="Resource" uid="uid://bdooje52atj47" path="res://resources/passives/ancient_sentinel.tres" id="49_t1yxo"]
+[ext_resource type="Resource" uid="uid://dfgq0dl24owof" path="res://resources/passives/ashen_down.tres" id="50_rvryj"]
+[ext_resource type="Resource" uid="uid://cwyspu5ecqut7" path="res://resources/passives/chlorophyll.tres" id="51_yuflr"]
+[ext_resource type="Resource" uid="uid://dqr8x2mkf70p" path="res://resources/passives/corrosive_growth.tres" id="52_o8s6c"]
+[ext_resource type="Resource" uid="uid://bvps2wwuwohia" path="res://resources/passives/cursed_barrier.tres" id="53_haqqx"]
+[ext_resource type="Resource" uid="uid://bncsextcat56a" path="res://resources/passives/fungal_fortification.tres" id="54_f2fag"]
+[ext_resource type="Resource" uid="uid://cnfsveqgv4w63" path="res://resources/passives/gavel_drop.tres" id="55_xxndn"]
+[ext_resource type="Resource" uid="uid://djpmx7cqn4i3g" path="res://resources/passives/malignant_vitality.tres" id="56_l0nro"]
+[ext_resource type="Resource" uid="uid://dn5yskvrihd8q" path="res://resources/passives/mycelial_corruption.tres" id="57_gke8i"]
+[ext_resource type="Resource" uid="uid://bmvva78vysipg" path="res://resources/passives/portents_toll.tres" id="58_eeccw"]
+[ext_resource type="Resource" uid="uid://cproteanpasv1" path="res://resources/passives/protean_purge.tres" id="59_rhpg2"]
+[ext_resource type="Resource" uid="uid://cyam2k4vw7lqe" path="res://resources/passives/reprisal.tres" id="60_kupap"]
+[ext_resource type="Resource" uid="uid://buqpf0n55ux50" path="res://resources/passives/short_temper.tres" id="61_qkvbb"]
+[ext_resource type="Resource" uid="uid://41wd0ji8cjnm" path="res://resources/passives/spiky_carapace.tres" id="62_k7auw"]
+[ext_resource type="Resource" uid="uid://cberyla0agor1" path="res://resources/familiars/berylazagor.tres" id="63_b446w"]
+[ext_resource type="Resource" uid="uid://7doar52d84rn" path="res://resources/passives/sticky_residue.tres" id="63_vbgn7"]
+[ext_resource type="Resource" uid="uid://jw3ih0604rto" path="res://resources/passives/taste_for_blood.tres" id="64_36g0w"]
+[ext_resource type="Resource" uid="uid://bmnv4slv3lf0h" path="res://resources/passives/venomous_rhythm.tres" id="65_yb105"]
+[ext_resource type="PackedScene" uid="uid://vjdrxuhv1ynl" path="res://scenes/priority_builder/priority_builder.tscn" id="76_1w6ws"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
 
@@ -59,9 +121,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_battle")
-player_familiar_data = ExtResource("3_4k1nj")
-available_builds = Array[ExtResource("3_djc8l")]([ExtResource("4_p0caf"), ExtResource("4_22uqi"), ExtResource("6_dd63g"), ExtResource("9_saiin")])
-opponent_lineup = Array[ExtResource("6_66ngm")]([ExtResource("2_saiin"), ExtResource("15_dd63g"), ExtResource("2_p0caf"), ExtResource("2_6vh42"), ExtResource("2_ekamt"), ExtResource("7_6ni85"), ExtResource("3_4k1nj"), ExtResource("2_fpf3k")])
+full_roster = Array[ExtResource("2_rrh2e")]([ExtResource("2_i3fbd"), ExtResource("3_rrh2e"), ExtResource("4_cqddr"), ExtResource("5_qnn43"), ExtResource("6_d2g17"), ExtResource("7_uq7we"), ExtResource("8_hauko"), ExtResource("9_gt766"), ExtResource("10_oef1w"), ExtResource("11_soua1"), ExtResource("2_6vh42"), ExtResource("2_nha6o"), ExtResource("2_p0caf"), ExtResource("3_4k1nj"), ExtResource("7_6ni85"), ExtResource("63_b446w")])
+stat_upgrade_pool = Array[ExtResource("8_2mnj5")]([ExtResource("8_4gblq"), ExtResource("9_sattt"), ExtResource("10_jid5g"), ExtResource("11_1i0gj"), ExtResource("12_gmkwt")])
+technique_reward_pool = Array[ExtResource("14_qrayh")]([ExtResource("15_gs12l"), ExtResource("16_i3fbd"), ExtResource("17_rrh2e"), ExtResource("18_cqddr"), ExtResource("19_qnn43"), ExtResource("20_d2g17"), ExtResource("21_uq7we"), ExtResource("22_hauko"), ExtResource("23_gt766"), ExtResource("24_oef1w"), ExtResource("25_soua1"), ExtResource("26_8p3fd"), ExtResource("27_o2llt"), ExtResource("28_mx0ge"), ExtResource("29_dwymc"), ExtResource("30_4rw15"), ExtResource("31_p48d8"), ExtResource("32_tip4j"), ExtResource("33_mpjlb"), ExtResource("34_38w7l"), ExtResource("35_o655g"), ExtResource("36_g1072"), ExtResource("37_pa3g0"), ExtResource("38_n4rad"), ExtResource("39_bpy7r"), ExtResource("40_58yg0"), ExtResource("41_0c1oo"), ExtResource("42_m2s26"), ExtResource("43_cm72k"), ExtResource("44_67q2c"), ExtResource("45_hh0b5"), ExtResource("46_wi1sw"), ExtResource("47_0yd4v")])
+passive_reward_pool = Array[ExtResource("48_aom6h")]([ExtResource("49_t1yxo"), ExtResource("50_rvryj"), ExtResource("51_yuflr"), ExtResource("52_o8s6c"), ExtResource("53_haqqx"), ExtResource("54_f2fag"), ExtResource("55_xxndn"), ExtResource("56_l0nro"), ExtResource("57_gke8i"), ExtResource("58_eeccw"), ExtResource("59_rhpg2"), ExtResource("60_kupap"), ExtResource("61_qkvbb"), ExtResource("62_k7auw"), ExtResource("63_vbgn7"), ExtResource("64_36g0w"), ExtResource("65_yb105")])
 
 [node name="TooltipLayer" parent="." unique_id=1423614277 instance=ExtResource("18_fpf3k")]
 
@@ -176,3 +239,124 @@ offset_bottom = 48.0
 grow_horizontal = 0
 theme = ExtResource("19_p0caf")
 text = "1x"
+
+[node name="StatUpgradePanel" type="VBoxContainer" parent="." unique_id=1661631153]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 150.0
+offset_right = -16.0
+offset_bottom = 590.0
+grow_horizontal = 2
+
+[node name="HeaderLabel" type="Label" parent="StatUpgradePanel" unique_id=855118998]
+layout_mode = 2
+text = "1 stat upgrade to apply"
+
+[node name="RowsContainer" type="VBoxContainer" parent="StatUpgradePanel" unique_id=813407388]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ConfirmButton" type="Button" parent="StatUpgradePanel" unique_id=439118741]
+layout_mode = 2
+disabled = true
+text = "Confirm"
+
+[node name="RewardSelectPanel" type="VBoxContainer" parent="." unique_id=1531917245]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 150.0
+offset_right = -16.0
+offset_bottom = 590.0
+grow_horizontal = 2
+
+[node name="CardRow" type="HBoxContainer" parent="RewardSelectPanel" unique_id=663900416]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SpeciesColumn" type="VBoxContainer" parent="RewardSelectPanel/CardRow" unique_id=1587109415]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SlotLabel" type="Label" parent="RewardSelectPanel/CardRow/SpeciesColumn" unique_id=1294968131]
+layout_mode = 2
+text = "Species"
+horizontal_alignment = 1
+
+[node name="RerollButton" type="Button" parent="RewardSelectPanel/CardRow/SpeciesColumn" unique_id=2062995085]
+layout_mode = 2
+text = "Reroll"
+
+[node name="RunColumn" type="VBoxContainer" parent="RewardSelectPanel/CardRow" unique_id=2106150200]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SlotLabel" type="Label" parent="RewardSelectPanel/CardRow/RunColumn" unique_id=845245689]
+layout_mode = 2
+text = "Build"
+horizontal_alignment = 1
+
+[node name="RerollButton" type="Button" parent="RewardSelectPanel/CardRow/RunColumn" unique_id=428489786]
+layout_mode = 2
+text = "Reroll"
+
+[node name="PivotColumn" type="VBoxContainer" parent="RewardSelectPanel/CardRow" unique_id=33612925]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SlotLabel" type="Label" parent="RewardSelectPanel/CardRow/PivotColumn" unique_id=308469329]
+layout_mode = 2
+text = "Wildcard"
+horizontal_alignment = 1
+
+[node name="RerollButton" type="Button" parent="RewardSelectPanel/CardRow/PivotColumn" unique_id=755980464]
+layout_mode = 2
+text = "Reroll"
+
+[node name="ActionRow" type="HBoxContainer" parent="RewardSelectPanel" unique_id=1515370735]
+layout_mode = 2
+
+[node name="RerollsRemainingLabel" type="Label" parent="RewardSelectPanel/ActionRow" unique_id=70945478]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Rerolls left: 3"
+
+[node name="SkipButton" type="Button" parent="RewardSelectPanel/ActionRow" unique_id=1616817643]
+layout_mode = 2
+text = "Skip"
+
+[node name="NextRoundButton" type="Button" parent="RewardSelectPanel/ActionRow" unique_id=1184232685]
+layout_mode = 2
+disabled = true
+text = "Next Round"
+
+[node name="PriorityBuilder" parent="." unique_id=1870533042 instance=ExtResource("76_1w6ws")]
+visible = false
+layout_mode = 1
+
+[node name="GameOverPanel" type="VBoxContainer" parent="." unique_id=424323279]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 150.0
+offset_right = -16.0
+offset_bottom = 590.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="MessageLabel" type="Label" parent="GameOverPanel" unique_id=1387639829]
+layout_mode = 2
+text = "Game Over"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="GameOverPanel" unique_id=545872067]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Restart"

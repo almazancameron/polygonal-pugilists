@@ -16,3 +16,19 @@ extends PassiveEffect
 
 @export var stat: Familiar.Stat = Familiar.Stat.POWER
 @export var flat_bonus: int = 0
+
+func _effect_phrase() -> String:
+	if flat_bonus == 0:
+		return ""
+	return "%s%d %s" % ["+" if flat_bonus > 0 else "", flat_bonus, Familiar.stat_name(stat)]
+
+## Bypasses PassiveEffect.describe()'s trigger/condition phrasing entirely --
+## trigger/conditions are unused for this subclass (see the class's own
+## docstring: consulted directly by effective_stat(), not through the
+## trigger/check_passives() system at all), so describing "when X, +2
+## Power" would invent an event that never actually gates anything.
+func describe() -> String:
+	var effect: String = _effect_phrase()
+	if effect == "":
+		return "%s does nothing." % passive_name
+	return "%s: always active, %s." % [passive_name, effect]

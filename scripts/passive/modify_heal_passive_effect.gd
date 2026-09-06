@@ -21,3 +21,8 @@ extends PassiveEffect
 ## to this one, so the two paths never see each other's passives.
 
 @export var heal_bonus: int = 0
+
+func _effect_phrase() -> String:
+	if heal_bonus == 0:
+		return ""
+	return "+%d heal power" % heal_bonus

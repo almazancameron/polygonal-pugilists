@@ -95,6 +95,34 @@ func build_rule() -> PriorityRule:
 
 	return rule
 
+## Reconstructs this slot's block tree from an already-authored PriorityRule
+## -- the reverse of build_rule(), used to reopen the editor with a
+## familiar's existing priority_rules already shown rather than blank.
+## Conditions are added as flat, top-level, un-nested blocks regardless of
+## how the rule's original author might have grouped them -- a flat ANDed
+## array can't distinguish a grouping from any other, since nesting was
+## always presentation only (see build_rule()/_collect()'s own comment).
+## Requires set_tooltip_layer() to have already been called, same ordering
+## _on_add_slot_pressed() already relies on.
+func load_rule(rule: PriorityRule, all_condition_definitions: Array[ConditionBlockDefinition]) -> void:
+	if rule.technique != null:
+		var block: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
+		technique_slot.add_child(block)
+		block.setup(rule.technique, _tooltip_layer)
+
+	for condition in rule.conditions:
+		var definition: ConditionBlockDefinition = ConditionBlockDefinition.find_matching(condition, all_condition_definitions)
+		if definition == null:
+			push_warning("No palette definition matches a condition (%s) on rule for %s -- skipped reconstructing it in the editor." % [condition.get_script().resource_path, rule.technique.technique_name if rule.technique != null else "?"])
+			continue
+
+		var block: ConditionBlock = load(ConditionBlock.SCENE_PATH).instantiate()
+		condition_body.add_child(block)
+		block.setup(definition, condition)
+		block.structure_changed.connect(_on_block_structure_changed)
+
+	structure_changed.emit()
+
 func _collect(block: ConditionBlock, into: Array[Condition]) -> void:
 	into.append(block.build_condition())
 
@@ -129,11 +157,11 @@ func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	# here meant the list was never asked and reordering never worked.
 	var list: SegmentList = SegmentList.find_enclosing(self)
 	if list != null and list.is_reorder_payload(data):
-		list.show_insert_indicator(get_global_transform() * at_position)
+		list.show_insert_indicator(get_global_transform() * at_position, data["node"])
 		return true
 
 	if _is_over(technique_slot, at_position):
-		return _accepts_technique(data)
+		return accepts_technique_drop(data)
 
 	if _is_over(condition_body, at_position):
 		return _is_condition_payload(data)
@@ -147,7 +175,7 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 		return
 
 	if _is_over(technique_slot, at_position):
-		_drop_technique(data)
+		receive_technique_drop(data)
 	elif _is_over(condition_body, at_position):
 		_drop_condition(data)
 
@@ -165,23 +193,48 @@ func _is_condition_payload(data: Dictionary) -> bool:
 		return true
 	return data.get("source") == "build" and data.get("node") is ConditionBlock
 
-## One technique per slot.
-func _accepts_technique(data: Dictionary) -> bool:
-	if technique_block() != null:
-		return false
+## One technique per slot -- but landing on an already-filled slot is never
+## refused outright. A technique already placed in *another* slot swaps
+## with whatever's here (see receive_technique_drop); a fresh palette pick
+## just replaces it, discarding the old occupant, since a palette drag has
+## no "other slot" to send a displaced technique back to. Public (not
+## Godot-virtual-underscore-private) because TechniqueBlock forwards to it
+## directly -- see that script's own _can_drop_data for why.
+func accepts_technique_drop(data: Dictionary) -> bool:
 	if data.has("technique"):
 		return true
-	return data.get("source") == "build" and data.get("node") is TechniqueBlock
+	if not (data.get("source") == "build" and data.get("node") is TechniqueBlock):
+		return false
+	return data["node"] != technique_block()
 
-func _drop_technique(data: Dictionary) -> void:
+## A dropped technique that lands on an already-filled slot displaces
+## whatever's there rather than being refused. A placed technique swaps
+## into wherever the dragged one came from (never silently lost); a
+## palette pick has nowhere to send the displaced one back to, so it's
+## simply replaced.
+func receive_technique_drop(data: Dictionary) -> void:
 	if data.get("source") == "palette":
+		var old: TechniqueBlock = technique_block()
+		if old != null:
+			technique_slot.remove_child(old)
+			old.queue_free()
+
 		var block: TechniqueBlock = load(TECHNIQUE_BLOCK_SCENE).instantiate()
 		technique_slot.add_child(block)
 		block.setup(data["technique"], _tooltip_layer)
-	else:
-		var moved: TechniqueBlock = data["node"]
-		moved.get_parent().remove_child(moved)
-		technique_slot.add_child(moved)
+		return
+
+	var dragged: TechniqueBlock = data["node"]
+	var origin_slot: Node = dragged.get_parent()
+	var existing: TechniqueBlock = technique_block()
+
+	origin_slot.remove_child(dragged)
+
+	if existing != null:
+		technique_slot.remove_child(existing)
+		origin_slot.add_child(existing)
+
+	technique_slot.add_child(dragged)
 
 func _drop_condition(data: Dictionary) -> void:
 	if data.get("source") == "palette":
@@ -192,9 +245,20 @@ func _drop_condition(data: Dictionary) -> void:
 	else:
 		var moved: ConditionBlock = data["node"]
 		moved.get_parent().remove_child(moved)
-		condition_body.add_child(moved)
-		if not moved.structure_changed.is_connected(_on_block_structure_changed):
-			moved.structure_changed.connect(_on_block_structure_changed)
+		receive_condition_block(moved)
+
+## Accepts a top-level ConditionBlock at a specific index (or appended, if
+## at_index is left negative), connecting its structure_changed the same
+## way a normal drop already does. Shared by the drag-drop "moved" path
+## above and by ConditionBlock._remove_and_promote_children(), which needs
+## to insert promoted children exactly where the block they were nested
+## under used to sit, not just at the end.
+func receive_condition_block(block: ConditionBlock, at_index: int = -1) -> void:
+	condition_body.add_child(block)
+	if at_index >= 0:
+		condition_body.move_child(block, at_index)
+	if not block.structure_changed.is_connected(_on_block_structure_changed):
+		block.structure_changed.connect(_on_block_structure_changed)
 
 func _on_block_structure_changed() -> void:
 	structure_changed.emit()

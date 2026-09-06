@@ -7,5 +7,6 @@
 
 [resource]
 script = ExtResource("2_yjbma")
+build_name = "Thymoxen Default"
 priority_rules = Array[ExtResource("1_ehgqv")]([ExtResource("2_bk518"), ExtResource("3_qp86p")])
 metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

@@ -24,3 +24,12 @@ extends PassiveEffect
 ## Technique.execute() entirely, so a passive's operation can never reach
 ## them regardless of this flag.
 @export var triggers_hooks: bool = false
+
+func _effect_phrase() -> String:
+	if operation == null:
+		return ""
+	# Inlines the operation's own actual effect (e.g. "deals 100% damage")
+	# rather than just its name -- a bare "executes Reprisal" told the
+	# reader nothing about what firing it actually does.
+	var summary: String = operation.effect_summary()
+	return summary if summary != "" else "does nothing"

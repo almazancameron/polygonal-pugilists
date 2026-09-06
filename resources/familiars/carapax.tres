@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="4_b4qlj"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_qt3ek"]
 [ext_resource type="Resource" uid="uid://b3rdaww1me0ul" path="res://resources/priority_rules/carapax_bash_rule.tres" id="5_f0bg4"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_f0bg4"]
 [ext_resource type="Resource" uid="uid://bvyuvsd1w14a2" path="res://resources/techniques/barbed_shell.tres" id="9_15exf"]
 [ext_resource type="Resource" uid="uid://dgcsa1wesjsgn" path="res://resources/techniques/guard_bash.tres" id="10_xcwdw"]
 

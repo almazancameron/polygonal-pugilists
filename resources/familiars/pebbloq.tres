@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="7_doeij"]
 [ext_resource type="Resource" uid="uid://c0e863qx0f3bu" path="res://resources/priority_rules/pebbloq_parry_rule.tres" id="7_parry_rule"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_v2sdf"]
 [ext_resource type="Resource" uid="uid://bdooje52atj47" path="res://resources/passives/ancient_sentinel.tres" id="9_sentinel"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jo4ey"]
@@ -21,7 +22,6 @@ script = ExtResource("1_familiar")
 familiar_name = "Pebbloq"
 sprite = SubResource("AtlasTexture_jo4ey")
 max_hp = 55
-power = 12
 defense = 9
 speed = 6
 techniques = Array[ExtResource("2_technique")]([ExtResource("3_chronoparry"), ExtResource("4_collapse")])

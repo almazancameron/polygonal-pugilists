@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="7_8bghu"]
 [ext_resource type="Resource" uid="uid://s0ucalcbsf72" path="res://resources/priority_rules/mystbud_bloom_rule.tres" id="7_bloom_rule"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_ync28"]
 [ext_resource type="Resource" uid="uid://cwyspu5ecqut7" path="res://resources/passives/chlorophyll.tres" id="9_chlorophyll"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dd63g"]

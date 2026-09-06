@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="4_guc8w"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_lto4f"]
 [ext_resource type="Resource" uid="uid://brsn88eknyg48" path="res://resources/priority_rules/omenfly_approach_rule.tres" id="5_telyf"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_telyf"]
 [ext_resource type="Resource" uid="uid://ctjusbdumiiq7" path="res://resources/techniques/bad_omen.tres" id="9_xj7lh"]
 [ext_resource type="Resource" uid="uid://b5toage8mmi15" path="res://resources/techniques/fates_approach.tres" id="10_y3qhf"]
 

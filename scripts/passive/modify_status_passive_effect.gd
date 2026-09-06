@@ -88,3 +88,20 @@ func _tunable_field_names() -> Array[String]:
 		names.append(String(property.name))
 
 	return names
+
+func _effect_phrase() -> String:
+	if status_effect == Status.StatusEffect.NONE:
+		return ""
+
+	var parts: Array[String] = []
+
+	if stack_bonus != 0:
+		parts.append("+%d stack%s" % [stack_bonus, "s" if stack_bonus != 1 else ""])
+
+	if field_name != &"":
+		parts.append("+%s %s" % [field_bonus, field_name])
+
+	if parts.is_empty():
+		return ""
+
+	return "boosts %s (%s)" % [Status.status_link(status_effect), ", ".join(parts)]

@@ -70,26 +70,35 @@ Single scene family under `res://scenes/` and `res://scripts/`, wired together i
   `Familiar.priority_rules` is an ordered list of these, evaluated by
   `Combatant.choose_technique()`.
 - **`UpgradeOption`** (`scripts/upgrade/upgrade_option.gd`, `Resource`) — a post-fight
-  reward choice, subclassed (`AddTechniqueUpgrade`, `ModifyStatUpgrade`) since each kind
-  changes a familiar's build differently.
-- **`PriorityBuild`** (`priority_build.gd`, `Resource`) — a named, authored
-  `priority_rules` set the player picks between at the start of a run. Now feeds into a
-  round loop rather than being a one-and-done pick — see `DECISIONS.md`.
+  reward choice, subclassed (`AddTechniqueUpgrade`, `ModifyStatUpgrade`, `AddPassiveUpgrade`,
+  `TradePassiveUpgrade`) since each kind changes a familiar's build differently.
+- **Reward system** (`scripts/reward/`, session 8) — `RewardTag`/`TagAffinity` (a closed
+  tag vocabulary plus weighted species affinities), `BuildSnapshot` (tag/role counts
+  derived from a familiar's currently-equipped techniques/passives), `RewardSelector`
+  (pure weighted-scoring functions across three named slots — Species/Run/Pivot — decoupled
+  from `Combatant`/UI on purpose), `RewardProgression` (the round→reward-kind cadence, a
+  real `RewardKind.NONE` once it runs out), and `RewardFlowController` (orchestrates one
+  reward-screen session: RNG, snapshot, rerolls, staged stat allocation). Full architecture
+  and reasoning in `DECISIONS.md`.
+- **`PriorityBuild`** (`scripts/priority_build.gd`, `Resource`) — the old pre-fight
+  build-picker's data shape. The picker itself is retired now that the reward system above
+  exists (a drafted familiar just starts with its own authored default build); this script
+  and its `.tres` content are currently unreferenced.
 - **`CombatLog`** / `CombatLogView`, **`HPBar`**, **`StatusRow`** — small, decoupled,
   reusable UI pieces. `HPBar` draws a colored preview of upcoming status damage;
   `StatusRow` shows every active status uniformly (including non-damaging ones like Acid).
 
-**Current playable state:** the player picks a `PriorityBuild`, then plays through
-multiple rounds of autonomous 1v1 fights — **zero manual clicks on either side** during a
-fight, both `Combatant`s choosing via the same `choose_technique()` evaluator through
-`battle_controller.gd`'s unified `take_turn()` — with an `UpgradeOption` reward pick
-between rounds that actually grows the build. HP bars, status previews, and the status
-icon row all update live and pace one step at a time now (each hit/heal/status
-application its own log line, not a batched turn summary). Verified with headless Godot
-scripting (see `CLAUDE.md`'s Validation section), not only by manual play. Playtest note
-from before the round loop existed: with only two premade builds and five techniques,
-watching a fight felt thin — expected, since the real buildcrafting layer
-(Step 6) doesn't exist yet; see `DEVLOG.md`.
+**Current playable state:** the player starts with their drafted familiar's own default
+build, then plays through multiple rounds of autonomous 1v1 fights — **zero manual clicks
+on either side** during a fight, both `Combatant`s choosing via the same
+`choose_technique()` evaluator through `battle_controller.gd`'s unified `take_turn()` —
+with the real tailored reward screen (session 8; weighted Species/Build/Wildcard slots,
+shared rerolls, allocate-then-confirm stat upgrades) between rounds actually growing the
+build. HP bars, status previews, and the status icon row all update live and pace one
+step at a time now (each hit/heal/status application its own log line, not a batched turn
+summary), with the whole HUD (panels, speed toggle, combat log) hidden during the reward
+sequence and restored once the next fight begins. Verified with headless Godot scripting
+(see `CLAUDE.md`'s Validation section), not only by manual play.
 
 **What's conspicuously absent relative to Milestone 1:** no round/shop loop, no
 rematch/rebuild flow, no persistent build accumulation across fights, no targeting (only
@@ -108,6 +117,27 @@ round-robin harness, none doomed. Four real engine bugs were found and fixed alo
 way (a Retaliation stack-overflow, Ward absorbing self-applications, a lethal hit that
 could heal itself back to life, Cleanse silently bypassing the passive-notification
 system) — see `DEVLOG.md`/`DECISIONS.md` for the mechanics.
+
+**Session 8 update:** the real reward screen exists (weighted Species/Build/Wildcard
+slots, shared rerolls, allocate-then-confirm stat upgrades, the passive-trade flow), the
+pre-fight `PriorityBuild` picker is retired, and the priority editor is integrated into
+the live game loop. Most of the session after the reward system itself was a debugging
+arc on the tooltip system it exposed — three real, non-obvious root causes (hover-tracking
+keyed by the wrong granularity, a cached-vs-on-demand Control size read too early, and a
+genuine `RichTextLabel` reliability gap confirmed by reading Godot's own engine source) —
+see `DEVLOG.md`/`DECISIONS.md`.
+
+**Session 8, continued (same day):** five rounds of live-tested drag-and-drop feel fixes
+on the priority builder, a `PassiveEffect.describe()` overhaul, and the mock-state panel
+rewritten from "declare a hypothetical state" into "play the current build out for real
+against a passive dummy" — which immediately surfaced a genuine engine bug (Stasis's
+stack-interception mechanism never told the passive system *it* was the status that
+changed, so Pebbloq's Ancient Sentinel had silently never fired in any real fight, not
+just this panel — see `DECISIONS.md`). Absorption gained a stack cap; the player/opponent
+matchup is now randomly drawn at every launch instead of fixed; a Game Over screen with
+Restart replaced quitting the app outright. All of this was still Claude-implemented, same
+as sessions 7 and 8's first half — see the "third consecutive session" note in §7 below,
+which this extends to a fourth.
 
 ## 2. Demonstrated knowledge
 
@@ -138,6 +168,8 @@ system) — see `DEVLOG.md`/`DECISIONS.md` for the mechanics.
 | Independent content authoring (Status subclasses) | Demonstrated | Implemented 11 new `Status` subclasses independently (Infestation, Hone, Fortify, Enlarge, Recharge, Ward, Thorns, Hex, Absorption, Ruin, Retaliation) — including Ward and Absorption, which needed the harder "intercept inside `Combatant`" shape rather than a normal overridden hook — with Claude limited to review, `StatusEffect` enum/factory wiring, and design guidance only when directly asked (Ward's approach) |
 | Trigger/event-side matching (attacker vs. defender hooks, `trigger_target: SELF`/`TARGET`) | Demonstrated | After Claude explained why Taste for Blood's `HIT` trigger + default `trigger_target` never fired for Battabat's own attack, corrected both fields (`ATTACK`, `trigger_target = SELF`) independently and correctly on the first try |
 | Reasoning about event-ordering/scoping bugs in a cascading system | Demonstrated | Diagnosed the real mechanism behind a passive firing twice in one turn after Claude's first two hypotheses were wrong, correctly landing on "a turn is upkeep + execution together" — the fix `battle_controller.gd` now implements |
+| Recognizing when two symptoms share one root cause | Demonstrated | Correctly rejected Claude's premature "nothing consumes Stasis" conclusion by citing a specific counter-observation from real play (a Recharge pickup visibly draining Stasis) *before* Claude had found the real bug — redirected the investigation to the actual gap (the passive system never being told about it). Separately, independently connected "Pebbloq wasn't a balance outlier before" to "the same reason its passive didn't fire in the mock-state preview," ahead of Claude proposing that link |
+| Game-balance reasoning about a shield/pool mechanic | Introduced | Correctly reasoned through, unprompted, that capping Absorption's stack pool only prevents the *unbounded-restacking* class of stalemate specifically, and that what matters is an opponent's cumulative damage within one round against whatever the pool holds — not "a single hit" in isolation |
 
 **Design ownership — a milestone, not a checklist item**: session 2 recorded the developer's first substantive pushbacks on Claude's proposed designs (the `Technique` over-subclassing, and the Step-5 sequencing challenge). Sessions 3–4 went well beyond pushback: essentially the entire technique-rework-plus-eleven-statuses content wave was designed and typed by the developer, with Claude in a pure review/support role (enum wiring, resource migrations, bug fixes only when explicitly requested). That's the "developer designs and implements — Claude acts mainly as reviewer/debugging partner" end state `CLAUDE.md`'s north star describes, reached far earlier than the roadmap's original pacing expected. The one caution from this stretch: Claude implemented one full bug fix (the Ruin/Absorption damage-log bug) from a casual "let's fix X" without re-confirming first, a repeat of an already-flagged pattern — worth the developer continuing to watch for, not because the fix was wrong, but because the habit of asking first is what's actually being protected.
 
@@ -154,11 +186,16 @@ Progress so far: the combat engine, real stats, a 24-status effect system, a
 `PassiveEffect` system (Focus breakpoints, a real `FocusTable`, and the continuously-live
 `ModifyStatPassiveEffect` category all included), composable multi-step techniques, a
 combat log/explanation surface, a full behavioral-priority system driving *both* sides
-(Steps 4–5), and a round loop with post-fight reward selection (Step 6, in a lighter form
-than originally planned — see §4) all exist. **The full 16-familiar roster is now built
-and balance-tested** (session 7). Still missing before Milestone 1 is complete: the actual
-bracket/draft structure, the real reward screen, integrating the already-prototyped
-priority editor, targeting, and a boss encounter.
+(Steps 4–5), and now the real reward screen (Step 6, session 8 — weighted
+Species/Build/Wildcard slots, not the placeholder flat-pool version originally shipped —
+see §4) all exist. **The full 16-familiar roster is built and balance-tested** (session 7).
+**The full non-bracket play loop is now confirmed working end-to-end** (developer-verified,
+same session): launch, get randomly assigned a fighter, fight through the whole opponent
+lineup with a reward-and-priority-editor step after each non-final win, reach a win/loss
+screen, and Restart into a genuinely new run. Still missing before Milestone 1 is
+complete: the actual bracket/draft structure (replacing the current random-matchup
+stand-in), targeting, and a boss encounter — the priority editor is fully integrated now,
+no longer on this list.
 
 ## 4. Ordered learning/development steps
 
@@ -221,13 +258,15 @@ unearned abstraction and it was collapsed into one parameterized class. See
 - **Definition of done, met:** a full fight plays out with zero manual clicks, driven
   entirely by authored priorities on both sides.
 
-### Step 6 — Round loop + reward selection — ✅ Done (lighter than originally planned)
-Multiple sequential fights now play out with an `UpgradeOption` reward pick (via
-`AddTechniqueUpgrade`/`ModifyStatUpgrade`) between them, proving out
-runtime build growth (`Familiar.techniques`/stats growing in memory across fights within
-one session works fine — no explicit per-run build object needed yet). This is not yet
-the bracket itself (§9) — no draft, no opponent scaling, no scouting/odds — just the
-accumulation loop the bracket will eventually sit on top of.
+### Step 6 — Round loop + reward selection — ✅ Done
+Multiple sequential fights play out with the real, tailored reward screen (session 8)
+between them — weighted Species/Build/Wildcard slots via `RewardSelector`, shared reroll
+charges, allocate-then-confirm stat upgrades, and the round-4 passive-trade sacrifice flow
+— replacing the earlier flat-pool placeholder version. Confirms runtime build growth
+(`Familiar.techniques`/stats growing in memory across fights within one session works
+fine — no explicit per-run build object needed). This is not yet the bracket itself (§9)
+— no draft, no opponent scaling, no scouting/odds — just the accumulation loop the
+bracket will eventually sit on top of.
 
 ### Content pass — ✅ Done (16-familiar roster complete, session 7)
 Bulk status/technique/passive authoring toward the full 16-familiar roster
@@ -297,23 +336,33 @@ Explicitly not being built yet, to avoid scope creep:
 ## 7. Next lesson
 
 The round loop (Step 6), Stasis's cross-cutting stack-loss interception, the
-`PassiveEffect` system, and now the 16-familiar content pass are all done — see
-`DEVLOG.md` sessions 6–7. Session 7 was overwhelmingly Claude-implemented (five new
-familiars, four real engine bugs, two new `PassiveEffect` capabilities), with the
-developer's role concentrated in design direction, balance judgment calls, and reviewing
-Claude's proposed fixes/tradeoffs rather than hands-on GDScript — a different mode than
-sessions 3–6's independent content authoring, not a regression in it. Worth naming
-explicitly if a future session finds this pattern (Claude implementing engine/content at
-the developer's direction) becoming the default: the north star in `CLAUDE.md` still
-points toward the developer implementing ordinary features independently, so a stretch of
-sessions shaped like this one is worth revisiting if it keeps recurring rather than being
-treated as the new steady state.
+`PassiveEffect` system, the 16-familiar content pass, the real reward screen, and the
+priority editor's integration (including its mock-state panel becoming a real playback
+simulator) are all done — see `DEVLOG.md` sessions 6–8. Sessions 7 and 8 were both
+overwhelmingly Claude-implemented for the actual GDScript — five new familiars and four
+engine bugs in session 7; the reward system, a tooltip debugging arc, five rounds of
+drag-and-drop fixes, a real engine bug (Stasis/passive-notification), and a balance/export/
+Game-Over pass in session 8 — with the developer's hands-on contribution concentrated in
+design direction, live playtesting/bug reports, sharp mid-debugging corrections (twice
+this session, catching a premature conclusion from a real counter-observation rather than
+just accepting it), and reviewing Claude's proposed fixes, rather than typing GDScript
+directly. This is now true across an extended stretch, not just two sessions — the north
+star in `CLAUDE.md` still points toward the developer implementing ordinary features
+independently, and this is worth a real check-in (not another silent extension) before
+starting the bracket, which is a large enough system that *how* it gets built matters as
+much as what gets built.
 
-**Immediate next step, not a learning exercise**: the content pass is done, but the
-bracket (§9/Step 7) is not next — the reward screen and the priority-editor integration
-are, in that order (see `GAME_DESIGN.md` §10, unchanged this session). The reason to do
-these two first rather than jump straight to the bracket: both can be built and tested
-against the game's *current* shape (a simple sequential list of opponents progressed
-through one at a time) — the bracket structurally can't be, since there's no bracket to
-test against until it exists. If traits/augments are still wanted, they're the one
-unstarted piece of the original content-pass scope and can slot in whenever.
+**Immediate next step, per explicit developer direction ("bracket next")**: the tournament
+bracket (§9/Step 7, `GAME_DESIGN.md`). Read §9's own open questions (off-screen simulation
+odds/fidelity/cost) before implementing anything — this is the least-settled part of the
+design doc and a good candidate for the developer to drive more of the actual
+implementation on, given the check-in note above. The current random-matchup gauntlet
+(`full_roster` in `battle_controller.gd`) is a deliberate, throwaway stand-in for the
+bracket's real character-select/draft — expect it to be replaced outright, not extended.
+The Game Over/Restart flow and matchup randomization are now developer-verified
+end-to-end — the full non-bracket play loop genuinely works start to finish (§3). One
+known loose end before the bracket: Pebbloq needs an actual rebalance now that its
+Ancient Sentinel passive works (`DEVLOG.md`). Also re-export `build/FamiliarRPG0.exe`
+before any external playtest — the file on disk predates this session's fixes. The
+visual style pass and traits/augments remain open, lower-priority, and can slot in
+whenever.

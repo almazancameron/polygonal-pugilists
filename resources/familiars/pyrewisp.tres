@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="6_o55iy"]
 [ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="7_drb5n"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="8_54u21"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_s0pd0"]
 [ext_resource type="Resource" uid="uid://o5mvjov4noxb" path="res://resources/techniques/inferno_veil.tres" id="9_7bs6u"]
 [ext_resource type="Resource" uid="uid://c7ld5tc4682sw" path="res://resources/techniques/siphon_energy.tres" id="10_72qbh"]
 

@@ -9,6 +9,7 @@
 [ext_resource type="Resource" uid="uid://l35avd3o1pk5" path="res://resources/priority_rules/berylazagor_endurance_rule.tres" id="6_endurance_rule"]
 [ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="7_1jebp"]
 [ext_resource type="Resource" uid="uid://bberylgnashr1" path="res://resources/priority_rules/berylazagor_gnashing_rule.tres" id="7_gnashing_rule"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_edg5d"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
 [ext_resource type="Resource" uid="uid://djpmx7cqn4i3g" path="res://resources/passives/malignant_vitality.tres" id="9_malignant"]
 

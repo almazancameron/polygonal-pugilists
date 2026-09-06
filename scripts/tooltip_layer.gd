@@ -25,12 +25,24 @@ const TOOLTIP_PANEL_SCENE: PackedScene = preload("res://scenes/tooltip_panel.tsc
 const HOVER_DELAY: float = 0.2
 const CURSOR_OFFSET: Vector2 = Vector2(16, 16)
 
+## How far the cursor can drift from where a RichTextLabel link's hover
+## began before _catch_exited_active_tooltips() treats it as "left the
+## link", used only as a fallback for a source whose own meta_hover_ended
+## isn't firing (see that function's comment). Tuned down from an initial
+## 90.0 (calibrated against the longest single-word status names, e.g.
+## Regeneration/Retaliation/Infestation) after live feedback that 90 felt
+## too loose -- the cursor doesn't need to physically leave the link's
+## rendered word before the tooltip should give up.
+const LINK_DRIFT_TOLERANCE: float = 40.0
+
 var _hover_timer: Timer
 
 var _pending_source: Control = null
 var _pending_text: String = ""
+var _pending_anchor: Vector2 = Vector2.ZERO
 
-## Each entry: {source: Control, panel: TooltipPanel, shift_pinned: bool}.
+## Each entry: {source: Control, panel: TooltipPanel, shift_pinned: bool,
+## anchor: Vector2 (cursor position when this hover began)}.
 var _active_tooltips: Array[Dictionary] = []
 
 var _currently_hovered_source: Control = null
@@ -54,6 +66,8 @@ func _ready() -> void:
 	add_child(_hover_timer)
 
 func _process(delta: float) -> void:
+	_catch_exited_active_tooltips()
+
 	# array of { panel, source }
 	var panel_source_array: Array[Dictionary] = []
 
@@ -74,6 +88,45 @@ func _process(delta: float) -> void:
 			if source.has_meta("tooltip_text"):
 				panel.set_text(source.get_meta("tooltip_text"))
 
+## Safety net for a RichTextLabel source whose meta_hover_ended can't be
+## trusted to fire on its own (confirmed live for a link nested this deep
+## -- RewardCard's Button/ButtonGroup/VBoxContainer chain -- vs.
+## TooltipPanel's plain PanelContainer/Control, where it's fine). Traced
+## this into Godot's own source: RichTextLabel's meta-hover recompute
+## (rich_text_label.cpp's gui_input) and Godot's own control-hit-test
+## dispatch (viewport.cpp's gui_find_control/_gui_call_input) are both
+## unconditional and Button-nesting-agnostic, so in theory this shouldn't
+## be reachable at all -- but live testing (both here and by hand) shows
+## it reliably is, so this compensates for it rather than trusting it'll
+## get fixed upstream.
+##
+## Two checks, from coarsest to (approximately) finest:
+## - Left the control's rect entirely: unambiguous, always correct --
+##   leaving the control necessarily means leaving whatever link is
+##   inside it too.
+## - For a RichTextLabel source specifically, drifted more than
+##   LINK_DRIFT_TOLERANCE from where this hover began: a heuristic
+##   stand-in for "left the link" when still within the same control,
+##   since there's no public API to hit-test a specific link's glyphs
+##   directly. Approximate by construction -- lingering within a long
+##   link's own glyphs could false-positive, and a very short hop to
+##   adjacent plain text could false-negative -- but it's closer to
+##   link-scoped than "only the whole label" was.
+## Both routed through hover_ended() (not a raw removal) so shift-pinning
+## is honored exactly as it would be from a real mouse-exit.
+func _catch_exited_active_tooltips() -> void:
+	var cursor: Vector2 = get_global_mouse_position()
+	for entry in _active_tooltips.duplicate():
+		if entry["shift_pinned"]:
+			continue
+		var source = entry["source"]
+		if not is_instance_valid(source):
+			continue
+		if not source.get_global_rect().has_point(cursor):
+			hover_ended(source)
+		elif source is RichTextLabel and cursor.distance_to(entry["anchor"]) > LINK_DRIFT_TOLERANCE:
+			hover_ended(source)
+
 ## Call from a source Control's mouse_entered handler (or, for a nested
 ## tooltip, from TooltipPanel forwarding its RichTextLabel's
 ## meta_hover_started).
@@ -88,6 +141,7 @@ func hover_started(source: Control, text: String) -> void:
 
 	_pending_source = source
 	_pending_text = text
+	_pending_anchor = get_global_mouse_position()
 	_hover_timer.start()
 
 ## Call from a source Control's mouse_exited handler (or TooltipPanel
@@ -121,6 +175,7 @@ func _show_pending_tooltip() -> void:
 
 	var source: Control = _pending_source
 	var text: String = _pending_text
+	var anchor: Vector2 = _pending_anchor
 	_pending_source = null
 
 	var panel: TooltipPanel = TOOLTIP_PANEL_SCENE.instantiate()
@@ -131,7 +186,7 @@ func _show_pending_tooltip() -> void:
 	panel.set_pinned(false)
 	panel.close_requested.connect(_on_active_close_requested.bind(panel))
 
-	_active_tooltips.append({"source": source, "panel": panel, "shift_pinned": false})
+	_active_tooltips.append({"source": source, "panel": panel, "shift_pinned": false, "anchor": anchor})
 
 	# Wait for layout to settle so panel.size reflects the real wrapped
 	# content -- reading it synchronously here would still be the
@@ -144,9 +199,20 @@ func _show_pending_tooltip() -> void:
 ## Anchors the panel near `anchor` (the cursor position for a normal hover,
 ## or wherever the mouse is over a nested link), flipping to the opposite
 ## side on whichever axis would otherwise push it past the screen edge.
+##
+## Deliberately reads panel.get_combined_minimum_size() rather than
+## panel.size: the latter is a cached rect that only updates once Godot's
+## own deferred container layout pass actually runs, which one
+## process_frame await isn't reliably enough time for -- reading it here
+## could still see the panel's pre-resize (smaller, often placeholder)
+## size, under-clamping and letting the *later*, properly-resized panel
+## overflow past whichever edge it was placed near. get_combined_
+## minimum_size() recomputes on demand (see TooltipPanel.set_text(),
+## which already relies on the same on-demand guarantee for content_label's
+## own minimum size), so it's accurate immediately, no extra frame needed.
 func _position_near_cursor(panel: Control, anchor: Vector2) -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
-	var panel_size: Vector2 = panel.size
+	var panel_size: Vector2 = panel.get_combined_minimum_size()
 
 	var pos: Vector2 = anchor + CURSOR_OFFSET
 	if pos.x + panel_size.x > viewport_size.x:

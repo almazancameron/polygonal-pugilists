@@ -34,9 +34,14 @@ var _condition: Condition
 ## widget values instead of caching state that could drift out of sync.
 var _widgets: Dictionary = {}
 
-func setup(block_definition: ConditionBlockDefinition) -> void:
+## existing_condition lets a caller reconstruct a block around a Condition
+## that already exists (reverse-populating the editor from a familiar's
+## already-authored priority_rules) instead of always minting a fresh one --
+## the sentence widgets below already read their initial value from
+## _condition.get(part.property), so nothing else here needs to change.
+func setup(block_definition: ConditionBlockDefinition, existing_condition: Condition = null) -> void:
 	definition = block_definition
-	_condition = definition.condition_script.new()
+	_condition = existing_condition if existing_condition != null else definition.condition_script.new()
 
 	for key in definition.fixed_values:
 		_condition.set(key, definition.fixed_values[key])
@@ -61,6 +66,73 @@ func setup(block_definition: ConditionBlockDefinition) -> void:
 	if is_wrapper():
 		body.empty_text = "drop ONE condition here"
 
+## Right-click removes just this block, promoting any of its own AND-
+## nested children up into wherever it sat -- deleting a condition
+## shouldn't silently delete everything grouped underneath it too. A
+## wrapper's single body child is promoted the same way (unwrapping it),
+## since a NOT block's body slot works through the identical mechanism.
+func _gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed):
+		return
+	accept_event()
+	_remove_and_promote_children()
+
+## Right-clicking directly on a dropdown/spinbox stops there by default
+## (MOUSE_FILTER_STOP on Godot's own button/range controls marks the event
+## handled before it can bubble to this block's own _gui_input) -- these
+## widgets forward it back to the same handler so removal works no matter
+## which part of the sentence the click landed on.
+func _on_widget_gui_input(event: InputEvent) -> void:
+	_gui_input(event)
+
+func _remove_and_promote_children() -> void:
+	var container: Node = _find_container()
+	if container == null:
+		return
+
+	var my_index: int = get_index()
+	var children: Array[ConditionBlock] = body_children()
+
+	for child in children:
+		body.remove_child(child)
+
+	get_parent().remove_child(self)
+
+	for i in children.size():
+		if container is RuleSegment:
+			container.receive_condition_block(children[i], my_index + i)
+		elif container is ConditionBlock:
+			container.receive_condition_block(children[i], my_index + i)
+
+	queue_free()
+	structure_changed.emit()
+
+## Walks ancestors to find whichever RuleSegment or ConditionBlock this
+## block is a direct (or nested) part of -- self.get_parent() is only ever
+## the DropZone holding it (condition_body or a body), never that owner
+## directly, and the two owners nest their DropZone at different depths
+## (RuleSegment: DropZone -> Rows -> RuleSegment; ConditionBlock: DropZone
+## -> BodyMargin -> ConditionBlock), so a fixed-depth walk isn't reliable.
+func _find_container() -> Node:
+	var node: Node = get_parent()
+	while node != null:
+		if node is RuleSegment or node is ConditionBlock:
+			return node
+		node = node.get_parent()
+	return null
+
+## Accepts a ConditionBlock into this block's own body at a specific index
+## (or appended, if at_index is left negative) -- the nested-block analog
+## of RuleSegment.receive_condition_block(), used the same way by both a
+## normal nested drag-drop and by another block's
+## _remove_and_promote_children().
+func receive_condition_block(block: ConditionBlock, at_index: int = -1) -> void:
+	body.add_child(block)
+	if at_index >= 0:
+		body.move_child(block, at_index)
+	if not block.structure_changed.is_connected(_on_child_structure_changed):
+		block.structure_changed.connect(_on_child_structure_changed)
+
 func _add_text(part: SentencePart) -> void:
 	var label := Label.new()
 	label.text = part.text
@@ -81,6 +153,7 @@ func _add_enum_choice(part: SentencePart) -> void:
 			break
 
 	option.item_selected.connect(func(_index: int) -> void: structure_changed.emit())
+	option.gui_input.connect(_on_widget_gui_input)
 	sentence_row.add_child(option)
 	_widgets[part.property] = option
 
@@ -108,6 +181,7 @@ func _add_number(part: SentencePart) -> void:
 		spin.value = float(current) / part.display_scale
 
 	spin.value_changed.connect(func(_value: float) -> void: structure_changed.emit())
+	spin.gui_input.connect(_on_widget_gui_input)
 	sentence_row.add_child(spin)
 	_widgets[part.property] = spin
 
@@ -223,7 +297,7 @@ func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	# not bubble past this STOP control to the list.
 	var list: SegmentList = SegmentList.find_enclosing(self)
 	if list != null and list.is_reorder_payload(data):
-		list.show_insert_indicator(get_global_transform() * at_position)
+		list.show_insert_indicator(get_global_transform() * at_position, data["node"])
 		return true
 
 	if not _is_over_body(at_position):
@@ -251,9 +325,7 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 	else:
 		var moved: ConditionBlock = data["node"]
 		moved.get_parent().remove_child(moved)
-		body.add_child(moved)
-		if not moved.structure_changed.is_connected(_on_child_structure_changed):
-			moved.structure_changed.connect(_on_child_structure_changed)
+		receive_condition_block(moved)
 
 	structure_changed.emit()
 

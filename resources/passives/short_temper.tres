@@ -2,11 +2,12 @@
 
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_scf3g"]
 [ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_a4oqh"]
-[ext_resource type="Resource" uid="uid://b7n3dsl27l5xu" path="res://resources/techniques/short_temper.tres" id="2_xepke"]
+[ext_resource type="Resource" path="res://resources/techniques/passive_operations/short_temper.tres" id="2_xepke"]
 
 [resource]
 script = ExtResource("2_a4oqh")
 operation = ExtResource("2_xepke")
+passive_name = "Short Temper"
 trigger = 2
 trigger_target = 0
 status_effect_filter = 13

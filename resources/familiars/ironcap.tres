@@ -11,6 +11,7 @@
 [ext_resource type="Resource" uid="uid://cnxb08v5x4r1x" path="res://resources/priority_rules/ironcap_ironclad_rule.tres" id="5_eia52"]
 [ext_resource type="Resource" uid="uid://cg5vwqlaelrb0" path="res://resources/techniques/body_press.tres" id="7_aliry"]
 [ext_resource type="Resource" uid="uid://cq6dfxe78q2yt" path="res://resources/techniques/ironclad.tres" id="8_en2pf"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_jlpqv"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rj06v"]
 atlas = ExtResource("4_ttxf1")

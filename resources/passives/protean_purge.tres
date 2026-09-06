@@ -1,10 +1,11 @@
 [gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://cproteanpasv1"]
 
 [ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
-[ext_resource type="Resource" uid="uid://btgpok25wo6n3" path="res://resources/techniques/protean_purge.tres" id="2_technique"]
+[ext_resource type="Resource" path="res://resources/techniques/passive_operations/protean_purge.tres" id="2_technique"]
 
 [resource]
 script = ExtResource("1_passive")
+passive_name = "Protean Purge"
 operation = ExtResource("2_technique")
 trigger = 2
 trigger_target = 0

@@ -9,6 +9,7 @@
 [ext_resource type="Resource" uid="uid://bshrumburstr1" path="res://resources/priority_rules/shrumbus_burst_rule.tres" id="6_burst_rule"]
 [ext_resource type="Resource" uid="uid://bshrumfruitr1" path="res://resources/priority_rules/shrumbus_fruiting_rule.tres" id="7_fruiting_rule"]
 [ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="7_hmk6r"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_msv5f"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
 [ext_resource type="Resource" uid="uid://dn5yskvrihd8q" path="res://resources/passives/mycelial_corruption.tres" id="9_mycelial"]
 

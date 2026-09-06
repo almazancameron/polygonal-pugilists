@@ -11,6 +11,17 @@ extends Resource
 
 @export var step_groups: Array[TechniqueStepGroup] = []
 
+## Reward-tailoring metadata, consulted only by the reward-selection
+## system (scripts/reward/), never by combat logic. tags is a flat,
+## unweighted set of this technique's 1-3 genuinely meaningful drafting
+## hooks -- not an exhaustive list of everything it touches. role_* are
+## flat per-role contribution weights (offense/defense/sustain/control).
+@export var tags: Array[RewardTag.Tag] = []
+@export var role_offense: int = 0
+@export var role_defense: int = 0
+@export var role_sustain: int = 0
+@export var role_control: int = 0
+
 ## Deals damage (respecting Defend), heals, and applies each entry in
 ## status_effects, all per the hit_count/heal_applications/status_applications
 ## counts. Override this entirely for a technique whose control flow doesn't
@@ -253,6 +264,16 @@ func apply_heal(user: Combatant, target: Combatant, heal: HealAction, numeric_bo
 ## resolves them into nested status tooltips; see tooltip_panel.gd's
 ## _on_meta_hover_started().
 func describe() -> String:
+	var summary: String = effect_summary()
+	if summary == "":
+		return "%s does nothing." % technique_name
+	return "%s: %s." % [technique_name, summary]
+
+## The bare effect text describe() wraps in "Name: ...." -- split out so a
+## passive's OperationPassiveEffect can inline exactly what its operation
+## does (see PassiveEffect._effect_phrase()) instead of a name-only
+## "executes X" that says nothing about the actual effect.
+func effect_summary() -> String:
 	var parts: Array[String] = []
 
 	for step_group in step_groups:
@@ -322,10 +343,7 @@ func describe() -> String:
 
 		parts.append(group_text)
 
-	if parts.is_empty():
-		return "%s does nothing." % technique_name
-
-	return "%s: %s." % [technique_name, "; ".join(parts)]
+	return "; ".join(parts)
 
 ## Summarizes whichever of a group's bonuses are tagged for one action type,
 ## as a trailing fragment ("" when there are none). Delegates each bonus's

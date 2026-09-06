@@ -38,6 +38,15 @@ func populate_techniques(techniques: Array[Technique], layer: TooltipLayer) -> v
 		add_child(block)
 		block.setup_technique(technique, layer)
 
+## Read-only reference list -- see PaletteBlock.setup_passive() for why
+## these never produce a drag.
+func populate_passives(passives: Array[PassiveEffect], layer: TooltipLayer) -> void:
+	_clear()
+	for passive in passives:
+		var block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
+		add_child(block)
+		block.setup_passive(passive, layer)
+
 func _add_header(text: String) -> void:
 	var header := Label.new()
 	header.text = text.to_upper()

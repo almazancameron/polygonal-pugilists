@@ -12,7 +12,7 @@ extends UpgradeOption
 @export var rule: PriorityRule
 
 func describe() -> String:
-	return "Learn %s" % technique.technique_name
+	return technique.describe()
 
 func apply(familiar: Familiar) -> void:
 	familiar.techniques.append(technique)

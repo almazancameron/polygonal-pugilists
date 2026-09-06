@@ -65,6 +65,19 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_palette")
 
+[node name="PassiveLabel" type="Label" parent="Columns/LeftColumn" unique_id=1918144282]
+layout_mode = 2
+text = "PASSIVES"
+
+[node name="PassiveScroll" type="ScrollContainer" parent="Columns/LeftColumn" unique_id=202427317]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PassivePalette" type="VBoxContainer" parent="Columns/LeftColumn/PassiveScroll" unique_id=174492805]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_palette")
+
 [node name="BuildColumn" type="VBoxContainer" parent="Columns" unique_id=1718360387]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -85,6 +98,10 @@ mouse_filter = 2
 layout_mode = 2
 text = "+ Add slot"
 
+[node name="ConfirmButton" type="Button" parent="Columns/BuildColumn/Header" unique_id=966138334]
+layout_mode = 2
+text = "Confirm Priorities"
+
 [node name="BuildScroll" type="ScrollContainer" parent="Columns/BuildColumn" unique_id=281569208]
 layout_mode = 2
 size_flags_vertical = 3
@@ -93,6 +110,7 @@ horizontal_scroll_mode = 0
 [node name="SegmentList" type="VBoxContainer" parent="Columns/BuildColumn/BuildScroll" unique_id=536640715]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 6
 script = ExtResource("3_seglist")
 

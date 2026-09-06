@@ -32,6 +32,21 @@ func _on_mouse_exited() -> void:
 	if _tooltip_layer != null:
 		_tooltip_layer.hover_ended(self)
 
+## Right-click removes this technique from whatever slot holds it. The
+## slot's own DropZone (technique_slot) already listens for
+## child_exiting_tree, so removing self here is enough to notify the
+## owning RuleSegment -- no signal to emit by hand.
+func _gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed):
+		return
+	accept_event()
+	if _tooltip_layer != null:
+		_tooltip_layer.hover_ended(self)
+	var parent: Node = get_parent()
+	if parent != null:
+		parent.remove_child(self)
+	queue_free()
+
 ## Dragging a placed technique carries the node itself, so dragging out of a
 ## slot and dragging between slots are one path.
 func _get_drag_data(_at_position: Vector2) -> Variant:
@@ -39,3 +54,39 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview.text = technique.technique_name if technique != null else "technique"
 	set_drag_preview(preview)
 	return {"source": "build", "node": self}
+
+## Forwards to the enclosing RuleSegment's own technique-drop handling.
+## Needed because this block's own (default STOP) mouse filter is what
+## Godot's drag-drop dispatch hits first once a slot is occupied -- an
+## unimplemented _can_drop_data here silently refuses without bubbling any
+## further, making the technique's own name (the most obvious place to aim
+## a drop at) a dead zone, leaving only whatever thin sliver of the
+## surrounding DropZone happens to still be exposed. Same class of gap
+## ConditionBlock/RuleSegment already forward reorder payloads around.
+func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+	var segment: RuleSegment = _enclosing_segment()
+	return segment != null and segment.accepts_technique_drop(data)
+
+func _drop_data(_at_position: Vector2, data: Variant) -> void:
+	var segment: RuleSegment = _enclosing_segment()
+	if segment != null:
+		segment.receive_technique_drop(data)
+		# RuleSegment._drop_data() always re-emits structure_changed as its
+		# own last step, which is what re-evaluates completeness *after*
+		# the new block's setup() has actually run -- add_child() alone
+		# fires an earlier, transient evaluation while the block is still
+		# unconfigured (technique == null), same gap already documented on
+		# RuleSegment.is_complete(). Forwarding straight to
+		# receive_technique_drop() bypasses that trailing emit entirely,
+		# so it has to be repeated here or a replace-in-place drop is left
+		# showing stale "no technique" -- found live, not from reading the
+		# code alone.
+		segment.structure_changed.emit()
+
+func _enclosing_segment() -> RuleSegment:
+	var node: Node = get_parent()
+	while node != null:
+		if node is RuleSegment:
+			return node
+		node = node.get_parent()
+	return null

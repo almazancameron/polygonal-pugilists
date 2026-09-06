@@ -25,6 +25,13 @@ enum Stat { MAX_HP, POWER, DEFENSE, SPEED, FOCUS }
 ## retroactively reshape every breakpoint's actual threshold at once.
 @export var focus_step_size: int = 5
 
+## This species' reward-tailoring identity -- weighted tags consulted
+## only by the Species reward slot (scripts/reward/reward_selector.gd),
+## e.g. Ashwing might weight BURN heavily and TARGET_STATUS lightly.
+## Deliberately never read by the Run slot, which tracks currently-
+## equipped techniques/passives instead -- see BuildSnapshot.
+@export var species_affinities: Array[TagAffinity] = []
+
 ## Human-readable display name for a Stat value -- used by upgrade
 ## descriptions rather than exposing the raw enum name or property name.
 static func stat_name(stat: Stat) -> String:

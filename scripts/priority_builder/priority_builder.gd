@@ -1,12 +1,17 @@
 class_name PriorityBuilder
 extends Control
 
-## The priority builder screen. Standalone by design -- it touches neither
-## battle.tscn nor battle_controller.gd. It produces an in-memory
-## Array[PriorityRule] via SegmentList.compile(); nothing consumes it yet.
+## The priority-rule editor. Playable standalone (builder_familiar/
+## opponent_familiar assigned via the Inspector, as originally built) and
+## embedded live in battle.tscn, shown once per round from
+## battle_controller.gd's advance_to_priority_editor() -- setup() is what
+## makes the second case possible, since the opponent (and the player's own
+## techniques/priority_rules) change every round, not just once at startup.
 ##
-## This is the prototype for the in-run priority-rule editor that
-## GAME_DESIGN.md names as the replacement for the PriorityBuild stopgap.
+## Produces an Array[PriorityRule] via SegmentList.compile()/compiled_rules();
+## confirm_requested signals a caller that the player is done.
+
+signal confirm_requested
 
 const BLOCK_DIR: String = "res://resources/priority_builder/blocks"
 
@@ -32,8 +37,10 @@ const DEFINITION_ORDER: Array[String] = [
 @onready var portrait: TextureRect = $Columns/LeftColumn/FamiliarPanel/Rows/Portrait
 @onready var stat_grid: GridContainer = $Columns/LeftColumn/FamiliarPanel/Rows/StatGrid
 @onready var technique_palette: BlockPalette = $Columns/LeftColumn/TechniqueScroll/TechniquePalette
+@onready var passive_palette: BlockPalette = $Columns/LeftColumn/PassiveScroll/PassivePalette
 
 @onready var add_slot_button: Button = $Columns/BuildColumn/Header/AddSlotButton
+@onready var confirm_button: Button = $Columns/BuildColumn/Header/ConfirmButton
 @onready var segment_list: SegmentList = $Columns/BuildColumn/BuildScroll/SegmentList
 
 @onready var condition_palette: BlockPalette = $Columns/RightColumn/ConditionScroll/ConditionPalette
@@ -41,23 +48,99 @@ const DEFINITION_ORDER: Array[String] = [
 @onready var probe_controls: VBoxContainer = $Columns/RightColumn/StateProbe/Rows/Controls
 @onready var probe_message: Label = $Columns/RightColumn/StateProbe/Rows/Message
 
+## True once anything has structurally changed since the last setup() call
+## -- i.e. the player actually touched the build area (not just the mock
+## probe, which doesn't affect what gets saved). Reset to false at the end
+## of every setup(), after that call's own reconstruction has already
+## (harmlessly) flipped it true via the same signal a real edit would use.
+var _dirty: bool = false
+
+var _no_changes_dialog: ConfirmationDialog
+
 func _ready() -> void:
-	state_probe.setup(builder_familiar, opponent_familiar)
-	state_probe.build_controls(probe_controls)
 	state_probe.state_changed.connect(_refresh)
+	segment_list.structure_changed.connect(_on_build_structure_changed)
+	add_slot_button.pressed.connect(_on_add_slot_pressed)
+	confirm_button.pressed.connect(_on_confirm_pressed)
+
+	_no_changes_dialog = ConfirmationDialog.new()
+	_no_changes_dialog.dialog_text = "You haven't changed anything this round. Continue anyway?"
+	_no_changes_dialog.confirmed.connect(func() -> void: confirm_requested.emit())
+	add_child(_no_changes_dialog)
+
+	# Only true when opened as the standalone scene, with both exports
+	# already assigned in the Inspector -- battle_controller.gd instead
+	# calls setup() itself once it has a real familiar/opponent to hand over.
+	if builder_familiar != null:
+		setup(builder_familiar, opponent_familiar)
+
+func _on_build_structure_changed() -> void:
+	_dirty = true
+	state_probe.reset_simulation(segment_list.compile()["rules"])
+	_refresh()
+
+## Nudges rather than blocks: a player who genuinely wants to carry on
+## unchanged (nothing to rearrange this round) can still confirm through
+## it, but an accidental click-through on a screen that quietly did
+## nothing gets caught first.
+func _on_confirm_pressed() -> void:
+	if _dirty:
+		confirm_requested.emit()
+	else:
+		_no_changes_dialog.popup_centered()
+
+## Rebuilds every familiar-dependent part of the screen from scratch: the
+## familiar panel, both palettes, the mock-state probe, and one segment per
+## already-authored priority_rules entry (reconstructed via
+## RuleSegment.load_rule()) so reopening the editor shows what the player
+## already has, not a blank canvas -- required by GAME_DESIGN.md §9.2 step 4.
+## Called once from _ready() for the standalone scene, and again by
+## battle_controller.gd every round, since the opponent (and the player's
+## own techniques/priority_rules) both change round to round.
+func setup(familiar: Familiar, opponent: Familiar) -> void:
+	builder_familiar = familiar
+	opponent_familiar = opponent
+
+	# remove_child immediately, queue_free to actually release afterward --
+	# same reasoning as BlockPalette._clear(): queue_free() alone leaves the
+	# outgoing segments still counted as children for the rest of this frame,
+	# which would double up with the freshly-loaded ones added below.
+	for segment in segment_list.segments():
+		segment_list.remove_child(segment)
+		segment.queue_free()
+
+	state_probe.setup(builder_familiar, opponent_familiar)
+	state_probe.build_controls(probe_controls, tooltip_layer)
 
 	familiar_name_label.text = builder_familiar.familiar_name
 	portrait.texture = builder_familiar.sprite
 
 	condition_palette.populate_conditions(_definitions())
 	technique_palette.populate_techniques(builder_familiar.techniques, tooltip_layer)
+	passive_palette.populate_passives(builder_familiar.passives, tooltip_layer)
 
-	segment_list.structure_changed.connect(_refresh)
-	add_slot_button.pressed.connect(_on_add_slot_pressed)
+	for rule in builder_familiar.priority_rules:
+		var segment: RuleSegment = segment_list.add_segment()
+		segment.set_tooltip_layer(tooltip_layer)
+		segment.load_rule(rule, _definitions())
 
-	# Start with one empty slot so the screen is never a blank canvas with
-	# no obvious first move.
-	_on_add_slot_pressed()
+	# No auto-added trailing empty slot: the screen shows exactly what the
+	# familiar already has. "+ Add slot" is right there whenever the player
+	# actually wants a new one -- an empty slot nobody asked for on every
+	# single reopen just reads as clutter.
+	_refresh()
+
+	# The reconstruction above legitimately flows through the same
+	# structure_changed path a real edit does (loading segments, connecting
+	# blocks) -- consume that now so _dirty accurately reflects only what
+	# happens after setup() returns.
+	_dirty = false
+
+## The single accessor battle_controller.gd needs once the player confirms --
+## keeps it from reaching through priority_builder.segment_list.compile()
+## itself.
+func compiled_rules() -> Array[PriorityRule]:
+	return segment_list.compile()["rules"]
 
 ## Clicking anywhere outside a focused input releases it.
 ##

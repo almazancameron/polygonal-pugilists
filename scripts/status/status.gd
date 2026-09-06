@@ -12,7 +12,17 @@ var stacks: int = 1:
 		if value < stacks and owner != null and status_id() != Status.status_effect_id(Status.StatusEffect.STASIS):
 			var stasis: Status = owner.get_status(Status.StatusEffect.STASIS)
 			if stasis != null:
+				# This status's own reduction is redirected into Stasis instead
+				# (stacks left untouched below), so Stasis is the one whose
+				# stacks actually just changed -- notify for *it*, not for
+				# self, or STATUS_REDUCED/REMOVED never fires for Stasis at
+				# all (every caller of _notify_stack_change() only ever knows
+				# to check the status object it thinks it's ticking).
+				var stasis_stacks_before: int = stasis.stacks
 				stasis.stacks -= 1
+				owner._notify_stack_change(stasis, stasis_stacks_before)
+				if stasis.is_expired():
+					owner.statuses.erase(stasis)
 				return
 		stacks = value
 

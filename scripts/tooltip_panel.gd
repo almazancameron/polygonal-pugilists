@@ -22,6 +22,7 @@ var tooltip_layer: TooltipLayer = null
 var _dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
 var _mouse_over: bool = false
+var _hovered_meta: Variant = null
 
 func _ready() -> void:
 	close_button.pressed.connect(func() -> void: close_requested.emit())
@@ -38,10 +39,18 @@ func _on_meta_hover_started(meta: Variant) -> void:
 		return
 
 	var status: Status = Status.from_id(StringName(str(meta)))
-	if status != null:
-		tooltip_layer.hover_started(content_label, status.describe())
+	if status == null:
+		return
+	# See RewardCard._on_description_meta_hover_started() for why this
+	# guards against a second, different link on the same label being
+	# silently ignored by hover_started()'s "already showing" check.
+	if _hovered_meta != null and _hovered_meta != meta:
+		tooltip_layer.hover_ended(content_label)
+	_hovered_meta = meta
+	tooltip_layer.hover_started(content_label, status.describe())
 
 func _on_meta_hover_ended() -> void:
+	_hovered_meta = null
 	if tooltip_layer != null:
 		tooltip_layer.hover_ended(content_label)
 

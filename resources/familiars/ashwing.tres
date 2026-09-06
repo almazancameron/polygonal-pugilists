@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_ww7uc"]
 [ext_resource type="Resource" uid="uid://bmx3vo7iohaql" path="res://resources/priority_rules/ashwing_stoke_rule.tres" id="5_fv546"]
 [ext_resource type="Resource" uid="uid://blh627cxop8ng" path="res://resources/techniques/red_roc.tres" id="7_e5nmj"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_gnsi5"]
 [ext_resource type="Resource" uid="uid://buer6sg31xofm" path="res://resources/techniques/stoke.tres" id="8_q8lrs"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e8sf1"]

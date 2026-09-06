@@ -9,8 +9,9 @@
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="3_kn4wb"]
 [ext_resource type="Resource" uid="uid://di032vu67r5kt" path="res://resources/priority_rules/guubal_reclaim_rule.tres" id="4_wpb83"]
 [ext_resource type="Resource" uid="uid://bfjju3nkr50x2" path="res://resources/priority_rules/guubal_corrosive_rule.tres" id="4_xwf4l"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_gl1u3"]
 [ext_resource type="Resource" uid="uid://hcbpxomwrm58" path="res://resources/techniques/corrosive_ooze.tres" id="8_wpb83"]
-[ext_resource type="Resource" uid="uid://cp1w34fm2ry5v" path="res://resources/techniques/culture.tres" id="9_gl1u3"]
+[ext_resource type="Resource" uid="uid://bxbtbn23rxcuk" path="res://resources/techniques/reclaim_byproducts.tres" id="12_gl1u3"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m4hsq"]
 atlas = ExtResource("2_iskl7")
@@ -23,7 +24,7 @@ sprite = SubResource("AtlasTexture_m4hsq")
 max_hp = 60
 power = 9
 speed = 9
-techniques = Array[ExtResource("3_kn4wb")]([ExtResource("8_wpb83"), ExtResource("9_gl1u3")])
+techniques = Array[ExtResource("3_kn4wb")]([ExtResource("8_wpb83"), ExtResource("12_gl1u3")])
 priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("4_wpb83"), ExtResource("4_xwf4l")])
 passives = Array[ExtResource("1_tj0wc")]([ExtResource("2_xwf4l")])
 focus_table = ExtResource("1_wpb83")

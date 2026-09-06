@@ -8,24 +8,50 @@ extends Control
 ## round against opponent_lineup's next entry; the final win or any loss
 ## ends the run.
 ##
-## Manual Inspector wiring required: player_familiar_data, available_builds,
-## upgrade_pool, opponent_lineup. enemy_familiar_data derives itself from
-## opponent_lineup[0] -- no separate wiring needed for it.
+## Manual Inspector wiring required: full_roster, stat_upgrade_pool,
+## technique_reward_pool, passive_reward_pool. player_familiar_data and
+## opponent_lineup are instead randomly drawn from full_roster every time
+## _ready() runs (see _randomize_matchup()) -- a lightweight stand-in for the
+## real bracket/character-select screen GAME_DESIGN.md §9.1 eventually calls
+## for (that lets the player pick their own entrant; this is just a random
+## gauntlet in the meantime). enemy_familiar_data derives itself from
+## opponent_lineup[0] -- no separate wiring needed for it. The player's
+## familiar starts on whatever priority_rules are already authored directly
+## on its own Familiar resource -- same as any enemy -- there is no pre-fight
+## build picker any more.
 
 enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 
+## Every familiar _randomize_matchup() can draw from -- exported and authored
+## rather than directory-scanned at runtime, since a runtime scan of
+## resources/familiars/ works from the editor but not from an exported .pck
+## (see _randomize_matchup()'s doc comment).
+@export var full_roster: Array[Familiar] = []
+
+## Overwritten by _randomize_matchup() every time _ready() runs -- any value
+## authored here in the Inspector is just a fallback for a context that
+## somehow skips _ready() (none currently do).
 @export var player_familiar_data: Familiar
 
-## The priority builds offered on the pre-fight build-select screen. The
-## chosen build's priority_rules get assigned onto player_familiar_data.
-@export var available_builds: Array[PriorityBuild] = []
+## The 5 mandatory-stat-upgrade offers shown at the start of every reward
+## sequence (Phase A) -- expected to hold exactly one ModifyStatUpgrade
+## per Familiar.Stat value.
+@export var stat_upgrade_pool: Array[ModifyStatUpgrade] = []
 
-## Upgrade offers shown after each non-final round. Currently the whole
-## pool is offered every round rather than a random subset -- revisit
-## once there's more than one upgrade authored.
-@export var upgrade_pool: Array[UpgradeOption] = []
+## Reward-screen content pools (Phase B) -- see RewardProgression for
+## which pool a given round's cadence draws from, and RewardSelector for
+## how a specific candidate gets chosen from whichever pool is active.
+@export var technique_reward_pool: Array[Technique] = []
+@export var passive_reward_pool: Array[PassiveEffect] = []
 
-## Opponents in order of increasing difficulty.
+## Seeds the reward screen's RNG for reproducible testing. 0 means
+## "randomize instead" (see _ready()) -- real play shouldn't want a fixed
+## reward sequence every run.
+@export var reward_seed: int = 0
+
+## Randomized every _ready() by _randomize_matchup() -- no meaningful
+## difficulty ordering exists among them (nothing in the current roster
+## carries a difficulty rating to order by).
 @export var opponent_lineup: Array[Familiar] = []
 @onready var enemy_familiar_data: Familiar = opponent_lineup[0] if opponent_lineup.size() > 0 else null
 
@@ -41,6 +67,10 @@ var current_round: int = 0
 
 @onready var tooltip_layer: TooltipLayer = $TooltipLayer/TooltipContainer
 
+@onready var panels: HBoxContainer = $Panels
+@onready var log_scroll: ScrollContainer = $LogScroll
+@onready var log_view: CombatLogView = $LogScroll/LogView
+
 @onready var player_name_label: Label = $Panels/PlayerPanel/NameLabel
 @onready var enemy_name_label: Label = $Panels/EnemyPanel/NameLabel
 
@@ -55,6 +85,40 @@ var current_round: int = 0
 @onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
 @onready var speed_toggle_button: Button = $SpeedToggleButton
+
+@onready var priority_builder: PriorityBuilder = $PriorityBuilder
+
+@onready var game_over_panel: VBoxContainer = $GameOverPanel
+@onready var game_over_message_label: Label = $GameOverPanel/MessageLabel
+@onready var restart_button: Button = $GameOverPanel/RestartButton
+
+## -- Reward sequence (Phase A stat allocation + Phase B reward cards) --
+const REWARD_CARD_SCENE: PackedScene = preload("res://scenes/reward_card.tscn")
+const STAT_UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/stat_upgrade_row.tscn")
+
+@onready var stat_upgrade_panel: VBoxContainer = $StatUpgradePanel
+@onready var stat_header_label: Label = $StatUpgradePanel/HeaderLabel
+@onready var stat_rows_container: VBoxContainer = $StatUpgradePanel/RowsContainer
+@onready var stat_confirm_button: Button = $StatUpgradePanel/ConfirmButton
+
+@onready var reward_select_panel: VBoxContainer = $RewardSelectPanel
+@onready var species_column: VBoxContainer = $RewardSelectPanel/CardRow/SpeciesColumn
+@onready var run_column: VBoxContainer = $RewardSelectPanel/CardRow/RunColumn
+@onready var pivot_column: VBoxContainer = $RewardSelectPanel/CardRow/PivotColumn
+@onready var rerolls_remaining_label: Label = $RewardSelectPanel/ActionRow/RerollsRemainingLabel
+@onready var skip_button: Button = $RewardSelectPanel/ActionRow/SkipButton
+@onready var next_round_button: Button = $RewardSelectPanel/ActionRow/NextRoundButton
+
+## The 3 RewardCards share one ButtonGroup (exactly one selected at a
+## time) but each column keeps its own separate RerollButton outside the
+## group -- see the reward-screen plan's note on why ButtonGroup still
+## fits despite per-slot rerolls.
+var _reward_card_group: ButtonGroup = ButtonGroup.new()
+var _reward_cards: Dictionary = {}  # RewardSelector.RewardSlot -> RewardCard
+var _slot_columns: Dictionary = {}  # RewardSelector.RewardSlot -> VBoxContainer
+var selected_reward_option: UpgradeOption = null
+
+var reward_flow: RewardFlowController = RewardFlowController.new()
 
 ## Cycles battle pacing 1x -> 2x -> 4x -> 1x. Every pause between turn/upkeep
 ## steps goes through get_tree().create_timer(), which already scales with
@@ -73,14 +137,41 @@ var phase: Phase = Phase.PLAYER_TURN
 var engine: BattleEngine
 
 func _ready() -> void:
+	player_status_row.tooltip_layer = tooltip_layer
+	enemy_status_row.tooltip_layer = tooltip_layer
+
+	speed_toggle_button.pressed.connect(_on_speed_toggle_pressed)
+
+	_slot_columns = {
+		RewardSelector.RewardSlot.SPECIES: species_column,
+		RewardSelector.RewardSlot.RUN: run_column,
+		RewardSelector.RewardSlot.PIVOT: pivot_column,
+	}
+
+	for slot in _slot_columns:
+		var column: VBoxContainer = _slot_columns[slot]
+		column.get_node("RerollButton").pressed.connect(_on_reroll_pressed.bind(slot))
+
+	skip_button.pressed.connect(_on_skip_pressed)
+	next_round_button.pressed.connect(_on_next_round_pressed)
+	restart_button.pressed.connect(_on_restart_pressed)
+
+	await _start_new_run()
+
+## Resets every piece of per-run state -- a fresh matchup, a fresh
+## RewardFlowController (RNG, reroll charges, build snapshot), the round
+## counter, the combat log -- and starts the opening fight. Called once from
+## _ready() and again by _on_restart_pressed(), so Restart is a genuinely new
+## run rather than a full-health replay of whatever matchup just ended.
+func _start_new_run() -> void:
+	_randomize_matchup()
+	current_round = 0
+
 	player = Combatant.new(player_familiar_data)
 	enemy = Combatant.new(enemy_familiar_data)
 	player.opponent = enemy
 	enemy.opponent = player
 	engine = BattleEngine.new(player, enemy)
-
-	player_status_row.tooltip_layer = tooltip_layer
-	enemy_status_row.tooltip_layer = tooltip_layer
 
 	player_name_label.text = player.familiar.familiar_name
 	enemy_name_label.text = enemy.familiar.familiar_name
@@ -91,17 +182,62 @@ func _ready() -> void:
 	player_portrait.texture = player.familiar.sprite
 	enemy_portrait.texture = enemy.familiar.sprite
 
-	populate_build_select_buttons()
+	reward_flow = RewardFlowController.new()
+	if reward_seed != 0:
+		reward_flow.seed_rng(reward_seed)
+	else:
+		reward_flow.randomize_rng()
 
-	speed_toggle_button.pressed.connect(_on_speed_toggle_pressed)
+	stat_confirm_button.disabled = true
+	stat_upgrade_panel.visible = false
+	reward_select_panel.visible = false
+	game_over_panel.visible = false
+
+	log_view.clear()
+
+	await begin_fight("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
+
+## Draws 5 distinct familiars from the full roster -- one for the player, four
+## for opponent_lineup -- so every launch starts a different matchup instead
+## of whatever's fixed in the Inspector. Duplicates each pick: player_familiar_
+## data's priority_rules get mutated in place over the course of a run
+## (advance_to_priority_editor()), and load() caches .tres resources by path,
+## so reusing the shared object directly would corrupt the base familiar's
+## data in memory for any later pick of the same familiar within this
+## process.
+##
+## full_roster is an authored, exported list rather than a runtime directory
+## scan of resources/familiars/ (an earlier version of this method did that,
+## the same way balance_test.gd's _load_familiars() still does) --
+## DirAccess.list_dir_begin()/get_next() can enumerate a res:// folder when
+## Godot is reading loose project files (the editor, or a --script run), but
+## not against a packed, exported .pck, where it silently returns nothing.
+## balance_test.gd is fine relying on it since it only ever runs against the
+## loose project; anything that has to work in an exported build (this file)
+## can't.
+func _randomize_matchup() -> void:
+	if full_roster.is_empty():
+		push_error("full_roster is empty -- assign all familiars in the Inspector")
+		return
+
+	var roster: Array[Familiar] = full_roster.duplicate()
+	roster.shuffle()
+
+	player_familiar_data = roster[0].duplicate()
+
+	opponent_lineup = []
+	for familiar in roster.slice(1, 6):
+		opponent_lineup.append(familiar.duplicate())
+
+	enemy_familiar_data = opponent_lineup[0]
 
 func _on_speed_toggle_pressed() -> void:
 	speed_index = (speed_index + 1) % SPEED_MULTIPLIERS.size()
 	Engine.time_scale = SPEED_MULTIPLIERS[speed_index]
 	speed_toggle_button.text = "%dx" % SPEED_MULTIPLIERS[speed_index]
 
-## Spawns a button on the shared choice panel (used for both build-select
-## and upgrade-select) that calls on_pressed when clicked.
+## Spawns a button on the shared choice panel (used for the round-4
+## sacrifice screen) that calls on_pressed when clicked.
 func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") -> void:
 	var button := Button.new()
 	button.text = label
@@ -115,38 +251,232 @@ func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") 
 
 	build_select_panel.add_child(button)
 
-func populate_build_select_buttons() -> void:
-	for build in available_builds:
-		add_choice_button(build.build_name, _on_build_selected.bind(build))
+## ---- Reward sequence: Phase B (tailored reward cards) comes first, ----
+## ---- then Phase A (mandatory stat allocation) ----
 
-func populate_upgrade_select_buttons() -> void:
-	var available_upgrades: Array[UpgradeOption] = upgrade_pool.duplicate()
-	available_upgrades.shuffle()  # Randomize the order of upgrades for variety
-	available_upgrades = available_upgrades.slice(0, min(3, available_upgrades.size()))  # Limit to 3 upgrades
+## Every reward sequence starts here: the tailored reward cards (Phase B)
+## show first. Only once that's resolved (a reward picked, or explicitly
+## skipped) does the mandatory stat allocation (Phase A) run -- once per
+## round either way, never twice. Skipping the reward grants 2 stat
+## points on that single pass instead of 1, rather than showing the stat
+## screen a second, separate time.
+func begin_reward_sequence() -> void:
+	# Hidden for the whole reward sequence (Phase B and whichever Phase A
+	# pass follows it) -- shown again once begin_fight() resumes the next
+	# fight. Nothing re-shows them in between, so hiding all three once
+	# here, at the sequence's actual single entry point, covers every
+	# reward path regardless of which screen it starts or ends on. The
+	# speed toggle and combat log only mean anything while a fight is
+	# actually playing out.
+	panels.visible = false
+	speed_toggle_button.visible = false
+	log_scroll.visible = false
 
-	for upgrade in available_upgrades:
-		add_choice_button(upgrade.label, _on_upgrade_selected.bind(upgrade), upgrade.describe())
+	begin_phase_b()
 
-func _on_build_selected(build: PriorityBuild) -> void:
-	player_familiar_data.priority_rules = build.priority_rules
-	await begin_fight("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
+## Builds one StatUpgradeRow per stat_upgrade_pool entry and shows the
+## panel. on_confirmed is called once the player commits their
+## allocation -- parameterized so this same screen serves both the
+## post-reward-pick pass (1 point) and the skip-triggered pass (2 points).
+func populate_stat_upgrade_rows(points: int, on_confirmed: Callable) -> void:
+	reward_flow.begin_stat_phase(points)
 
-func _on_upgrade_selected(upgrade: UpgradeOption) -> void:
-	upgrade.apply(player_familiar_data)
+	for child in stat_rows_container.get_children():
+		child.queue_free()
+
+	for upgrade in stat_upgrade_pool:
+		var row: StatUpgradeRow = STAT_UPGRADE_ROW_SCENE.instantiate()
+		stat_rows_container.add_child(row)
+		row.setup(upgrade, player_familiar_data.get_stat(upgrade.stat))
+		row.allocate_requested.connect(_on_stat_allocate_requested)
+
+	if stat_confirm_button.pressed.is_connected(_on_stat_confirm_pressed):
+		stat_confirm_button.pressed.disconnect(_on_stat_confirm_pressed)
+	stat_confirm_button.pressed.connect(_on_stat_confirm_pressed.bind(on_confirmed))
+
+	_refresh_stat_rows()
+	stat_upgrade_panel.visible = true
+
+func _on_stat_allocate_requested(stat: Familiar.Stat, delta: int) -> void:
+	if not reward_flow.try_allocate(stat, delta):
+		return
+
+	for row in stat_rows_container.get_children():
+		if row.upgrade.stat == stat:
+			row.set_allocated_count(reward_flow.allocated.get(stat, 0))
+
+	_refresh_stat_rows()
+
+func _refresh_stat_rows() -> void:
+	for row in stat_rows_container.get_children():
+		row.refresh_availability(reward_flow.available_points)
+	stat_confirm_button.disabled = reward_flow.available_points > 0
+	stat_header_label.text = "%d stat upgrade%s to apply" % [
+		reward_flow.available_points, "s" if reward_flow.available_points != 1 else ""
+	]
+
+func _on_stat_confirm_pressed(on_confirmed: Callable) -> void:
+	reward_flow.confirm_stat_phase(player_familiar_data, stat_upgrade_pool)
 	player.current_hp = player.familiar.max_hp  # Ensure current_hp matches if max_hp changed
-	update_hp_display(player)  # Update the HP bar in case max_hp changed
-	if upgrade.unique:
-		upgrade_pool.erase(upgrade)
-	await begin_fight("Upgrade applied: %s. Let the battle continue!" % upgrade.describe(), CombatLog.Source.PLAYER)
+	update_hp_display(player)
+	stat_upgrade_panel.visible = false
+	on_confirmed.call()
+
+## Dispatches on this round's cadence (RewardProgression) -- a normal
+## technique/passive grant shows the 3 cards immediately; a passive-trade
+## round shows the sacrifice screen first. Nothing past the authored
+## cadence has a reward to offer at all, so it goes straight to the
+## (1-point) stat allocation instead.
+func begin_phase_b() -> void:
+	var kind: RewardProgression.RewardKind = reward_flow.begin_reward_screen(
+		current_round, player_familiar_data, technique_reward_pool, passive_reward_pool
+	)
+
+	match kind:
+		RewardProgression.RewardKind.NONE:
+			populate_stat_upgrade_rows(1, advance_to_priority_editor)
+		RewardProgression.RewardKind.PASSIVE_TRADE:
+			begin_sacrifice_screen()
+		_:
+			_show_reward_cards(true)
+
+## Reuses the build-select panel's plain button-list convention -- one
+## button per currently-held passive, plus a Skip that leads straight to
+## the stat-allocation pass with 2 points (skipping the trade entirely).
+## Skip lives ONLY here, not on the reward-cards screen that follows.
+func begin_sacrifice_screen() -> void:
+	for child in build_select_panel.get_children():
+		child.queue_free()
+
+	for passive in reward_flow.sacrifice_options(player_familiar_data):
+		add_choice_button("Give up: %s" % passive.passive_name, _on_sacrifice_selected.bind(passive), passive.describe())
+
+	add_choice_button("Skip", _on_skip_pressed)
+
+func _on_sacrifice_selected(passive: PassiveEffect) -> void:
+	for child in build_select_panel.get_children():
+		child.queue_free()
+
+	reward_flow.resolve_sacrifice(passive, player_familiar_data)
+	_show_reward_cards(false)
+
+func _show_reward_cards(show_skip: bool) -> void:
+	_populate_reward_cards()
+	skip_button.visible = show_skip
+	reward_select_panel.visible = true
+
+## Destroys and recreates all 3 slot cards for a fresh screen (a reroll
+## instead reuses the existing card -- see _on_reroll_pressed()).
+func _populate_reward_cards() -> void:
+	selected_reward_option = null
+	next_round_button.disabled = true
+
+	for slot in _slot_columns:
+		var column: VBoxContainer = _slot_columns[slot]
+
+		if _reward_cards.has(slot):
+			var old_card: RewardCard = _reward_cards[slot]
+			column.remove_child(old_card)
+			old_card.queue_free()
+			_reward_cards.erase(slot)
+
+		var option: UpgradeOption = reward_flow.candidate_for_slot(slot)
+		if option == null:
+			continue
+
+		var card: RewardCard = REWARD_CARD_SCENE.instantiate()
+		column.add_child(card)
+		column.move_child(card, 1)  # between SlotLabel (0) and RerollButton
+		card.button_group = _reward_card_group
+		card.setup(option, tooltip_layer)
+		card.toggled.connect(_on_reward_card_toggled.bind(slot))
+		_reward_cards[slot] = card
+
+	_refresh_reroll_buttons()
+
+func _on_reward_card_toggled(pressed: bool, slot: RewardSelector.RewardSlot) -> void:
+	if not pressed:
+		return
+	selected_reward_option = reward_flow.candidate_for_slot(slot)
+	next_round_button.disabled = selected_reward_option == null
+
+func _refresh_reroll_buttons() -> void:
+	rerolls_remaining_label.text = "Rerolls left: %d" % reward_flow.rerolls_remaining
+	var available: bool = reward_flow.rerolls_remaining > 0 and reward_flow.has_unseen_candidates()
+	for slot in _slot_columns:
+		var column: VBoxContainer = _slot_columns[slot]
+		column.get_node("RerollButton").disabled = not available
+
+## Rerolls exactly one slot in place -- reuses the existing RewardCard
+## node (re-setup() with the new candidate) rather than destroying and
+## recreating it, so the shared ButtonGroup never needs re-registering.
+func _on_reroll_pressed(slot: RewardSelector.RewardSlot) -> void:
+	if not reward_flow.reroll_slot(slot, player_familiar_data):
+		return
+
+	var card: RewardCard = _reward_cards.get(slot)
+	var option: UpgradeOption = reward_flow.candidate_for_slot(slot)
+	if card == null or option == null:
+		return
+
+	# The rerolled slot's previous content is gone -- clear its selection
+	# state (through the ButtonGroup) rather than leave a stale choice
+	# pointing at an option that's no longer offered.
+	if card.button_pressed:
+		selected_reward_option = null
+		next_round_button.disabled = true
+	card.button_pressed = false
+	card.setup(option, tooltip_layer)
+
+	_refresh_reroll_buttons()
+
+## Declining the reward grants 2 stat points on the single allocation
+## pass that follows, instead of running that screen a second time.
+func _on_skip_pressed() -> void:
+	reward_select_panel.visible = false
+	for child in build_select_panel.get_children():
+		child.queue_free()
+	populate_stat_upgrade_rows(2, advance_to_priority_editor)
+
+func _on_next_round_pressed() -> void:
+	if selected_reward_option == null:
+		return
+	selected_reward_option.apply(player_familiar_data)
+	player.current_hp = player.familiar.max_hp
+	update_hp_display(player)
+	reward_select_panel.visible = false
+	populate_stat_upgrade_rows(1, advance_to_priority_editor)
+
+## Shows the priority editor (GAME_DESIGN.md §9.2 step 4) with the player's
+## current familiar and this round's actual opponent, waits for the player
+## to confirm, writes the result back onto player_familiar_data, then starts
+## the next fight. setup() re-populates the whole screen every time --
+## including reconstructing segments for whatever priority_rules the
+## familiar already has -- since both the opponent and the player's own
+## techniques/rules can differ from the last time this ran.
+func advance_to_priority_editor() -> void:
+	priority_builder.visible = true
+	priority_builder.setup(player_familiar_data, enemy_familiar_data)
+
+	await priority_builder.confirm_requested
+
+	player_familiar_data.priority_rules = priority_builder.compiled_rules()
+	priority_builder.visible = false
+
+	await begin_fight("Prepare for the next bout!", CombatLog.Source.PLAYER)
 
 func _other(combatant: Combatant) -> Combatant:
 	return enemy if combatant == player else player
 
-## Clears whichever choice screen is showing (build-select or
-## upgrade-select) and starts the fight's opening turn. No upkeep before
-## this first turn -- both Combatants are freshly created with no statuses
-## yet, same as before Speed-based ordering existed.
+## Clears the sacrifice screen's buttons if any are showing, re-shows the
+## HUD, and starts the fight's opening turn. No upkeep before this first
+## turn -- both Combatants are freshly created with no statuses yet, same
+## as before Speed-based ordering existed.
 func begin_fight(message: String, source: CombatLog.Source) -> void:
+	panels.visible = true
+	speed_toggle_button.visible = true
+	log_scroll.visible = true
+
 	for child in build_select_panel.get_children():
 		child.queue_free()
 
@@ -262,15 +592,13 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 
 	await advance_turn(actor)
 
-## get_tree().quit() only requests a quit at the end of the current frame --
-## it does NOT stop this function from continuing to run. Each branch must
-## `return true` explicitly, or the caller's "battle's over, stop here"
-## guards never trigger and processing (and duplicate victory/defeat logs)
-## continue for another full step before things settle.
+## Each branch must `return true` explicitly, or the caller's "battle's over,
+## stop here" guards never trigger and processing (and duplicate victory/
+## defeat logs) continue for another full step before things settle.
 ##
 ## engine.check_victory() is guarded the same way engine's own doc comment
 ## describes: once it returns true here, this function always returns before
-## anything could call it again on the same (now-replaced-or-quit) pair.
+## anything could call it again on the same (now-replaced) pair.
 func check_victory() -> bool:
 	if not engine.check_victory():
 		return false
@@ -290,23 +618,39 @@ func check_victory() -> bool:
 		phase = Phase.BATTLE_OVER
 		combat_log.add_entry("Victory! %s is defeated." % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
 		await get_tree().create_timer(1.0).timeout
-		get_tree().quit()
+		show_game_over("You win! %s has been defeated." % enemy.familiar.familiar_name)
 		return true
 
 	phase = Phase.BATTLE_OVER
 	combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
 	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	show_game_over("Defeat! %s has fallen." % player.familiar.familiar_name)
 	return true
 
+## Hides the in-fight HUD (same set begin_reward_sequence() hides -- none of
+## it means anything once the run is decided) and shows the game-over panel.
+## _on_restart_pressed() is the only way out of it.
+func show_game_over(message: String) -> void:
+	panels.visible = false
+	speed_toggle_button.visible = false
+	log_scroll.visible = false
+
+	game_over_message_label.text = message
+	game_over_panel.visible = true
+
+func _on_restart_pressed() -> void:
+	await _start_new_run()
+
 ## Advances to the next opponent, resets both Combatants (full heal, no
-## statuses -- see DECISIONS.md), and shows the upgrade-choice screen.
-## take_turn() only resumes once the player picks one (_on_upgrade_selected).
+## statuses -- see DECISIONS.md), and starts the reward sequence (Phase A
+## stat allocation, then Phase B's tailored reward cards). take_turn()
+## only resumes once that whole sequence resolves into
+## advance_to_priority_editor()/begin_fight().
 func start_next_round() -> void:
 	current_round += 1
 	enemy_familiar_data = opponent_lineup[current_round]
 
-	populate_upgrade_select_buttons()
+	begin_reward_sequence()
 
 	player = Combatant.new(player_familiar_data)
 	update_hp_display(player)

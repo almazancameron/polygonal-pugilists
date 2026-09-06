@@ -7,5 +7,6 @@
 
 [resource]
 script = ExtResource("2_0f457")
+build_name = "Pyrewisp Default"
 priority_rules = Array[ExtResource("1_582sy")]([ExtResource("2_adocv"), ExtResource("3_jgv65")])
 metadata/_custom_type_script = "uid://c1s5hv1nwpuep"

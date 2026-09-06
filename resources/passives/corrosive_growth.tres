@@ -9,4 +9,5 @@ status_effect = 3
 stack_bonus = 1
 field_name = &"max_stack_count"
 field_bonus = 1.0
+passive_name = "Corrosive Growth"
 metadata/_custom_type_script = "uid://c5gfmyosppbco"

@@ -12,6 +12,7 @@ metadata/_custom_type_script = "uid://1w4ob6may3tr"
 [resource]
 script = ExtResource("2_3xeoi")
 heal_bonus = 1
+passive_name = "Heal Power"
 trigger = 14
 trigger_target = 0
 conditions = Array[ExtResource("1_7m5ns")]([SubResource("Resource_of423")])

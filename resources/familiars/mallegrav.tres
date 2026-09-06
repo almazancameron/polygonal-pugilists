@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="4_ddch2"]
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_mn566"]
 [ext_resource type="Resource" uid="uid://c5g2lr1w6q6l5" path="res://resources/techniques/concussive_blow.tres" id="8_7pfhb"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_ahacj"]
 [ext_resource type="Resource" uid="uid://cr01t1lg378wu" path="res://resources/techniques/wind_up_strike.tres" id="9_ahacj"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_meeeb"]

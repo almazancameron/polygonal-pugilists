@@ -14,5 +14,6 @@ script = ExtResource("2_ci6r5")
 status_effect = 6
 field_name = &"burst_damage"
 field_bonus = 1.0
+passive_name = "Foretell Damage"
 conditions = Array[ExtResource("1_i7tp7")]([SubResource("Resource_qcy11")])
 metadata/_custom_type_script = "uid://c5gfmyosppbco"

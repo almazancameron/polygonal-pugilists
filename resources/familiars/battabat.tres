@@ -11,6 +11,7 @@
 [ext_resource type="Resource" uid="uid://s4r3v0o4b4wv" path="res://resources/priority_rules/battabat_assault_rule.tres" id="5_gvy6s"]
 [ext_resource type="Resource" uid="uid://bvg5dja8gnxp" path="res://resources/techniques/frenzied_assault.tres" id="6_iw7vc"]
 [ext_resource type="Resource" uid="uid://b7kly11svcdq" path="res://resources/techniques/open_wounds.tres" id="7_rtnq6"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_0cb2x"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_weubk"]
 atlas = ExtResource("4_uporp")

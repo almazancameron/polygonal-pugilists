@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_oe2qu"]
 [ext_resource type="Resource" uid="uid://wkyqrv5tppu8" path="res://resources/priority_rules/thymoxen_rush_rule.tres" id="4_tl37m"]
 [ext_resource type="Resource" uid="uid://fb2x1amhv3ur" path="res://resources/priority_rules/thymoxen_fury_rule.tres" id="5_b0h8p"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_b0h8p"]
 [ext_resource type="Resource" uid="uid://ce4jqxd7vs6d4" path="res://resources/techniques/growing_fury.tres" id="9_uod64"]
 [ext_resource type="Resource" uid="uid://bo74yk58gd5pr" path="res://resources/techniques/meteor_rush.tres" id="10_nxowd"]
 

@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://jw3ih0604rto"]
 
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_rp6gq"]
-[ext_resource type="Resource" uid="uid://tp7yuynymg6f" path="res://resources/techniques/taste_for_blood.tres" id="2_5w0u7"]
+[ext_resource type="Resource" path="res://resources/techniques/passive_operations/taste_for_blood.tres" id="2_5w0u7"]
 [ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_rp6gq"]
 
 [resource]
 script = ExtResource("2_rp6gq")
 operation = ExtResource("2_5w0u7")
 triggers_hooks = true
+passive_name = "Taste for Blood"
 trigger = 8
 trigger_target = 0
 limiter = 1

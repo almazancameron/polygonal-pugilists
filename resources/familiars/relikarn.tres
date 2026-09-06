@@ -9,6 +9,7 @@
 [ext_resource type="Resource" uid="uid://bvk3n8x2q4wte" path="res://resources/priority_rules/relikarn_devastation_rule.tres" id="6_devastation_rule"]
 [ext_resource type="Resource" uid="uid://dj7h2nax3q5rv" path="res://resources/priority_rules/relikarn_grudge_rule.tres" id="7_grudge_rule"]
 [ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="7_sajgt"]
+[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_34o6b"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
 [ext_resource type="Resource" uid="uid://cyam2k4vw7lqe" path="res://resources/passives/reprisal.tres" id="9_reprisal"]
 

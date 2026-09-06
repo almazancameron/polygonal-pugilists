@@ -57,5 +57,11 @@ func set_status_preview_segments(segments: Array[Dictionary]) -> void:
 
 
 func _ready() -> void:
-	bar.add_theme_stylebox_override("background", bar_background_style)
-	bar.add_theme_stylebox_override("fill", bar_fill_style)
+	# Null when instantiated without per-instance style overrides authored
+	# (e.g. state_probe.gd's mock HP bars) -- add_theme_stylebox_override()
+	# requires a non-null StyleBox, so skip rather than error; the bar just
+	# falls back to the default theme in that case.
+	if bar_background_style != null:
+		bar.add_theme_stylebox_override("background", bar_background_style)
+	if bar_fill_style != null:
+		bar.add_theme_stylebox_override("fill", bar_fill_style)

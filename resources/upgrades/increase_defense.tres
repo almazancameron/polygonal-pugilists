@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ModifyStatUpgrade" format=3]
+
+[ext_resource type="Script" uid="uid://bjq6tglny5akc" path="res://scripts/upgrade/modify_stat_upgrade.gd" id="1_stat"]
+
+[resource]
+script = ExtResource("1_stat")
+stat = 2
+bonus = 2
+label = "+2 Defense"
+unique = false
+metadata/_custom_type_script = "uid://bjq6tglny5akc"

@@ -42,3 +42,28 @@ extends Resource
 ## turning "not (A and B)" into "not A and B" while the on-screen nesting
 ## reads as the former.
 @export var body_property: StringName = &""
+
+## Finds which palette definition an already-existing Condition instance was
+## (or could have been) built from -- the reverse of ConditionBlock.setup().
+## "One descriptor per sentence shape" (see this class's own top comment)
+## makes (condition_script, fixed_values) an unambiguous key back to a single
+## definition: a real Condition built from a given definition necessarily
+## carries that exact script and those exact fixed field values, and no two
+## definitions in the same palette share both. Returns null if nothing
+## matches (e.g. hand-authored content using a shape the palette doesn't
+## cover) -- the caller's job to decide what to do about that, not this.
+static func find_matching(condition: Condition, definitions: Array[ConditionBlockDefinition]) -> ConditionBlockDefinition:
+	for candidate in definitions:
+		if condition.get_script() != candidate.condition_script:
+			continue
+
+		var matches: bool = true
+		for key in candidate.fixed_values:
+			if condition.get(key) != candidate.fixed_values[key]:
+				matches = false
+				break
+
+		if matches:
+			return candidate
+
+	return null

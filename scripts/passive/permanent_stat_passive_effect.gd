@@ -14,3 +14,8 @@ extends PassiveEffect
 ## something else (e.g. "+5 Focus per Foretell stack you have") is expected
 ## eventually but deliberately deferred until a concrete passive needs it.
 @export var stat_change: ModifyStatUpgrade
+
+func _effect_phrase() -> String:
+	if stat_change == null:
+		return ""
+	return stat_change.describe()

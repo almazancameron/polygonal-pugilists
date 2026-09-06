@@ -14,5 +14,6 @@ script = ExtResource("2_lk83k")
 status_effect = 2
 field_name = &"flare_damage"
 field_bonus = 1.0
+passive_name = "Flare Damage"
 conditions = Array[ExtResource("1_t7wqm")]([SubResource("Resource_8xs0k")])
 metadata/_custom_type_script = "uid://c5gfmyosppbco"

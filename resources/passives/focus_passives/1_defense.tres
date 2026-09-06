@@ -12,4 +12,5 @@ metadata/_custom_type_script = "uid://1w4ob6may3tr"
 script = ExtResource("2_rd62v")
 stat = 2
 flat_bonus = 1
+passive_name = "Defense"
 conditions = Array[ExtResource("1_rd62v")]([SubResource("Resource_bi5l8")])
