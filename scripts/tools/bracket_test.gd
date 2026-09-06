@@ -15,6 +15,8 @@ const EXPECTED_CHECKS: Array[String] = [
 	"generate_entrants_distinct",
 	"generate_is_deterministic_per_seed",
 	"generate_rejects_wrong_roster_size",
+	"advance_round_pairs_winners",
+	"advance_through_all_rounds",
 ]
 
 var _failures: Array[String] = []
@@ -25,6 +27,8 @@ func _init() -> void:
 	_check_generate_entrants_distinct()
 	_check_generate_is_deterministic_per_seed()
 	_check_generate_rejects_wrong_roster_size()
+	_check_advance_round_pairs_winners()
+	_check_advance_through_all_rounds()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -66,6 +70,46 @@ func _check_generate_rejects_wrong_roster_size() -> void:
 	var bracket: Bracket = Bracket.generate(short_roster, _rng(3))
 	_expect(bracket == null, "generate() should return null for a roster that isn't exactly 16")
 	_done("generate_rejects_wrong_roster_size")
+
+func _check_advance_round_pairs_winners() -> void:
+	var bracket: Bracket = Bracket.generate(_roster(), _rng(7))
+
+	# Every round-1 match resolves to entrant_a, so the expected round-2
+	# pairing is (match0.a vs match1.a), (match2.a vs match3.a), ...
+	for bracket_match in bracket.rounds[0].matches:
+		bracket_match.winner = bracket_match.entrant_a
+
+	bracket.advance_round(0)
+
+	for k in range(bracket.rounds[1].matches.size()):
+		var target: BracketMatch = bracket.rounds[1].matches[k]
+		var expected_a: Familiar = bracket.rounds[0].matches[2 * k].winner
+		var expected_b: Familiar = bracket.rounds[0].matches[2 * k + 1].winner
+		_expect(target.entrant_a == expected_a,
+			"round-2 match %d entrant_a should be round-1 match %d's winner" % [k, 2 * k])
+		_expect(target.entrant_b == expected_b,
+			"round-2 match %d entrant_b should be round-1 match %d's winner" % [k, 2 * k + 1])
+		_expect(target.is_ready(), "round-2 match %d should be ready after advancing" % k)
+	_done("advance_round_pairs_winners")
+
+func _check_advance_through_all_rounds() -> void:
+	var bracket: Bracket = Bracket.generate(_roster(), _rng(8))
+
+	# Walk all three transitions, always advancing entrant_a, so the final
+	# should end up holding the very first match's entrant_a.
+	var expected_finalist: Familiar = bracket.rounds[0].matches[0].entrant_a
+
+	for round_index in range(bracket.rounds.size()):
+		for bracket_match in bracket.rounds[round_index].matches:
+			_expect(bracket_match.is_ready(), "round %d should be fully populated before resolving" % round_index)
+			bracket_match.winner = bracket_match.entrant_a
+		if round_index < bracket.rounds.size() - 1:
+			bracket.advance_round(round_index)
+
+	var final_match: BracketMatch = bracket.rounds[3].matches[0]
+	_expect(final_match.winner == expected_finalist,
+		"advancing entrant_a every round should carry match 0's entrant_a to the final")
+	_done("advance_through_all_rounds")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.

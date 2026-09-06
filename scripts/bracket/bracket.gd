@@ -54,3 +54,28 @@ static func generate(roster: Array[Familiar], rng: RandomNumberGenerator, boss: 
 		match_count = match_count / 2
 
 	return bracket
+
+## Feeds a resolved round's winners into the next round. Standard
+## single-elimination pairing: this round's match 2k supplies next
+## round's match k's entrant_a, match 2k+1 supplies its entrant_b.
+## Expressed from the source side (walk this round, write forward), which
+## keeps the caller from having to know the pairing rule at all.
+func advance_round(round_index: int) -> void:
+	if round_index < 0 or round_index >= rounds.size() - 1:
+		push_error("advance_round(%d) has no following round to fill" % round_index)
+		return
+
+	var current: BracketRound = rounds[round_index]
+	var next: BracketRound = rounds[round_index + 1]
+
+	for i in range(current.matches.size()):
+		var source: BracketMatch = current.matches[i]
+		if source.winner == null:
+			push_error("advance_round(%d): match %d has no winner yet" % [round_index, i])
+			continue
+
+		var target: BracketMatch = next.matches[i / 2]
+		if i % 2 == 0:
+			target.entrant_a = source.winner
+		else:
+			target.entrant_b = source.winner
