@@ -5,17 +5,16 @@ extends Control
 ## until one side is defeated -- both sides choose their own technique via
 ## Combatant.choose_technique(), with no manual clicking once a fight
 ## starts. A non-final win shows an upgrade choice and starts the next
-## round against opponent_lineup's next entry; the final win or any loss
+## round against the bracket's next opponent; the final win or any loss
 ## ends the run.
 ##
 ## Manual Inspector wiring required: full_roster, stat_upgrade_pool,
-## technique_reward_pool, passive_reward_pool. player_familiar_data and
-## opponent_lineup are instead randomly drawn from full_roster every time
-## _ready() runs (see _randomize_matchup()) -- a lightweight stand-in for the
-## real bracket/character-select screen GAME_DESIGN.md §9.1 eventually calls
-## for (that lets the player pick their own entrant; this is just a random
-## gauntlet in the meantime). enemy_familiar_data derives itself from
-## opponent_lineup[0] -- no separate wiring needed for it. The player's
+## technique_reward_pool, passive_reward_pool. full_roster must hold
+## exactly 16 familiars -- Bracket.generate() shuffles them into a real
+## single-elimination tree at the start of every run (see _build_bracket()),
+## replacing the random gauntlet that used to stand in for it. Matches the
+## player isn't in are simulated and scouted before their own fight, then
+## rolled to a true winner afterward (BracketResolver). The player's
 ## familiar starts on whatever priority_rules are already authored directly
 ## on its own Familiar resource -- same as any enemy -- there is no pre-fight
 ## build picker any more.
@@ -49,14 +48,24 @@ enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 ## reward sequence every run.
 @export var reward_seed: int = 0
 
-## Randomized every _ready() by _randomize_matchup() -- no meaningful
-## difficulty ordering exists among them (nothing in the current roster
-## carries a difficulty rating to order by).
-@export var opponent_lineup: Array[Familiar] = []
-@onready var enemy_familiar_data: Familiar = opponent_lineup[0] if opponent_lineup.size() > 0 else null
+## Assigned by _build_bracket()/start_next_round() from the bracket's own
+## pairings. No longer derived from a pre-authored lineup.
+var enemy_familiar_data: Familiar
 
-## Index into opponent_lineup for the fight currently in progress.
+## The run's whole tournament tree. Replaces the old opponent_lineup
+## gauntlet -- see docs/superpowers/specs/2026-09-06-tournament-bracket-design.md.
+var bracket: Bracket
+
+## Round the player is currently in, as a 0-indexed index into
+## bracket.rounds (was previously an index into opponent_lineup).
 var current_round: int = 0
+
+## Seeded per run so a round's upsets are reproducible when reward_seed is set.
+var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
+## Last round's off-screen results, reported once the player's own match
+## resolves.
+var _last_round_results: Array[Dictionary] = []
 
 ## Logs the enemy's skipped-rule reasoning to the combat log. Off by
 ## default since it's debug noise for normal play; flip on in the
@@ -215,7 +224,7 @@ func _on_begin_fight_pressed() -> void:
 ## _ready() and again by _on_restart_pressed(), so Restart is a genuinely new
 ## run rather than a full-health replay of whatever matchup just ended.
 func _start_new_run() -> void:
-	_randomize_matchup()
+	_build_bracket()
 	current_round = 0
 	_priority_rules_edited_this_round = false
 
@@ -250,14 +259,9 @@ func _start_new_run() -> void:
 	await _wait_for_pre_fight_screen(enemy, false)
 	await begin_fight("%s prepares for battle!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 
-## Draws 5 distinct familiars from the full roster -- one for the player, four
-## for opponent_lineup -- so every launch starts a different matchup instead
-## of whatever's fixed in the Inspector. Duplicates each pick: player_familiar_
-## data's priority_rules get mutated in place over the course of a run
-## (advance_to_priority_editor()), and load() caches .tres resources by path,
-## so reusing the shared object directly would corrupt the base familiar's
-## data in memory for any later pick of the same familiar within this
-## process.
+## Builds this run's bracket and puts the player in one of its round-1
+## matches. Bracket.generate() duplicates every entrant, so builds can
+## mutate in place over the run without corrupting the base .tres files.
 ##
 ## full_roster is an authored, exported list rather than a runtime directory
 ## scan of resources/familiars/ (an earlier version of this method did that,
@@ -268,21 +272,43 @@ func _start_new_run() -> void:
 ## balance_test.gd is fine relying on it since it only ever runs against the
 ## loose project; anything that has to work in an exported build (this file)
 ## can't.
-func _randomize_matchup() -> void:
-	if full_roster.is_empty():
-		push_error("full_roster is empty -- assign all familiars in the Inspector")
+##
+## The entrant choice is temporary: the character-select screen replaces
+## _auto_pick_entrant() with a real player decision.
+func _build_bracket() -> void:
+	if full_roster.size() != Bracket.ENTRANT_COUNT:
+		push_error("full_roster must hold exactly %d familiars, holds %d" % [Bracket.ENTRANT_COUNT, full_roster.size()])
 		return
 
-	var roster: Array[Familiar] = full_roster.duplicate()
-	roster.shuffle()
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
 
-	player_familiar_data = roster[0].duplicate()
+	if reward_seed != 0:
+		_bracket_rng.seed = reward_seed
+	else:
+		_bracket_rng.randomize()
 
-	opponent_lineup = []
-	for familiar in roster.slice(1, 6):
-		opponent_lineup.append(familiar.duplicate())
+	bracket = Bracket.generate(full_roster, rng)
+	_last_round_results = []
 
-	enemy_familiar_data = opponent_lineup[0]
+	# Scouted before anyone has picked a side, so all 8 round-1 matches get
+	# odds -- character select shows them while choosing. Whichever match
+	# the player then joins keeps its label but never reads it again.
+	BracketResolver.scout_round(bracket.rounds[0])
+
+	_auto_pick_entrant(rng)
+
+func _auto_pick_entrant(rng: RandomNumberGenerator) -> void:
+	var first_round: BracketRound = bracket.rounds[0]
+	var chosen: BracketMatch = first_round.matches[rng.randi_range(0, first_round.matches.size() - 1)]
+	chosen.is_player_match = true
+
+	player_familiar_data = chosen.entrant_a
+	enemy_familiar_data = chosen.entrant_b
+
+## The match the player is fighting this round.
+func player_bracket_match() -> BracketMatch:
+	return bracket.rounds[current_round].player_match()
 
 func _on_speed_toggle_pressed() -> void:
 	speed_index = (speed_index + 1) % SPEED_MULTIPLIERS.size()
@@ -324,6 +350,17 @@ func begin_reward_sequence() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
+
+	# The rest of the round's results, revealed now that the player's own
+	# match is settled. Combat-log lines rather than a dedicated reveal
+	# screen -- the visual pass that would style one is deliberately
+	# deferred behind the bracket (GAME_DESIGN.md §10).
+	for result in _last_round_results:
+		var upset_note: String = " (UPSET)" if result.was_upset else ""
+		combat_log.add_entry("%s defeats %s.%s" % [
+			result.winner.familiar_name, result.loser.familiar_name, upset_note
+		], CombatLog.Source.PLAYER)
+	_last_round_results = []
 
 	begin_phase_b()
 
@@ -707,7 +744,7 @@ func check_victory() -> bool:
 		combat_log.add_entry(engine.battle_end_enemy_message, CombatLog.Source.ENEMY)
 
 	if engine.winner == player:
-		if current_round < opponent_lineup.size() - 1:
+		if current_round < bracket.rounds.size() - 1:
 			combat_log.add_entry("Victory! %s is defeated. Prepare for the next round!" % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
 
 			await get_tree().create_timer(1.5).timeout
@@ -721,6 +758,15 @@ func check_victory() -> bool:
 		return true
 
 	phase = Phase.BATTLE_OVER
+
+	# Record the elimination in the bracket before the run ends. Nothing
+	# else in this round needs resolving -- single elimination means the
+	# run is over the moment the player loses (GAME_DESIGN.md §9.5).
+	var lost_match: BracketMatch = player_bracket_match()
+	if lost_match != null:
+		lost_match.winner = enemy_familiar_data
+		lost_match.revealed = true
+
 	combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
 	await get_tree().create_timer(2.5).timeout
 	show_game_over("Defeat! %s has fallen." % player.familiar.familiar_name)
@@ -746,8 +792,31 @@ func _on_restart_pressed() -> void:
 ## only resumes once that whole sequence resolves into
 ## advance_to_priority_editor()/begin_fight().
 func start_next_round() -> void:
+	# Record the player's own win, then roll every other match in this
+	# round to its true winner (which may upset the simulated favourite)
+	# before advancing -- advance_round() needs every match resolved.
+	var finished_match: BracketMatch = player_bracket_match()
+	if finished_match != null:
+		finished_match.winner = player_familiar_data
+		finished_match.revealed = true
+
+	_last_round_results = BracketResolver.resolve_round(
+		bracket.rounds[current_round], current_round + 1,
+		technique_reward_pool, passive_reward_pool, _bracket_rng)
+
+	bracket.advance_round(current_round)
 	current_round += 1
-	enemy_familiar_data = opponent_lineup[current_round]
+
+	# The player advances into whichever next-round match now holds them.
+	for bracket_match in bracket.rounds[current_round].matches:
+		if bracket_match.has_entrant(player_familiar_data):
+			bracket_match.is_player_match = true
+			break
+
+	var next_match: BracketMatch = bracket.rounds[current_round].player_match()
+	enemy_familiar_data = next_match.other_entrant(player_familiar_data)
+
+	BracketResolver.scout_round(bracket.rounds[current_round])
 
 	begin_reward_sequence()
 

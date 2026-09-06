@@ -20,6 +20,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"odds_boundaries",
 	"simulate_produces_winner_and_margin",
 	"ai_drafter_grows_a_build",
+	"resolver_scouts_and_resolves",
 ]
 
 var _failures: Array[String] = []
@@ -35,6 +36,7 @@ func _init() -> void:
 	_check_odds_boundaries()
 	_check_simulate_produces_winner_and_margin()
 	_check_ai_drafter_grows_a_build()
+	_check_resolver_scouts_and_resolves()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -193,6 +195,39 @@ func _check_ai_drafter_grows_a_build() -> void:
 	_expect(AIDrafter.lowest_stat(hp_starved) == Familiar.Stat.MAX_HP,
 		"a familiar at the bottom of the HP range with everything else maxed should get HP")
 	_done("ai_drafter_grows_a_build")
+
+func _check_resolver_scouts_and_resolves() -> void:
+	var bracket: Bracket = Bracket.generate(_roster(), _rng(21))
+	bracket.rounds[0].matches[0].is_player_match = true
+
+	BracketResolver.scout_round(bracket.rounds[0])
+
+	_expect(bracket.rounds[0].matches[0].odds_label == "",
+		"the player's own match should never be scouted")
+	for bracket_match in bracket.rounds[0].other_matches():
+		_expect(bracket_match.odds_label != "", "every off-screen match should be scouted")
+		_expect(not bracket_match.revealed, "scouting must not resolve a match")
+		_expect(bracket_match.winner == null, "scouting must not pick a winner")
+
+	var technique_pool: Array[Technique] = []
+	var passive_pool: Array[PassiveEffect] = []
+	for other in _roster():
+		for technique in other.techniques:
+			if technique not in technique_pool:
+				technique_pool.append(technique)
+		for passive in other.passives:
+			if passive not in passive_pool:
+				passive_pool.append(passive)
+
+	var results: Array[Dictionary] = BracketResolver.resolve_round(
+		bracket.rounds[0], 1, technique_pool, passive_pool, _rng(22))
+
+	_expect(results.size() == 7, "7 off-screen matches should resolve, got %d" % results.size())
+	for bracket_match in bracket.rounds[0].other_matches():
+		_expect(bracket_match.revealed, "every off-screen match should be revealed after resolving")
+		_expect(bracket_match.winner != null, "every resolved match needs a winner")
+		_expect(bracket_match.has_entrant(bracket_match.winner), "the winner must be one of the entrants")
+	_done("resolver_scouts_and_resolves")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.
