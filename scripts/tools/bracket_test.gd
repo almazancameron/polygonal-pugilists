@@ -17,6 +17,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"generate_rejects_wrong_roster_size",
 	"advance_round_pairs_winners",
 	"advance_through_all_rounds",
+	"odds_boundaries",
 ]
 
 var _failures: Array[String] = []
@@ -29,6 +30,7 @@ func _init() -> void:
 	_check_generate_rejects_wrong_roster_size()
 	_check_advance_round_pairs_winners()
 	_check_advance_through_all_rounds()
+	_check_odds_boundaries()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -110,6 +112,27 @@ func _check_advance_through_all_rounds() -> void:
 	_expect(final_match.winner == expected_finalist,
 		"advancing entrant_a every round should carry match 0's entrant_a to the final")
 	_done("advance_through_all_rounds")
+
+func _check_odds_boundaries() -> void:
+	_expect(is_equal_approx(BracketOdds.margin(1.0, 0.0), 1.0), "a full-HP win over a dead opponent is margin 1.0")
+	_expect(is_equal_approx(BracketOdds.margin(0.05, 0.0), 0.05), "a razor-thin win is a small margin")
+	_expect(is_equal_approx(BracketOdds.margin(0.2, 0.9), 0.0), "margin never goes negative")
+
+	_expect(is_equal_approx(BracketOdds.advance_probability(0.0), 0.5), "margin 0 is a coin flip")
+	_expect(is_equal_approx(BracketOdds.advance_probability(1.0), 1.0), "margin 1 is a lock")
+	_expect(is_equal_approx(BracketOdds.advance_probability(0.5), 0.75), "margin 0.5 is 75%")
+
+	_expect(BracketOdds.winner_label(0.95) == "Heavy Favorite", "0.95 is a heavy favorite")
+	_expect(BracketOdds.winner_label(0.90) == "Heavy Favorite", "0.90 is the heavy-favorite boundary")
+	_expect(BracketOdds.winner_label(0.80) == "Favorite", "0.80 is a favorite")
+	_expect(BracketOdds.winner_label(0.70) == "Favorite", "0.70 is the favorite boundary")
+	_expect(BracketOdds.winner_label(0.69) == "Toss-up", "just under 0.70 is a toss-up")
+	_expect(BracketOdds.winner_label(0.50) == "Toss-up", "an even match is a toss-up")
+
+	_expect(BracketOdds.loser_label(0.95) == "Heavy Underdog", "the other side of a heavy favorite")
+	_expect(BracketOdds.loser_label(0.80) == "Underdog", "the other side of a favorite")
+	_expect(BracketOdds.loser_label(0.50) == "Toss-up", "both sides of an even match read the same")
+	_done("odds_boundaries")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.
