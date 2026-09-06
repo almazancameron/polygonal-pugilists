@@ -18,6 +18,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"advance_round_pairs_winners",
 	"advance_through_all_rounds",
 	"odds_boundaries",
+	"simulate_produces_winner_and_margin",
 ]
 
 var _failures: Array[String] = []
@@ -31,6 +32,7 @@ func _init() -> void:
 	_check_advance_round_pairs_winners()
 	_check_advance_through_all_rounds()
 	_check_odds_boundaries()
+	_check_simulate_produces_winner_and_margin()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -133,6 +135,24 @@ func _check_odds_boundaries() -> void:
 	_expect(BracketOdds.loser_label(0.80) == "Underdog", "the other side of a favorite")
 	_expect(BracketOdds.loser_label(0.50) == "Toss-up", "both sides of an even match read the same")
 	_done("odds_boundaries")
+
+func _check_simulate_produces_winner_and_margin() -> void:
+	var roster: Array[Familiar] = _roster()
+	var a: Familiar = roster[0]
+	var b: Familiar = roster[1]
+
+	var result: Dictionary = BracketSimulator.simulate(a, b)
+
+	_expect(result.winner != null, "simulate() must always name a winner, even on a stalemate")
+	_expect(result.loser != null, "simulate() must always name a loser")
+	_expect(result.winner != result.loser, "winner and loser must differ")
+	_expect(result.winner == a or result.winner == b, "winner must be one of the two entrants")
+	_expect(result.margin >= 0.0 and result.margin <= 1.0, "margin must be 0..1, got %f" % result.margin)
+
+	# The real entrants must be untouched -- simulate() runs on Combatants
+	# built from them, and must never mutate the Familiar resources.
+	_expect(a.max_hp > 0 and b.max_hp > 0, "simulate() must not damage the source familiars")
+	_done("simulate_produces_winner_and_margin")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.
