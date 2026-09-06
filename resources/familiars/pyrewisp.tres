@@ -1,17 +1,35 @@
-[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://c86i6s1pi3tmf"]
+[gd_resource type="Resource" script_class="Familiar" format=3]
 
-[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_0bsjx"]
-[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_p6wjp"]
-[ext_resource type="Resource" uid="uid://bvps2wwuwohia" path="res://resources/passives/cursed_barrier.tres" id="2_p6wjp"]
-[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="3_s0pd0"]
-[ext_resource type="Resource" uid="uid://be5ocs1uxbtyr" path="res://resources/priority_rules/pyrewisp_veil_rule.tres" id="4_70sdq"]
-[ext_resource type="Resource" uid="uid://cbyqy5artskww" path="res://resources/priority_rules/pyrewisp_siphon_rule.tres" id="5_rorp7"]
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="6_o55iy"]
-[ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="7_drb5n"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="8_54u21"]
-[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_s0pd0"]
-[ext_resource type="Resource" uid="uid://o5mvjov4noxb" path="res://resources/techniques/inferno_veil.tres" id="9_7bs6u"]
-[ext_resource type="Resource" uid="uid://c7ld5tc4682sw" path="res://resources/techniques/siphon_energy.tres" id="10_72qbh"]
+[ext_resource type="Script" path="res://scripts/passive/passive_effect.gd" id="1_0bsjx"]
+[ext_resource type="Resource" path="res://resources/focus_tables/focus_table.tres" id="1_p6wjp"]
+[ext_resource type="Resource" path="res://resources/passives/cursed_barrier.tres" id="2_p6wjp"]
+[ext_resource type="Script" path="res://scripts/priority_rule.gd" id="3_s0pd0"]
+[ext_resource type="Resource" path="res://resources/priority_rules/pyrewisp_veil_rule.tres" id="4_70sdq"]
+[ext_resource type="Resource" path="res://resources/priority_rules/pyrewisp_siphon_rule.tres" id="5_rorp7"]
+[ext_resource type="Script" path="res://scripts/familiar.gd" id="6_o55iy"]
+[ext_resource type="Texture2D" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="7_drb5n"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="8_54u21"]
+[ext_resource type="Script" path="res://scripts/reward/tag_affinity.gd" id="8_s0pd0"]
+[ext_resource type="Resource" path="res://resources/techniques/inferno_veil.tres" id="9_7bs6u"]
+[ext_resource type="Resource" path="res://resources/techniques/siphon_energy.tres" id="10_72qbh"]
+
+[sub_resource type="Resource" id="Resource_s0pd0"]
+script = ExtResource("8_s0pd0")
+tag = 13
+weight = 3
+
+[sub_resource type="Resource" id="Resource_70sdq"]
+script = ExtResource("8_s0pd0")
+tag = 14
+weight = 2
+
+[sub_resource type="Resource" id="Resource_rorp7"]
+script = ExtResource("8_s0pd0")
+tag = 26
+
+[sub_resource type="Resource" id="Resource_o55iy"]
+script = ExtResource("8_s0pd0")
+tag = 24
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3060o"]
 atlas = ExtResource("7_drb5n")
@@ -26,4 +44,5 @@ techniques = Array[ExtResource("8_54u21")]([ExtResource("9_7bs6u"), ExtResource(
 priority_rules = Array[ExtResource("3_s0pd0")]([ExtResource("4_70sdq"), ExtResource("5_rorp7")])
 passives = Array[ExtResource("1_0bsjx")]([ExtResource("2_p6wjp")])
 focus_table = ExtResource("1_p6wjp")
+species_affinities = Array[ExtResource("8_s0pd0")]([SubResource("Resource_s0pd0"), SubResource("Resource_70sdq"), SubResource("Resource_rorp7"), SubResource("Resource_o55iy")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

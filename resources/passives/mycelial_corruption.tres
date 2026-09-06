@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://dn5yskvrihd8q"]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
 
-[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
-[ext_resource type="Resource" uid="uid://cvh5humaxtesu" path="res://resources/techniques/passive_operations/mycelial_corruption.tres" id="2_technique"]
-[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="3_condition"]
-[ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="4_statuscond"]
+[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
+[ext_resource type="Resource" path="res://resources/techniques/passive_operations/mycelial_corruption.tres" id="2_technique"]
+[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="3_condition"]
+[ext_resource type="Script" path="res://scripts/condition/status_comparison_condition.gd" id="4_statuscond"]
 
 [sub_resource type="Resource" id="Resource_enemy_infested"]
 script = ExtResource("4_statuscond")
@@ -20,4 +20,6 @@ passive_name = "Mycelial Corruption"
 trigger = 5
 trigger_target = 0
 conditions = Array[ExtResource("3_condition")]([SubResource("Resource_enemy_infested")])
+tags = Array[int]([7, 2, 24])
+role_control = 2
 metadata/_custom_type_script = "uid://c4jawah678pod"

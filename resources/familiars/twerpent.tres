@@ -1,17 +1,33 @@
-[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://bgocjaty20glq"]
+[gd_resource type="Resource" script_class="Familiar" format=3]
 
-[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_5uf1g"]
-[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_arq6n"]
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_femnv"]
-[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_rg152"]
-[ext_resource type="Resource" uid="uid://bmnv4slv3lf0h" path="res://resources/passives/venomous_rhythm.tres" id="2_57m2e"]
-[ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="2_v3lvr"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="3_jfx6b"]
-[ext_resource type="Resource" uid="uid://cwyrhd2s3rooj" path="res://resources/priority_rules/twerpent_pulse_rule.tres" id="4_57m2e"]
-[ext_resource type="Resource" uid="uid://db1f2a6tuwo0d" path="res://resources/priority_rules/twerpent_fang_rule.tres" id="5_rg152"]
-[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_ak23r"]
-[ext_resource type="Resource" uid="uid://c57i335kerhra" path="res://resources/techniques/serpent_fang.tres" id="8_rg152"]
-[ext_resource type="Resource" uid="uid://cofuibiikbrun" path="res://resources/techniques/venom_pulse.tres" id="9_ak23r"]
+[ext_resource type="Script" path="res://scripts/priority_rule.gd" id="1_5uf1g"]
+[ext_resource type="Script" path="res://scripts/passive/passive_effect.gd" id="1_arq6n"]
+[ext_resource type="Script" path="res://scripts/familiar.gd" id="1_femnv"]
+[ext_resource type="Resource" path="res://resources/focus_tables/focus_table.tres" id="1_rg152"]
+[ext_resource type="Resource" path="res://resources/passives/venomous_rhythm.tres" id="2_57m2e"]
+[ext_resource type="Texture2D" path="res://assets/sprites/actors/SpriteSheet2.png" id="2_v3lvr"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="3_jfx6b"]
+[ext_resource type="Resource" path="res://resources/priority_rules/twerpent_pulse_rule.tres" id="4_57m2e"]
+[ext_resource type="Resource" path="res://resources/priority_rules/twerpent_fang_rule.tres" id="5_rg152"]
+[ext_resource type="Script" path="res://scripts/reward/tag_affinity.gd" id="8_ak23r"]
+[ext_resource type="Resource" path="res://resources/techniques/serpent_fang.tres" id="8_rg152"]
+[ext_resource type="Resource" path="res://resources/techniques/venom_pulse.tres" id="9_ak23r"]
+
+[sub_resource type="Resource" id="Resource_ak23r"]
+script = ExtResource("8_ak23r")
+weight = 3
+
+[sub_resource type="Resource" id="Resource_6gypa"]
+script = ExtResource("8_ak23r")
+tag = 10
+
+[sub_resource type="Resource" id="Resource_47fbl"]
+script = ExtResource("8_ak23r")
+tag = 24
+
+[sub_resource type="Resource" id="Resource_7twel"]
+script = ExtResource("8_ak23r")
+tag = 27
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a12nh"]
 atlas = ExtResource("2_v3lvr")
@@ -30,3 +46,4 @@ techniques = Array[ExtResource("3_jfx6b")]([ExtResource("8_rg152"), ExtResource(
 priority_rules = Array[ExtResource("1_5uf1g")]([ExtResource("4_57m2e"), ExtResource("5_rg152")])
 passives = Array[ExtResource("1_arq6n")]([ExtResource("2_57m2e")])
 focus_table = ExtResource("1_rg152")
+species_affinities = Array[ExtResource("8_ak23r")]([SubResource("Resource_ak23r"), SubResource("Resource_6gypa"), SubResource("Resource_47fbl"), SubResource("Resource_7twel")])

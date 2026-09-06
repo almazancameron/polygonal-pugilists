@@ -1,16 +1,19 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://bvps2wwuwohia"]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
 
-[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_vvb2u"]
+[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_vvb2u"]
 [ext_resource type="Resource" path="res://resources/techniques/passive_operations/cursed_barrier.tres" id="2_lyaeh"]
-[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_vvb2u"]
+[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="2_vvb2u"]
 
 [resource]
 script = ExtResource("2_vvb2u")
-passive_name = "Cursed Barrier"
 operation = ExtResource("2_lyaeh")
 triggers_hooks = true
+passive_name = "Cursed Barrier"
 trigger = 2
 trigger_target = 0
 status_effect_filter = 15
 limiter = 1
+tags = Array[int]([13, 14, 24, 27])
+role_defense = 1
+role_control = 2
 metadata/_custom_type_script = "uid://c4jawah678pod"

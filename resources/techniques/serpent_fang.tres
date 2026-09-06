@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://c57i335kerhra"]
+[gd_resource type="Resource" script_class="Technique" format=3]
 
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_jgiu0"]
-[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_u2a78"]
-[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_q3u1o"]
-[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="4_csywg"]
-[ext_resource type="Script" uid="uid://1kkotxxun3j" path="res://scripts/technique/status_application_action.gd" id="5_y1c5q"]
-[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="6_um4ol"]
-[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_a4b6f"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="1_jgiu0"]
+[ext_resource type="Script" path="res://scripts/technique/technique_step_group.gd" id="2_u2a78"]
+[ext_resource type="Script" path="res://scripts/technique/technique_action.gd" id="3_q3u1o"]
+[ext_resource type="Script" path="res://scripts/technique/hit_action.gd" id="4_csywg"]
+[ext_resource type="Script" path="res://scripts/technique/status_application_action.gd" id="5_y1c5q"]
+[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="6_um4ol"]
+[ext_resource type="Script" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="7_a4b6f"]
 
 [sub_resource type="Resource" id="Resource_i4xnr"]
 script = ExtResource("4_csywg")
@@ -29,4 +29,6 @@ script = ExtResource("1_jgiu0")
 technique_name = "Serpent Fang"
 power_multiplier = 0.667
 step_groups = Array[ExtResource("2_u2a78")]([SubResource("Resource_hqkok")])
+tags = Array[int]([0, 24])
+role_offense = 2
 metadata/_custom_type_script = "uid://bp4gbg2w2sdur"

@@ -1,17 +1,35 @@
-[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://cgi3li0cihksq"]
+[gd_resource type="Resource" script_class="Familiar" format=3]
 
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_00pm7"]
-[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="1_kn4wb"]
-[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_tj0wc"]
-[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_wpb83"]
-[ext_resource type="Texture2D" uid="uid://dws2vld8hmo01" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="2_iskl7"]
-[ext_resource type="Resource" uid="uid://dqr8x2mkf70p" path="res://resources/passives/corrosive_growth.tres" id="2_xwf4l"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="3_kn4wb"]
-[ext_resource type="Resource" uid="uid://di032vu67r5kt" path="res://resources/priority_rules/guubal_reclaim_rule.tres" id="4_wpb83"]
-[ext_resource type="Resource" uid="uid://bfjju3nkr50x2" path="res://resources/priority_rules/guubal_corrosive_rule.tres" id="4_xwf4l"]
-[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_gl1u3"]
-[ext_resource type="Resource" uid="uid://hcbpxomwrm58" path="res://resources/techniques/corrosive_ooze.tres" id="8_wpb83"]
-[ext_resource type="Resource" uid="uid://bxbtbn23rxcuk" path="res://resources/techniques/reclaim_byproducts.tres" id="12_gl1u3"]
+[ext_resource type="Script" path="res://scripts/familiar.gd" id="1_00pm7"]
+[ext_resource type="Script" path="res://scripts/priority_rule.gd" id="1_kn4wb"]
+[ext_resource type="Script" path="res://scripts/passive/passive_effect.gd" id="1_tj0wc"]
+[ext_resource type="Resource" path="res://resources/focus_tables/focus_table.tres" id="1_wpb83"]
+[ext_resource type="Texture2D" path="res://assets/sprites/actors/8bitMonsterSpriteSheet.png" id="2_iskl7"]
+[ext_resource type="Resource" path="res://resources/passives/corrosive_growth.tres" id="2_xwf4l"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="3_kn4wb"]
+[ext_resource type="Resource" path="res://resources/priority_rules/guubal_reclaim_rule.tres" id="4_wpb83"]
+[ext_resource type="Resource" path="res://resources/priority_rules/guubal_corrosive_rule.tres" id="4_xwf4l"]
+[ext_resource type="Script" path="res://scripts/reward/tag_affinity.gd" id="8_gl1u3"]
+[ext_resource type="Resource" path="res://resources/techniques/corrosive_ooze.tres" id="8_wpb83"]
+[ext_resource type="Resource" path="res://resources/techniques/reclaim_byproducts.tres" id="12_gl1u3"]
+
+[sub_resource type="Resource" id="Resource_gl1u3"]
+script = ExtResource("8_gl1u3")
+tag = 2
+weight = 3
+
+[sub_resource type="Resource" id="Resource_ourkk"]
+script = ExtResource("8_gl1u3")
+tag = 15
+
+[sub_resource type="Resource" id="Resource_0krqc"]
+script = ExtResource("8_gl1u3")
+tag = 27
+weight = 2
+
+[sub_resource type="Resource" id="Resource_w5vup"]
+script = ExtResource("8_gl1u3")
+tag = 24
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m4hsq"]
 atlas = ExtResource("2_iskl7")
@@ -28,4 +46,5 @@ techniques = Array[ExtResource("3_kn4wb")]([ExtResource("8_wpb83"), ExtResource(
 priority_rules = Array[ExtResource("1_kn4wb")]([ExtResource("4_wpb83"), ExtResource("4_xwf4l")])
 passives = Array[ExtResource("1_tj0wc")]([ExtResource("2_xwf4l")])
 focus_table = ExtResource("1_wpb83")
+species_affinities = Array[ExtResource("8_gl1u3")]([SubResource("Resource_gl1u3"), SubResource("Resource_ourkk"), SubResource("Resource_0krqc"), SubResource("Resource_w5vup")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

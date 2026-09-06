@@ -1,17 +1,35 @@
-[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://btyk8x5euimxt"]
+[gd_resource type="Resource" script_class="Familiar" format=3]
 
-[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_7pfhb"]
-[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="1_vxrvf"]
-[ext_resource type="Resource" uid="uid://cnfsveqgv4w63" path="res://resources/passives/gavel_drop.tres" id="2_5xp8o"]
-[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_ddch2"]
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="3_b2t2l"]
-[ext_resource type="Resource" uid="uid://wyp1qri7t1rd" path="res://resources/priority_rules/mallegrav_wind_up_rule.tres" id="3_cstek"]
-[ext_resource type="Resource" uid="uid://cduxxxqksw2es" path="res://resources/priority_rules/mallegrav_concussive_rule.tres" id="4_5xp8o"]
-[ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="4_ddch2"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="4_mn566"]
-[ext_resource type="Resource" uid="uid://c5g2lr1w6q6l5" path="res://resources/techniques/concussive_blow.tres" id="8_7pfhb"]
-[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_ahacj"]
-[ext_resource type="Resource" uid="uid://cr01t1lg378wu" path="res://resources/techniques/wind_up_strike.tres" id="9_ahacj"]
+[ext_resource type="Resource" path="res://resources/focus_tables/focus_table.tres" id="1_7pfhb"]
+[ext_resource type="Script" path="res://scripts/passive/passive_effect.gd" id="1_vxrvf"]
+[ext_resource type="Resource" path="res://resources/passives/gavel_drop.tres" id="2_5xp8o"]
+[ext_resource type="Script" path="res://scripts/priority_rule.gd" id="2_ddch2"]
+[ext_resource type="Script" path="res://scripts/familiar.gd" id="3_b2t2l"]
+[ext_resource type="Resource" path="res://resources/priority_rules/mallegrav_wind_up_rule.tres" id="3_cstek"]
+[ext_resource type="Resource" path="res://resources/priority_rules/mallegrav_concussive_rule.tres" id="4_5xp8o"]
+[ext_resource type="Texture2D" path="res://assets/sprites/actors/SpriteSheet3.png" id="4_ddch2"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="4_mn566"]
+[ext_resource type="Resource" path="res://resources/techniques/concussive_blow.tres" id="8_7pfhb"]
+[ext_resource type="Script" path="res://scripts/reward/tag_affinity.gd" id="8_ahacj"]
+[ext_resource type="Resource" path="res://resources/techniques/wind_up_strike.tres" id="9_ahacj"]
+
+[sub_resource type="Resource" id="Resource_ahacj"]
+script = ExtResource("8_ahacj")
+tag = 4
+weight = 3
+
+[sub_resource type="Resource" id="Resource_jx1e2"]
+script = ExtResource("8_ahacj")
+tag = 8
+
+[sub_resource type="Resource" id="Resource_moe6w"]
+script = ExtResource("8_ahacj")
+tag = 37
+weight = 2
+
+[sub_resource type="Resource" id="Resource_xvlnh"]
+script = ExtResource("8_ahacj")
+tag = 24
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_meeeb"]
 atlas = ExtResource("4_ddch2")
@@ -30,4 +48,5 @@ techniques = Array[ExtResource("4_mn566")]([ExtResource("8_7pfhb"), ExtResource(
 priority_rules = Array[ExtResource("2_ddch2")]([ExtResource("3_cstek"), ExtResource("4_5xp8o")])
 passives = Array[ExtResource("1_vxrvf")]([ExtResource("2_5xp8o")])
 focus_table = ExtResource("1_7pfhb")
+species_affinities = Array[ExtResource("8_ahacj")]([SubResource("Resource_ahacj"), SubResource("Resource_jx1e2"), SubResource("Resource_moe6w"), SubResource("Resource_xvlnh")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

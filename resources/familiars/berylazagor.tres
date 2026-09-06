@@ -1,17 +1,36 @@
-[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://cberyla0agor1"]
+[gd_resource type="Resource" script_class="Familiar" format=3]
 
-[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_0tyao"]
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_familiar"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="2_technique"]
-[ext_resource type="Resource" uid="uid://dmonstrendur1" path="res://resources/techniques/monstrous_endurance.tres" id="3_endurance"]
-[ext_resource type="Resource" uid="uid://dgnashingmaw1" path="res://resources/techniques/gnashing_maw.tres" id="4_gnashing"]
-[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="5_rule"]
-[ext_resource type="Resource" uid="uid://l35avd3o1pk5" path="res://resources/priority_rules/berylazagor_endurance_rule.tres" id="6_endurance_rule"]
-[ext_resource type="Texture2D" uid="uid://bjsvca4iapmxd" path="res://assets/sprites/actors/SpriteSheet3.png" id="7_1jebp"]
-[ext_resource type="Resource" uid="uid://bberylgnashr1" path="res://resources/priority_rules/berylazagor_gnashing_rule.tres" id="7_gnashing_rule"]
-[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_edg5d"]
-[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
-[ext_resource type="Resource" uid="uid://djpmx7cqn4i3g" path="res://resources/passives/malignant_vitality.tres" id="9_malignant"]
+[ext_resource type="Resource" path="res://resources/focus_tables/focus_table.tres" id="1_0tyao"]
+[ext_resource type="Script" path="res://scripts/familiar.gd" id="1_familiar"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="2_technique"]
+[ext_resource type="Resource" path="res://resources/techniques/monstrous_endurance.tres" id="3_endurance"]
+[ext_resource type="Resource" path="res://resources/techniques/gnashing_maw.tres" id="4_gnashing"]
+[ext_resource type="Script" path="res://scripts/priority_rule.gd" id="5_rule"]
+[ext_resource type="Resource" path="res://resources/priority_rules/berylazagor_endurance_rule.tres" id="6_endurance_rule"]
+[ext_resource type="Texture2D" path="res://assets/sprites/actors/SpriteSheet3.png" id="7_1jebp"]
+[ext_resource type="Resource" path="res://resources/priority_rules/berylazagor_gnashing_rule.tres" id="7_gnashing_rule"]
+[ext_resource type="Script" path="res://scripts/reward/tag_affinity.gd" id="8_edg5d"]
+[ext_resource type="Script" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Resource" path="res://resources/passives/malignant_vitality.tres" id="9_malignant"]
+
+[sub_resource type="Resource" id="Resource_edg5d"]
+script = ExtResource("8_edg5d")
+tag = 21
+weight = 3
+
+[sub_resource type="Resource" id="Resource_k7cvn"]
+script = ExtResource("8_edg5d")
+tag = 20
+weight = 2
+
+[sub_resource type="Resource" id="Resource_jyl62"]
+script = ExtResource("8_edg5d")
+tag = 23
+
+[sub_resource type="Resource" id="Resource_421km"]
+script = ExtResource("8_edg5d")
+tag = 41
+weight = 2
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dd63g"]
 atlas = ExtResource("7_1jebp")
@@ -27,4 +46,5 @@ techniques = Array[ExtResource("2_technique")]([ExtResource("3_endurance"), ExtR
 priority_rules = Array[ExtResource("5_rule")]([ExtResource("6_endurance_rule"), ExtResource("7_gnashing_rule")])
 passives = Array[ExtResource("8_passive")]([ExtResource("9_malignant")])
 focus_table = ExtResource("1_0tyao")
+species_affinities = Array[ExtResource("8_edg5d")]([SubResource("Resource_edg5d"), SubResource("Resource_k7cvn"), SubResource("Resource_jyl62"), SubResource("Resource_421km")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"

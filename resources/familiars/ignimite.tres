@@ -1,17 +1,36 @@
-[gd_resource type="Resource" script_class="Familiar" format=3 uid="uid://cignimitefam1"]
+[gd_resource type="Resource" script_class="Familiar" format=3]
 
-[ext_resource type="Resource" uid="uid://f0jskvgqth6h" path="res://resources/focus_tables/focus_table.tres" id="1_52igu"]
-[ext_resource type="Script" uid="uid://b1kdmxw6dtrow" path="res://scripts/familiar.gd" id="1_familiar"]
-[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="2_technique"]
-[ext_resource type="Resource" uid="uid://cr0l5xod8ghtu" path="res://resources/techniques/mutual_combustion.tres" id="3_combustion"]
-[ext_resource type="Resource" uid="uid://dextinguish1" path="res://resources/techniques/extinguish.tres" id="4_extinguish"]
-[ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="5_rule"]
-[ext_resource type="Resource" uid="uid://bignextrule1" path="res://resources/priority_rules/ignimite_extinguish_rule.tres" id="6_extinguish_rule"]
-[ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="7_2lfq5"]
-[ext_resource type="Resource" uid="uid://dsksf4fr4ttte" path="res://resources/priority_rules/ignimite_combustion_rule.tres" id="7_combustion_rule"]
-[ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_l06q8"]
-[ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
-[ext_resource type="Resource" uid="uid://cproteanpasv1" path="res://resources/passives/protean_purge.tres" id="9_protean"]
+[ext_resource type="Resource" path="res://resources/focus_tables/focus_table.tres" id="1_52igu"]
+[ext_resource type="Script" path="res://scripts/familiar.gd" id="1_familiar"]
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="2_technique"]
+[ext_resource type="Resource" path="res://resources/techniques/mutual_combustion.tres" id="3_combustion"]
+[ext_resource type="Resource" path="res://resources/techniques/extinguish.tres" id="4_extinguish"]
+[ext_resource type="Script" path="res://scripts/priority_rule.gd" id="5_rule"]
+[ext_resource type="Resource" path="res://resources/priority_rules/ignimite_extinguish_rule.tres" id="6_extinguish_rule"]
+[ext_resource type="Texture2D" path="res://assets/sprites/actors/SpriteSheet2.png" id="7_2lfq5"]
+[ext_resource type="Resource" path="res://resources/priority_rules/ignimite_combustion_rule.tres" id="7_combustion_rule"]
+[ext_resource type="Script" path="res://scripts/reward/tag_affinity.gd" id="8_l06q8"]
+[ext_resource type="Script" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
+[ext_resource type="Resource" path="res://resources/passives/protean_purge.tres" id="9_protean"]
+
+[sub_resource type="Resource" id="Resource_l06q8"]
+script = ExtResource("8_l06q8")
+tag = 1
+weight = 2
+
+[sub_resource type="Resource" id="Resource_s8a3v"]
+script = ExtResource("8_l06q8")
+tag = 22
+weight = 2
+
+[sub_resource type="Resource" id="Resource_gd3wm"]
+script = ExtResource("8_l06q8")
+tag = 27
+weight = 2
+
+[sub_resource type="Resource" id="Resource_k6x7y"]
+script = ExtResource("8_l06q8")
+tag = 32
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_edg5d"]
 atlas = ExtResource("7_2lfq5")
@@ -27,4 +46,5 @@ techniques = Array[ExtResource("2_technique")]([ExtResource("3_combustion"), Ext
 priority_rules = Array[ExtResource("5_rule")]([ExtResource("6_extinguish_rule"), ExtResource("7_combustion_rule")])
 passives = Array[ExtResource("8_passive")]([ExtResource("9_protean")])
 focus_table = ExtResource("1_52igu")
+species_affinities = Array[ExtResource("8_l06q8")]([SubResource("Resource_l06q8"), SubResource("Resource_s8a3v"), SubResource("Resource_gd3wm"), SubResource("Resource_k6x7y")])
 metadata/_custom_type_script = "uid://b1kdmxw6dtrow"
