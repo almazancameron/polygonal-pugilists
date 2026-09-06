@@ -14,10 +14,11 @@ const ENTRANT_COUNT: int = 16
 ## a seeded run reproduces the same bracket exactly -- the same reasoning
 ## RewardSelector already uses for its own draws.
 ##
-## Every entrant is duplicated: builds mutate in place across a run (the
-## player's via the reward screen, the AI's via AIDrafter) and load()
-## caches .tres by path, so sharing the base objects would corrupt them
-## for the rest of the process.
+## Every entrant goes through duplicate_for_run(), not a plain
+## duplicate(): builds mutate in place across a run (the player's via the
+## reward screen, the AI's via AIDrafter) and load() caches .tres by path,
+## and a plain duplicate() shares its Array properties with the original
+## -- see Familiar.duplicate_for_run() for why that isn't enough.
 static func generate(roster: Array[Familiar], rng: RandomNumberGenerator, boss: Familiar = null) -> Bracket:
 	if roster.size() != ENTRANT_COUNT:
 		push_error("Bracket.generate() needs exactly %d entrants, got %d" % [ENTRANT_COUNT, roster.size()])
@@ -25,7 +26,7 @@ static func generate(roster: Array[Familiar], rng: RandomNumberGenerator, boss: 
 
 	var entrants: Array[Familiar] = []
 	for familiar in roster:
-		entrants.append(familiar.duplicate())
+		entrants.append(familiar.duplicate_for_run())
 
 	# Fisher-Yates against the injected rng.
 	for i in range(entrants.size() - 1, 0, -1):

@@ -32,6 +32,30 @@ enum Stat { MAX_HP, POWER, DEFENSE, SPEED, FOCUS }
 ## equipped techniques/passives instead -- see BuildSnapshot.
 @export var species_affinities: Array[TagAffinity] = []
 
+## A copy safe to mutate for one run's worth of build growth.
+##
+## Resource.duplicate() is NOT enough on its own: it copies scalars by
+## value but hands the copy the *same* Array objects the original holds,
+## so `copy.techniques.append(...)` also grows the base .tres -- which
+## load() caches by path, meaning every later run in the same process
+## inherits the previous run's upgrades. Verified empirically, not
+## assumed: a duplicate's append raised the base familiar's technique
+## count from 2 to 3.
+##
+## Deliberately NOT duplicate(true) (deep): that would give this copy its
+## own Technique/PassiveEffect instances, and RewardSelector decides "do
+## I already own this?" by identity against the shared content pool, so
+## deep copies would silently make every owned item re-offerable. Fresh
+## arrays holding the same element references is exactly the middle
+## ground both requirements need.
+func duplicate_for_run() -> Familiar:
+	var copy: Familiar = duplicate()
+	copy.techniques = techniques.duplicate()
+	copy.priority_rules = priority_rules.duplicate()
+	copy.passives = passives.duplicate()
+	copy.species_affinities = species_affinities.duplicate()
+	return copy
+
 ## Human-readable display name for a Stat value -- used by upgrade
 ## descriptions rather than exposing the raw enum name or property name.
 static func stat_name(stat: Stat) -> String:

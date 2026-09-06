@@ -21,6 +21,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"simulate_produces_winner_and_margin",
 	"ai_drafter_grows_a_build",
 	"resolver_scouts_and_resolves",
+	"entrants_are_isolated_from_base_resources",
 ]
 
 var _failures: Array[String] = []
@@ -37,6 +38,7 @@ func _init() -> void:
 	_check_simulate_produces_winner_and_margin()
 	_check_ai_drafter_grows_a_build()
 	_check_resolver_scouts_and_resolves()
+	_check_entrants_are_isolated_from_base_resources()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -160,7 +162,7 @@ func _check_simulate_produces_winner_and_margin() -> void:
 
 func _check_ai_drafter_grows_a_build() -> void:
 	var roster: Array[Familiar] = _roster()
-	var familiar: Familiar = roster[0].duplicate()
+	var familiar: Familiar = roster[0].duplicate_for_run()
 	var technique_count_before: int = familiar.techniques.size()
 	var stat_total_before: int = familiar.max_hp + familiar.power + familiar.defense + familiar.speed + familiar.focus
 
@@ -186,7 +188,7 @@ func _check_ai_drafter_grows_a_build() -> void:
 	# max_hp must be reachable: comparing raw values would never pick it
 	# (it runs 35-85 while the others run 2-20), so the rule compares each
 	# stat's fraction of its own range instead.
-	var hp_starved: Familiar = roster[0].duplicate()
+	var hp_starved: Familiar = roster[0].duplicate_for_run()
 	hp_starved.max_hp = 35
 	hp_starved.power = 20
 	hp_starved.defense = 20
@@ -228,6 +230,45 @@ func _check_resolver_scouts_and_resolves() -> void:
 		_expect(bracket_match.winner != null, "every resolved match needs a winner")
 		_expect(bracket_match.has_entrant(bracket_match.winner), "the winner must be one of the entrants")
 	_done("resolver_scouts_and_resolves")
+
+## A run's build growth must not reach the cached base .tres. Resource
+## .duplicate() alone does NOT achieve this -- it hands the copy the same
+## Array objects, so an append grows the original too, and every later
+## run in the same process inherits the last one's upgrades. Regression
+## guard for a real bug: restarting after a defeat left every familiar
+## carrying the previous run's techniques.
+func _check_entrants_are_isolated_from_base_resources() -> void:
+	var roster: Array[Familiar] = _roster()
+	var base: Familiar = roster[0]
+	var base_techniques: int = base.techniques.size()
+	var base_passives: int = base.passives.size()
+	var base_rules: int = base.priority_rules.size()
+	var base_name: String = base.familiar_name
+
+	var bracket: Bracket = Bracket.generate(roster, _rng(31))
+	for bracket_match in bracket.rounds[0].matches:
+		for entrant in [bracket_match.entrant_a, bracket_match.entrant_b]:
+			if entrant.familiar_name != base_name:
+				continue
+			entrant.techniques.append(load("res://resources/techniques/body_press.tres"))
+			entrant.passives.append(load("res://resources/passives/gavel_drop.tres"))
+			entrant.priority_rules.append(load("res://resources/priority_rules/mallegrav_wind_up_rule.tres"))
+
+	_expect(base.techniques.size() == base_techniques,
+		"a bracket entrant's techniques leaked into the base .tres (%d -> %d)" % [base_techniques, base.techniques.size()])
+	_expect(base.passives.size() == base_passives,
+		"a bracket entrant's passives leaked into the base .tres (%d -> %d)" % [base_passives, base.passives.size()])
+	_expect(base.priority_rules.size() == base_rules,
+		"a bracket entrant's priority_rules leaked into the base .tres (%d -> %d)" % [base_rules, base.priority_rules.size()])
+
+	# The end-to-end symptom: a second run must hand out pristine entrants.
+	var second: Bracket = Bracket.generate(roster, _rng(32))
+	for bracket_match in second.rounds[0].matches:
+		for entrant in [bracket_match.entrant_a, bracket_match.entrant_b]:
+			if entrant.familiar_name == base_name:
+				_expect(entrant.techniques.size() == base_techniques,
+					"a second run's %s still carried the first run's upgrades" % base_name)
+	_done("entrants_are_isolated_from_base_resources")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.

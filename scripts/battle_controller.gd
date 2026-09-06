@@ -849,7 +849,7 @@ func start_boss_fight() -> void:
 		winning_match.winner = player_familiar_data
 		winning_match.revealed = true
 
-	enemy_familiar_data = bracket.boss_familiar.duplicate()
+	enemy_familiar_data = bracket.boss_familiar.duplicate_for_run()
 
 	begin_reward_sequence()
 
