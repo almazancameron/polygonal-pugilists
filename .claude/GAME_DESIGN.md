@@ -223,11 +223,13 @@ Familiars filling that skeleton can come from either of two sources: procedurall
 
 # 9. Tournament structure
 
-CURRENT DIRECTION — the least-built part of this document; expect it to change once implementation starts.
+CURRENT DIRECTION — **implemented** as of the bracket pass; see
+`docs/superpowers/specs/2026-09-06-tournament-bracket-design.md` for the design and
+`docs/superpowers/plans/2026-09-06-tournament-bracket.md` for how it was built.
 
 ## 9.1 The bracket
 
-**Settled:** a single-elimination bracket of 16 entrants, semi-randomly generated at the start of a run. The bracket screen doubles as the character-select screen — picking your entrant's spot in the bracket is how you start the run. Winning all 4 bracket rounds leads to a separate, fixed final boss encounter (§9.2) — a deliberately-authored showdown, not another random bracket match, and not resolved via the off-screen simulation (§9.3) the way matches the player doesn't take part in are.
+**Settled and implemented:** a single-elimination bracket of 16 entrants, semi-randomly generated at the start of a run. The bracket screen doubles as the character-select screen — picking your entrant's spot in the bracket is how you start the run. Winning all 4 bracket rounds leads to a separate, fixed final boss encounter (§9.2) — a deliberately-authored showdown, not another random bracket match, and not resolved via the off-screen simulation (§9.3) the way matches the player doesn't take part in are.
 
 ## 9.2 Loop
 
@@ -251,12 +253,17 @@ No separate upgrade choice happens before the very first fight beyond the draft 
 
 ## 9.3 Simulated off-screen fights
 
-Matches elsewhere in the bracket that the player doesn't take part in are *not* played through the full combat engine — they're resolved by comparing the two entrants' stats/builds into a win probability, then rolling against it. This is deliberately lightweight: full simulation of every bracket match would be expensive for no real payoff, since the player never sees them play out move-by-move.
+Matches elsewhere in the bracket that the player doesn't take part in *are* played through the full combat engine — the original plan to approximate them with a stat comparison turned out to be solving a cost problem that doesn't exist. A run needs at most 11 off-screen matches (7 + 3 + 1 + 0 across the four rounds) and `balance_test.gd` measures a full headless battle at roughly 7.5ms, so simulating them properly is cheaper than maintaining a second, cruder combat model that would need its own balancing.
 
-**Open questions to settle before implementing:**
-- What exactly feeds the odds calculation — raw stat totals, or does technique/priority-rule quality factor in too? Cheaper is better unless it visibly produces bad-feeling odds.
-- What fidelity does the player see when scouting an upcoming or already-decided match — an exact percentage, or a coarser signal (Favored/Toss-up/Underdog)? A coarser signal probably sits better with "occasional unclear outcomes and upsets" being a deliberate feature, not noise.
-- Is scouting free/always-visible, or a resource/choice the player spends something on? Given this project has no economy (§0.3), it's likely free — but worth deciding deliberately rather than defaulting.
+**All three open questions are now settled and implemented:**
+
+- **What feeds the odds:** a real `BattleEngine` simulation, reduced to a single number — the winner's HP fraction minus the loser's (`BracketOdds.margin()`). A flawless win is 1.0, a razor-thin one near 0. That margin becomes an advance probability (`0.5 + 0.5 * margin`), which is then *rolled against* rather than taken as the verdict — so a close simulated win stays genuinely uncertain and upsets remain possible, which is what §9.3 wanted in the first place. A stalemate (both alive at the turn cap) nominates the higher-HP side and naturally lands near a coin flip.
+- **Scouting fidelity:** five coarse labels — Heavy Favorite / Favorite / Toss-up / Underdog / Heavy Underdog — never a raw percentage, matching the instinct that a coarser signal reads better alongside deliberate upsets. Both sides of a match show mirrored labels.
+- **Scouting cost:** free and always visible, per §0.3's no-economy constraint. Round 1's odds are shown during character select itself (all 8 matches are scouted before anyone picks a side), so the player can weigh a pairing while choosing their entrant.
+
+Scouting and resolution are deliberately split: the player sees a match's odds *before* their own fight and only learns the outcome *after* it. Each entrant also shows its species affinity tags (§7) as scouting intel, so an opponent's playstyle is legible before the fight rather than only in hindsight. Results are read directly off the bracket screen — no combat-log narration, since a visible bracket makes that redundant.
+
+**Still deliberately open (OPEN / PLAYTEST):** every numeric constant above — the `0.5` margin coefficient and the 0.70/0.90 label boundaries — is a first, reversible guess, isolated in `BracketOdds` for exactly that reason. Retune once real brackets have been played, not before.
 
 ## 9.4 Upgrade choices between rounds
 
@@ -295,9 +302,9 @@ Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
 
 **Done, same session, developer-verified end-to-end:** a Game Over screen (win or the final loss) with a Restart button that re-rolls the whole run — replacing the old behavior of quitting the application outright — and a randomly-drawn player familiar + opponent lineup at the start of every run (from an authored full roster, not the bracket itself; a deliberate stand-in for the real bracket/character-select draft below, expected to be replaced outright once the bracket exists, not extended). Together these close the full non-bracket play loop end-to-end for the first time: launch, get assigned a fighter, fight through the whole opponent lineup with a reward-and-priority-editor step after each non-final win, reach a win/loss screen, and restart into a genuinely new run. This is effectively Milestone 1 minus the bracket itself — everything the bracket will eventually sit on top of already plays start to finish.
 
-**Next, per explicit developer direction:** the bracket (§9) — the only remaining piece before Milestone 1 is feature-complete. See §9's own open questions (off-screen simulation odds/fidelity/cost) before starting it. A mockup-matching visual style pass across battle/builder/reward/stat is planned but deprioritized behind the bracket. Remaining content-pass scope (traits/augments, if still wanted — see `LEARNING_ROADMAP.md`) is otherwise open and can slot in whenever.
+**Done (bracket pass):** the tournament bracket (§9) itself — `Bracket`/`BracketRound`/`BracketMatch` resources, generation from the 16-familiar roster, character select doubling as the bracket screen, off-screen matches simulated then rolled for upsets, between-round scouting showing odds and species tags alongside the previous round's results, AI entrants growing their builds through the player's own reward system, and a placeholder final-boss encounter. This completes Milestone 1's feature set: a full run now plays start to finish, from drafting an entrant out of a real bracket to the champion fight. Covered by a committed, re-runnable regression harness (`scripts/tools/bracket_test.gd`) rather than throwaway verification scripts.
 
-**After that:** the tournament/bracket structure (§9) itself — now settled at 16 entrants plus a fixed final boss (§9.1) rather than open — then whatever §9.3's remaining open questions (off-screen simulation odds/fidelity/cost) resolve into, and playtesting/balance passes.
+**Next:** the mockup-matching visual style pass across battle/builder/reward/stat/bracket, previously deprioritized behind the bracket and now the top remaining item. After that: authoring the final boss's real kit (the current one is a deliberate placeholder), the AI drafting/priority-optimizer system (§11), and remaining content-pass scope (traits/augments, if still wanted — see `LEARNING_ROADMAP.md`).
 
 # 11. AI drafting and balance-testing methodology
 

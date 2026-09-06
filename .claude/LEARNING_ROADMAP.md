@@ -286,12 +286,32 @@ sessions' worth of direct stat edits, plus independently spotting the Cleanse/`p
 non-determinism risk before it was fully diagnosed). Traits/augments, if still wanted, are
 the one piece of the originally-scoped content pass not yet started.
 
-### Step 7 (renumbered from the bracket) — Tournament bracket structure (higher-level, less detailed)
-The single-elimination bracket described in `GAME_DESIGN.md` §9 — a 16-or-32-entrant
-bracket doubling as character select, simulated off-screen matches (stat comparison →
-odds → roll, with scouting), and upgrade choices between rounds replacing the current
-pre-fight `PriorityBuild` picker/reward loop. See `GAME_DESIGN.md` §9's open questions
-before implementing.
+### Step 7 — Tournament bracket structure — ✅ Done (session 9)
+The single-elimination bracket described in `GAME_DESIGN.md` §9: 16 entrants,
+character select doubling as the bracket screen, off-screen matches resolved
+and scouted, and the round loop running off the bracket instead of the
+`opponent_lineup` gauntlet. Spec'd first
+(`docs/superpowers/specs/2026-09-06-tournament-bracket-design.md`), then built
+from a written plan in 12 tasks — Claude-implemented per the ownership split
+agreed at the start of the session, with the developer reviewing each phase and
+making three design calls that changed the result: restructuring the pre-fight
+flow, moving the "haven't edited priorities" confirmation onto the skip path,
+and cutting the combat-log reveal lines entirely on the reasoning that a
+visible bracket makes narration redundant.
+
+§9.3's own open questions all resolved *against* the doc's original guess: it
+had assumed real simulation of off-screen matches would be too expensive, but
+at ~11 matches per run and ~7.5ms each it's cheaper than maintaining a second
+combat model — so the real engine runs, and its HP margin becomes odds that get
+*rolled* rather than a verdict. See `DECISIONS.md`.
+
+**New here, worth noticing:** this is the first feature in the project with a
+committed, re-runnable test harness (`scripts/tools/bracket_test.gd`) rather
+than throwaway `_verify_*.gd` scripts — closing the gap session 5 flagged and
+never acted on. Its per-check completion markers exist because a GDScript
+runtime error aborts only its own function; that mechanism caught real crashes
+twice during the build instead of reporting false passes. Worth reading as the
+model for how future systems get covered.
 
 ### Step 8 — Final showdown + build-comparison pass (higher-level)
 The bracket's final match, opponents having accumulated a comparable amount of power to
@@ -299,7 +319,13 @@ the player over the run, plus a deliberate comparison of two different drafted b
 against it — directly testing the core thesis (`GAME_DESIGN.md` §1/§12) as a whole.
 Developer-led by this point, Claude reviewing.
 
-### Step 9 — AI drafting personalities & priority optimizer (not yet started, separate from the bracket)
+### Step 9 — AI drafting personalities & priority optimizer (not yet started; has a concrete integration point now)
+Swaps in at exactly one place: `AIDrafter.apply_round_reward()`
+(`scripts/bracket/ai_drafter.gd`), the deliberately naive placeholder the
+bracket ships with — a stat-fraction rule plus an auto-picked Run-slot reward,
+build-unaware by design. Nothing bracket-side needs to change when the real
+system replaces it.
+
 Full design in `docs/superpowers/specs/2026-09-06-ai-drafting-design.md` and
 `GAME_DESIGN.md` §11. Deliberately sequenced *after* the bracket ships (Steps
 7–8) rather than blocking it — the bracket's own AI-progression step starts
