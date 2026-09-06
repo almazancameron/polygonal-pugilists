@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bouecnl8c2673" path="res://scripts/condition/stat_comparison_condition.gd" id="2_mytth"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_uci7k"]
 [ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="3_1g1u7"]
-[ext_resource type="Resource" uid="uid://cg5vwqlaelrb0" path="res://resources/techniques/body_press.tres" id="4_1g1u7"]
+[ext_resource type="Resource" uid="uid://qnv81ygkrnlg" path="res://resources/techniques/body_press.tres" id="4_1g1u7"]
 
 [sub_resource type="Resource" id="Resource_hvfyp"]
 script = ExtResource("2_mytth")

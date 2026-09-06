@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_4n3dd"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="2_o2toa"]
 [ext_resource type="Script" uid="uid://brxa3r56ukm5t" path="res://scripts/condition/status_comparison_condition.gd" id="2_x27nl"]
-[ext_resource type="Resource" uid="uid://blh627cxop8ng" path="res://resources/techniques/red_roc.tres" id="4_5k51u"]
+[ext_resource type="Resource" uid="uid://cslkkvwhut5iu" path="res://resources/techniques/red_roc.tres" id="4_5k51u"]
 
 [sub_resource type="Resource" id="Resource_x27nl"]
 script = ExtResource("2_x27nl")
