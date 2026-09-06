@@ -19,6 +19,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"advance_through_all_rounds",
 	"odds_boundaries",
 	"simulate_produces_winner_and_margin",
+	"ai_drafter_grows_a_build",
 ]
 
 var _failures: Array[String] = []
@@ -33,6 +34,7 @@ func _init() -> void:
 	_check_advance_through_all_rounds()
 	_check_odds_boundaries()
 	_check_simulate_produces_winner_and_margin()
+	_check_ai_drafter_grows_a_build()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -153,6 +155,44 @@ func _check_simulate_produces_winner_and_margin() -> void:
 	# built from them, and must never mutate the Familiar resources.
 	_expect(a.max_hp > 0 and b.max_hp > 0, "simulate() must not damage the source familiars")
 	_done("simulate_produces_winner_and_margin")
+
+func _check_ai_drafter_grows_a_build() -> void:
+	var roster: Array[Familiar] = _roster()
+	var familiar: Familiar = roster[0].duplicate()
+	var technique_count_before: int = familiar.techniques.size()
+	var stat_total_before: int = familiar.max_hp + familiar.power + familiar.defense + familiar.speed + familiar.focus
+
+	var technique_pool: Array[Technique] = []
+	for other in roster:
+		for technique in other.techniques:
+			if technique not in technique_pool:
+				technique_pool.append(technique)
+
+	var passive_pool: Array[PassiveEffect] = []
+	for other in roster:
+		for passive in other.passives:
+			if passive not in passive_pool:
+				passive_pool.append(passive)
+
+	AIDrafter.apply_round_reward(familiar, 1, technique_pool, passive_pool, _rng(11))
+
+	_expect(familiar.techniques.size() == technique_count_before + 1,
+		"round 1's cadence is TECHNIQUE, so the AI should have gained one")
+	var stat_total_after: int = familiar.max_hp + familiar.power + familiar.defense + familiar.speed + familiar.focus
+	_expect(stat_total_after > stat_total_before, "the AI should also have spent its stat point")
+
+	# max_hp must be reachable: comparing raw values would never pick it
+	# (it runs 35-85 while the others run 2-20), so the rule compares each
+	# stat's fraction of its own range instead.
+	var hp_starved: Familiar = roster[0].duplicate()
+	hp_starved.max_hp = 35
+	hp_starved.power = 20
+	hp_starved.defense = 20
+	hp_starved.speed = 20
+	hp_starved.focus = 20
+	_expect(AIDrafter.lowest_stat(hp_starved) == Familiar.Stat.MAX_HP,
+		"a familiar at the bottom of the HP range with everything else maxed should get HP")
+	_done("ai_drafter_grows_a_build")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.
