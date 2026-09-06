@@ -234,6 +234,16 @@ func _on_begin_fight_pressed() -> void:
 ## _ready() and again by _on_restart_pressed(), so Restart is a genuinely new
 ## run rather than a full-health replay of whatever matchup just ended.
 func _start_new_run() -> void:
+	# Clear every screen the previous run could have left up *before*
+	# showing character select -- Restart is reached from the Game Over
+	# panel, which would otherwise sit there for the whole bracket screen.
+	stat_confirm_button.disabled = true
+	stat_upgrade_panel.visible = false
+	reward_select_panel.visible = false
+	game_over_panel.visible = false
+	priority_builder.visible = false
+	log_view.clear()
+
 	_build_bracket()
 	await _select_entrant()
 	current_round = 0
@@ -259,13 +269,6 @@ func _start_new_run() -> void:
 		reward_flow.seed_rng(reward_seed)
 	else:
 		reward_flow.randomize_rng()
-
-	stat_confirm_button.disabled = true
-	stat_upgrade_panel.visible = false
-	reward_select_panel.visible = false
-	game_over_panel.visible = false
-
-	log_view.clear()
 
 	await _wait_for_pre_fight_screen(enemy, false)
 	await begin_fight("%s prepares for battle!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
