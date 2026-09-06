@@ -63,10 +63,6 @@ var current_round: int = 0
 ## Seeded per run so a round's upsets are reproducible when reward_seed is set.
 var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
-## Last round's off-screen results, reported once the player's own match
-## resolves.
-var _last_round_results: Array[Dictionary] = []
-
 ## Logs the enemy's skipped-rule reasoning to the combat log. Off by
 ## default since it's debug noise for normal play; flip on in the
 ## Inspector to see why the enemy did or didn't pick each technique.
@@ -294,12 +290,26 @@ func _build_bracket() -> void:
 		_bracket_rng.randomize()
 
 	bracket = Bracket.generate(full_roster, rng)
-	_last_round_results = []
 
 	# Scouted before anyone has picked a side, so all 8 round-1 matches get
 	# odds -- character select shows them while choosing. Whichever match
 	# the player then joins keeps its label but never reads it again.
 	BracketResolver.scout_round(bracket.rounds[0])
+
+## Read-only view of the round the player is about to fight: every other
+## match's odds and each entrant's species tags, plus last round's
+## finished results, free and always available (GAME_DESIGN.md §9.3).
+func _show_scouting() -> void:
+	panels.visible = false
+	speed_toggle_button.visible = false
+	log_scroll.visible = false
+
+	bracket_screen.setup(bracket, current_round, false)
+	bracket_screen.visible = true
+
+	await bracket_screen.dismissed
+
+	bracket_screen.visible = false
 
 ## Round 1's character select. Every round-1 match is already scouted by
 ## the time this shows, so the player can weigh each pairing's odds while
@@ -369,17 +379,6 @@ func begin_reward_sequence() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
-
-	# The rest of the round's results, revealed now that the player's own
-	# match is settled. Combat-log lines rather than a dedicated reveal
-	# screen -- the visual pass that would style one is deliberately
-	# deferred behind the bracket (GAME_DESIGN.md §10).
-	for result in _last_round_results:
-		var upset_note: String = " (UPSET)" if result.was_upset else ""
-		combat_log.add_entry("%s defeats %s.%s" % [
-			result.winner.familiar_name, result.loser.familiar_name, upset_note
-		], CombatLog.Source.PLAYER)
-	_last_round_results = []
 
 	begin_phase_b()
 
@@ -594,6 +593,8 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 ## familiar already has -- since both the opponent and the player's own
 ## techniques/rules can differ from the last time this ran.
 func advance_to_priority_editor() -> void:
+	await _show_scouting()
+
 	_priority_rules_edited_this_round = false
 
 	while true:
@@ -819,7 +820,10 @@ func start_next_round() -> void:
 		finished_match.winner = player_familiar_data
 		finished_match.revealed = true
 
-	_last_round_results = BracketResolver.resolve_round(
+	# The returned summaries go unused: the bracket itself now records every
+	# winner, and the scouting screen shows them -- no log line needed for
+	# something the player can simply read off the bracket.
+	BracketResolver.resolve_round(
 		bracket.rounds[current_round], current_round + 1,
 		technique_reward_pool, passive_reward_pool, _bracket_rng)
 
