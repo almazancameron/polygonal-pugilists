@@ -47,8 +47,9 @@ If a system on this list starts feeling necessary to make Pixel Pugilists work, 
 - 8\. Familiar construction — bracket entrants
 - 9\. Tournament structure
 - 10\. Development roadmap
-- 11\. Playtest questions
-- 12\. Elevator pitch
+- 11\. AI drafting and balance-testing methodology
+- 12\. Playtest questions
+- 13\. Elevator pitch
 
 # 1. High concept
 
@@ -298,27 +299,63 @@ Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
 
 **After that:** the tournament/bracket structure (§9) itself — now settled at 16 entrants plus a fixed final boss (§9.1) rather than open — then whatever §9.3's remaining open questions (off-screen simulation odds/fidelity/cost) resolve into, and playtesting/balance passes.
 
-# 11. Playtest questions
+# 11. AI drafting and balance-testing methodology
+
+CURRENT DIRECTION — design settled (see
+`docs/superpowers/specs/2026-09-06-ai-drafting-design.md`), not yet
+implemented. Deliberately separate from the bracket (§9): the bracket
+ships with a simple placeholder AI-progression rule first, and this system
+is built and validated on its own, swapped in later with no change to the
+bracket's own architecture.
+
+Two problems share one system. First, bracket AI opponents need to feel
+like different fighters rather than one generic "also grows" rule.
+Second, and more valuable: `scripts/tools/balance_test.gd`'s round-robin
+has only ever tested a familiar's default starting kit — a familiar could
+look balanced at round 0 and be either dead weight or absurd once real
+reward choices accumulate, and nothing in this project's balance-testing
+has ever checked that.
+
+A small set of **drafting personalities** (Greedy, Synergy Master, Random
+to start — Species Loyalist, Balanced, and Experimental are real future
+additions, each just a new data-driven resource, not new code) each score
+reward candidates with their own weighted preferences, reusing the same
+relevance terms `RewardSelector` already computes for the player's own
+reward screen. A **shared priority-rule optimizer** — used identically by
+every personality — decides how a drafted build actually gets used,
+generating and battle-testing a bounded set of plausible priority-rule
+orderings from technique-authored `priority_hints` (most of which are
+mechanically derivable from a technique's own conditions, not manually
+authored). Separating "what to draft" from "how to use it" keeps a
+personality's *reward judgment* the thing being measured, not its ability
+to write priority rules.
+
+The same drafter-plus-optimizer machinery either sits behind a live
+bracket opponent later, or runs headless in a new `draft_balance_test.gd`
+tool that samples several realistic drafted builds per familiar instead of
+testing default kits alone — the actual reason this system exists.
+
+# 12. Playtest questions
 
 OPEN / PLAYTEST
 
-## 11.1 Combat timing and stats
+## 12.1 Combat timing and stats
 
 - Does fixed alternation hold up once opponents have accumulated very different amounts of power, or does turn order start to matter more than intended?
 - Does Speed or Focus need a job, or does the run stay interesting with them unused?
 
-## 11.2 Bracket and upgrade pacing
+## 12.2 Bracket and upgrade pacing
 
 - How many rounds (bracket size) makes a run feel complete without dragging?
 - How many upgrade choices does a build need before it feels distinctly "yours"?
 - Do simulated off-screen results feel meaningful to scout, or do players ignore them?
 - How much of an upset should the off-screen simulation allow before it reads as unfair rather than tense?
 
-## 11.3 Status and combo pacing
+## 12.3 Status and combo pacing
 
 Carried over from the full design (`FAMILIAR_FIGHT_CLUB_VISION.md` §18.3) since it's equally relevant here: how many actions should a setup build need before payoff, and are stacking statuses interesting to maintain or just fiddly?
 
-# 12. Elevator pitch
+# 13. Elevator pitch
 
 LOCKED
 

@@ -299,6 +299,22 @@ the player over the run, plus a deliberate comparison of two different drafted b
 against it — directly testing the core thesis (`GAME_DESIGN.md` §1/§12) as a whole.
 Developer-led by this point, Claude reviewing.
 
+### Step 9 — AI drafting personalities & priority optimizer (not yet started, separate from the bracket)
+Full design in `docs/superpowers/specs/2026-09-06-ai-drafting-design.md` and
+`GAME_DESIGN.md` §11. Deliberately sequenced *after* the bracket ships (Steps
+7–8) rather than blocking it — the bracket's own AI-progression step starts
+with a simple placeholder rule and swaps this in later with no bracket-side
+changes required. Two motivations, one system: bracket AI opponents that feel
+like different fighters (Greedy/Synergy Master/Random to start), and — the
+more valuable half — a real answer to `scripts/tools/balance_test.gd` only
+ever testing a familiar's default kit, never the range of builds it can
+actually become. Developer's own design; Claude formalized it into the spec
+and caught two real gaps during self-review (an AI stat-upgrade rule that
+would've silently ignored Max HP due to differing stat scales; a "role
+coverage" vs. "role bias" conflation that would've made Greedy behave like a
+gap-filler instead of an offense-stacker) — worth reviewing both fixes
+against what was actually intended before implementation starts.
+
 ## 5. Open design experiments
 
 For each, the smallest reversible experiment — none of these get a permanent answer yet:
