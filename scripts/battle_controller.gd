@@ -27,6 +27,16 @@ enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 ## (see _randomize_matchup()'s doc comment).
 @export var full_roster: Array[Familiar] = []
 
+## The fixed final encounter after the bracket's four rounds. Placeholder
+## content for now -- a real authored "absurd showdown" kit is its own
+## later pass. Kept out of resources/familiars/ deliberately: that folder
+## is directory-scanned by balance_test.gd and bracket_test.gd, and the
+## boss is not a bracket entrant.
+@export var final_boss: Familiar
+
+## True once the bracket is won and the boss fight is the active match.
+var facing_boss: bool = false
+
 ## Overwritten by _randomize_matchup() every time _ready() runs -- any value
 ## authored here in the Inspector is just a fallback for a context that
 ## somehow skips _ready() (none currently do).
@@ -289,7 +299,8 @@ func _build_bracket() -> void:
 	else:
 		_bracket_rng.randomize()
 
-	bracket = Bracket.generate(full_roster, rng)
+	bracket = Bracket.generate(full_roster, rng, final_boss)
+	facing_boss = false
 
 	# Scouted before anyone has picked a side, so all 8 round-1 matches get
 	# odds -- character select shows them while choosing. Whichever match
@@ -593,7 +604,10 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 ## familiar already has -- since both the opponent and the player's own
 ## techniques/rules can differ from the last time this ran.
 func advance_to_priority_editor() -> void:
-	await _show_scouting()
+	# Nothing to scout before the boss -- it isn't in the bracket, and the
+	# bracket itself is already finished by then.
+	if not facing_boss:
+		await _show_scouting()
 
 	_priority_rules_edited_this_round = false
 
@@ -771,6 +785,14 @@ func check_victory() -> bool:
 			start_next_round()
 			return true
 
+		# Bracket won -- the fixed final encounter follows, once.
+		if not facing_boss and bracket.boss_familiar != null:
+			combat_log.add_entry("Victory! %s is defeated. The champion awaits." % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
+
+			await get_tree().create_timer(1.5).timeout
+			start_boss_fight()
+			return true
+
 		phase = Phase.BATTLE_OVER
 		combat_log.add_entry("Victory! %s is defeated." % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
 		await get_tree().create_timer(2.5).timeout
@@ -811,6 +833,35 @@ func _on_restart_pressed() -> void:
 ## stat allocation, then Phase B's tailored reward cards). take_turn()
 ## only resumes once that whole sequence resolves into
 ## advance_to_priority_editor()/begin_fight().
+## The fixed encounter after the bracket itself is won. No scouting and no
+## off-screen resolution -- there is no rest of the round to resolve --
+## and no reward follows it, win or lose (GAME_DESIGN.md §9.2 step 7).
+## The reward sequence that runs here is round 4's, earned by winning the
+## final bracket match, not a reward for the boss.
+func start_boss_fight() -> void:
+	facing_boss = true
+
+	var winning_match: BracketMatch = player_bracket_match()
+	if winning_match != null:
+		winning_match.winner = player_familiar_data
+		winning_match.revealed = true
+
+	enemy_familiar_data = bracket.boss_familiar.duplicate()
+
+	begin_reward_sequence()
+
+	player = Combatant.new(player_familiar_data)
+	update_hp_display(player)
+
+	enemy = Combatant.new(enemy_familiar_data)
+	enemy_name_label.text = enemy.familiar.familiar_name
+	enemy_portrait.texture = enemy.familiar.sprite
+	update_hp_display(enemy)
+
+	player.opponent = enemy
+	enemy.opponent = player
+	engine = BattleEngine.new(player, enemy)
+
 func start_next_round() -> void:
 	# Record the player's own win, then roll every other match in this
 	# round to its true winner (which may upset the simulated favourite)

@@ -34,6 +34,7 @@
 [ext_resource type="Resource" uid="uid://bn2pvhgr22f7p" path="res://resources/techniques/blooming_strike.tres" id="17_rrh2e"]
 [ext_resource type="Resource" uid="uid://qnv81ygkrnlg" path="res://resources/techniques/body_press.tres" id="18_cqddr"]
 [ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="18_fpf3k"]
+[ext_resource type="Resource" uid="uid://c6hthsb3h2731" path="res://resources/bosses/final_boss_stub.tres" id="19_d2g17"]
 [ext_resource type="Theme" uid="uid://hkf2bxrjlau4" path="res://assets/themes/button_font.tres" id="19_p0caf"]
 [ext_resource type="Resource" uid="uid://yg7leamrvquj" path="res://resources/techniques/chronoparry.tres" id="19_qnn43"]
 [ext_resource type="Resource" uid="uid://c4thhx5mgbves" path="res://resources/techniques/concussive_blow.tres" id="20_d2g17"]
@@ -123,6 +124,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_battle")
 full_roster = Array[ExtResource("2_rrh2e")]([ExtResource("2_i3fbd"), ExtResource("3_rrh2e"), ExtResource("4_cqddr"), ExtResource("5_qnn43"), ExtResource("6_d2g17"), ExtResource("7_uq7we"), ExtResource("8_hauko"), ExtResource("9_gt766"), ExtResource("10_oef1w"), ExtResource("11_soua1"), ExtResource("2_6vh42"), ExtResource("2_nha6o"), ExtResource("2_p0caf"), ExtResource("3_4k1nj"), ExtResource("7_6ni85"), ExtResource("63_b446w")])
+final_boss = ExtResource("19_d2g17")
 stat_upgrade_pool = Array[ExtResource("8_2mnj5")]([ExtResource("8_4gblq"), ExtResource("9_sattt"), ExtResource("10_jid5g"), ExtResource("11_1i0gj"), ExtResource("12_gmkwt")])
 technique_reward_pool = Array[ExtResource("14_qrayh")]([ExtResource("15_gs12l"), ExtResource("16_i3fbd"), ExtResource("17_rrh2e"), ExtResource("18_cqddr"), ExtResource("19_qnn43"), ExtResource("20_d2g17"), ExtResource("21_uq7we"), ExtResource("22_hauko"), ExtResource("23_gt766"), ExtResource("24_oef1w"), ExtResource("25_soua1"), ExtResource("26_8p3fd"), ExtResource("27_o2llt"), ExtResource("28_mx0ge"), ExtResource("29_dwymc"), ExtResource("30_4rw15"), ExtResource("31_p48d8"), ExtResource("32_tip4j"), ExtResource("33_mpjlb"), ExtResource("34_38w7l"), ExtResource("35_o655g"), ExtResource("36_g1072"), ExtResource("37_pa3g0"), ExtResource("38_n4rad"), ExtResource("39_bpy7r"), ExtResource("40_58yg0"), ExtResource("41_0c1oo"), ExtResource("42_m2s26"), ExtResource("43_cm72k"), ExtResource("44_67q2c"), ExtResource("45_hh0b5"), ExtResource("46_wi1sw"), ExtResource("47_0yd4v")])
 passive_reward_pool = Array[ExtResource("48_aom6h")]([ExtResource("49_t1yxo"), ExtResource("50_rvryj"), ExtResource("51_yuflr"), ExtResource("52_o8s6c"), ExtResource("53_haqqx"), ExtResource("54_f2fag"), ExtResource("55_xxndn"), ExtResource("56_l0nro"), ExtResource("57_gke8i"), ExtResource("58_eeccw"), ExtResource("59_rhpg2"), ExtResource("60_kupap"), ExtResource("61_qkvbb"), ExtResource("62_k7auw"), ExtResource("63_vbgn7"), ExtResource("64_36g0w"), ExtResource("65_yb105")])
