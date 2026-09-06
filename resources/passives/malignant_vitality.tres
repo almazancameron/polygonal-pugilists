@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://bxb0v8d8pw0be"]
 
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_eqqq6"]
-[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
-[ext_resource type="Resource" path="res://resources/techniques/passive_operations/malignant_vitality.tres" id="2_technique"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_eqqq6"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
+[ext_resource type="Resource" uid="uid://b6rac077ge7uu" path="res://resources/techniques/passive_operations/malignant_vitality.tres" id="2_technique"]
 
 [resource]
 script = ExtResource("1_passive")

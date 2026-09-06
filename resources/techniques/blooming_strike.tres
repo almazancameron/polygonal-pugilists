@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="Technique" format=3]
+[gd_resource type="Resource" script_class="Technique" format=3 uid="uid://bn2pvhgr22f7p"]
 
-[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="1_tech"]
-[ext_resource type="Script" path="res://scripts/technique/technique_step_group.gd" id="2_group"]
-[ext_resource type="Script" path="res://scripts/technique/technique_action.gd" id="3_action"]
-[ext_resource type="Script" path="res://scripts/technique/hit_action.gd" id="4_hit"]
-[ext_resource type="Script" path="res://scripts/numeric_bonus/conditional_numeric_bonus.gd" id="5_condbonus"]
-[ext_resource type="Script" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_5ym2e"]
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="6_condition"]
-[ext_resource type="Script" path="res://scripts/condition/hp_comparison_condition.gd" id="7_hpcond"]
+[ext_resource type="Script" uid="uid://bp4gbg2w2sdur" path="res://scripts/technique/technique.gd" id="1_tech"]
+[ext_resource type="Script" uid="uid://bxo68i5nl228w" path="res://scripts/technique/technique_step_group.gd" id="2_group"]
+[ext_resource type="Script" uid="uid://c5xx01i37dduk" path="res://scripts/technique/technique_action.gd" id="3_action"]
+[ext_resource type="Script" uid="uid://mrlrygvhn1v7" path="res://scripts/technique/hit_action.gd" id="4_hit"]
+[ext_resource type="Script" uid="uid://0ar2g64cti28" path="res://scripts/numeric_bonus/conditional_numeric_bonus.gd" id="5_condbonus"]
+[ext_resource type="Script" uid="uid://3qq8130hhesh" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="6_5ym2e"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="6_condition"]
+[ext_resource type="Script" uid="uid://btc5hsdhdcrjj" path="res://scripts/condition/hp_comparison_condition.gd" id="7_hpcond"]
 
 [sub_resource type="Resource" id="Resource_hit"]
 script = ExtResource("4_hit")

@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://fd4g7ut0llgq"]
 
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_7qslw"]
-[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
-[ext_resource type="Resource" path="res://resources/techniques/passive_operations/protean_purge.tres" id="2_technique"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_7qslw"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
+[ext_resource type="Resource" uid="uid://btgpok25wo6n3" path="res://resources/techniques/passive_operations/protean_purge.tres" id="2_technique"]
 
 [resource]
 script = ExtResource("1_passive")

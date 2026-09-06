@@ -92,6 +92,35 @@ var current_round: int = 0
 @onready var game_over_message_label: Label = $GameOverPanel/MessageLabel
 @onready var restart_button: Button = $GameOverPanel/RestartButton
 
+@onready var begin_combat_panel: VBoxContainer = $BeginCombatPanel
+@onready var begin_combat_message_label: Label = $BeginCombatPanel/MessageLabel
+@onready var begin_combat_portrait: TextureRect = $BeginCombatPanel/OpponentPortrait
+@onready var begin_combat_name_label: Label = $BeginCombatPanel/OpponentNameLabel
+@onready var priority_builder_button: Button = $BeginCombatPanel/PriorityBuilderButton
+@onready var begin_combat_button: Button = $BeginCombatPanel/BeginButton
+
+## Emitted once the player picks a path off the pre-fight screen -- true for
+## "open the priority builder", false for "begin the fight as-is". A plain
+## signal rather than reusing priority_builder.confirm_requested since this
+## fires from either of two different buttons on a different screen.
+signal pre_fight_choice_made(open_priority_builder: bool)
+
+## Warns before beginning a fight with nothing actually edited this round --
+## moved here from priority_builder.gd's own Confirm button. Covers both
+## "never opened the editor" and "opened it (maybe more than once) but
+## never made an edit" -- see _priority_rules_edited_this_round, which is
+## what actually distinguishes those two cases from "opened it and edited
+## something," and is what decides whether this dialog fires at all.
+var _no_priority_changes_dialog: ConfirmationDialog
+
+## True once the priority builder has reported at least one real edit
+## since this round's pre-fight loop began -- accumulates across however
+## many times the player opens/closes the editor in one round (see
+## advance_to_priority_editor()), since priority_builder.has_unsaved_changes
+## itself only ever reflects a single open/close session. Reset at the
+## start of every pre-fight loop.
+var _priority_rules_edited_this_round: bool = false
+
 ## -- Reward sequence (Phase A stat allocation + Phase B reward cards) --
 const REWARD_CARD_SCENE: PackedScene = preload("res://scenes/reward_card.tscn")
 const STAT_UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/stat_upgrade_row.tscn")
@@ -156,7 +185,29 @@ func _ready() -> void:
 	next_round_button.pressed.connect(_on_next_round_pressed)
 	restart_button.pressed.connect(_on_restart_pressed)
 
+	priority_builder_button.pressed.connect(func() -> void: pre_fight_choice_made.emit(true))
+	begin_combat_button.pressed.connect(_on_begin_fight_pressed)
+
+	_no_priority_changes_dialog = ConfirmationDialog.new()
+	_no_priority_changes_dialog.dialog_text = "You haven't edited your priorities this round. Begin anyway?"
+	_no_priority_changes_dialog.confirmed.connect(func() -> void: pre_fight_choice_made.emit(false))
+	add_child(_no_priority_changes_dialog)
+
 	await _start_new_run()
+
+## Begin Fight always proceeds immediately when the priority builder isn't
+## even offered (the very first fight of a run, nothing to arrange yet).
+## When it is offered, the warning fires unless an actual edit happened
+## this round -- not merely opening the editor and looking. A technique
+## picked as this round's reward but never dragged into a rule will never
+## fire in battle regardless of the developer's intent when picking it, so
+## "I opened it but didn't change anything" is exactly as worth confirming
+## as "I never opened it at all."
+func _on_begin_fight_pressed() -> void:
+	if priority_builder_button.visible and not _priority_rules_edited_this_round:
+		_no_priority_changes_dialog.popup_centered()
+	else:
+		pre_fight_choice_made.emit(false)
 
 ## Resets every piece of per-run state -- a fresh matchup, a fresh
 ## RewardFlowController (RNG, reroll charges, build snapshot), the round
@@ -166,6 +217,7 @@ func _ready() -> void:
 func _start_new_run() -> void:
 	_randomize_matchup()
 	current_round = 0
+	_priority_rules_edited_this_round = false
 
 	player = Combatant.new(player_familiar_data)
 	enemy = Combatant.new(enemy_familiar_data)
@@ -195,6 +247,7 @@ func _start_new_run() -> void:
 
 	log_view.clear()
 
+	await _wait_for_pre_fight_screen(enemy, false)
 	await begin_fight("A wild %s appears!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 
 ## Draws 5 distinct familiars from the full roster -- one for the player, four
@@ -447,21 +500,60 @@ func _on_next_round_pressed() -> void:
 	reward_select_panel.visible = false
 	populate_stat_upgrade_rows(1, advance_to_priority_editor)
 
-## Shows the priority editor (GAME_DESIGN.md §9.2 step 4) with the player's
-## current familiar and this round's actual opponent, waits for the player
-## to confirm, writes the result back onto player_familiar_data, then starts
-## the next fight. setup() re-populates the whole screen every time --
+## Shows a "get ready" screen with the upcoming opponent's portrait/name and
+## waits for the player to choose a path, before begin_fight() actually
+## starts the fight -- both the run's opening fight and every subsequent
+## round's fight go through this first. panels/speed_toggle_button/log_scroll
+## are hidden the same way the reward/game-over screens already hide them
+## while shown; begin_fight() unconditionally shows them again right after,
+## so nothing here needs to restore them.
+##
+## show_priority_option is false for the run's opening fight (no reward has
+## happened yet, nothing to arrange) and true for every round transition.
+## Returns true if the player chose to open the priority builder, false if
+## they chose to begin the fight as-is.
+func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool) -> bool:
+	panels.visible = false
+	speed_toggle_button.visible = false
+	log_scroll.visible = false
+
+	begin_combat_message_label.text = "Ready to fight?"
+	begin_combat_portrait.texture = opponent.familiar.sprite
+	begin_combat_name_label.text = opponent.familiar.familiar_name
+	priority_builder_button.visible = show_priority_option
+	begin_combat_panel.visible = true
+
+	var open_priority_builder: bool = await pre_fight_choice_made
+
+	begin_combat_panel.visible = false
+	return open_priority_builder
+
+## Shows the pre-fight screen first (GAME_DESIGN.md §9.2 step 4's entry
+## point), looping back to it after every priority-editor session rather
+## than proceeding straight into the fight -- the player can open/close the
+## editor as many times as they like (looking without editing, then going
+## back in to actually make a change) before finally choosing to begin.
+## setup() re-populates the whole editor every time it's actually opened --
 ## including reconstructing segments for whatever priority_rules the
 ## familiar already has -- since both the opponent and the player's own
 ## techniques/rules can differ from the last time this ran.
 func advance_to_priority_editor() -> void:
-	priority_builder.visible = true
-	priority_builder.setup(player_familiar_data, enemy_familiar_data)
+	_priority_rules_edited_this_round = false
 
-	await priority_builder.confirm_requested
+	while true:
+		var open_priority_builder: bool = await _wait_for_pre_fight_screen(enemy, true)
+		if not open_priority_builder:
+			break
 
-	player_familiar_data.priority_rules = priority_builder.compiled_rules()
-	priority_builder.visible = false
+		priority_builder.visible = true
+		priority_builder.setup(player_familiar_data, enemy_familiar_data)
+
+		await priority_builder.confirm_requested
+
+		if priority_builder.has_unsaved_changes:
+			_priority_rules_edited_this_round = true
+		player_familiar_data.priority_rules = priority_builder.compiled_rules()
+		priority_builder.visible = false
 
 	await begin_fight("Prepare for the next bout!", CombatLog.Source.PLAYER)
 
@@ -612,18 +704,19 @@ func check_victory() -> bool:
 		if current_round < opponent_lineup.size() - 1:
 			combat_log.add_entry("Victory! %s is defeated. Prepare for the next round!" % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
 
+			await get_tree().create_timer(1.5).timeout
 			start_next_round()
 			return true
 
 		phase = Phase.BATTLE_OVER
 		combat_log.add_entry("Victory! %s is defeated." % enemy.familiar.familiar_name, CombatLog.Source.PLAYER)
-		await get_tree().create_timer(1.0).timeout
+		await get_tree().create_timer(2.5).timeout
 		show_game_over("You win! %s has been defeated." % enemy.familiar.familiar_name)
 		return true
 
 	phase = Phase.BATTLE_OVER
 	combat_log.add_entry("Defeat! %s is defeated." % player.familiar.familiar_name, CombatLog.Source.ENEMY)
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(2.5).timeout
 	show_game_over("Defeat! %s has fallen." % player.familiar.familiar_name)
 	return true
 

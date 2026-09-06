@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="ModifyStatusPassiveEffect" format=3]
+[gd_resource type="Resource" script_class="ModifyStatusPassiveEffect" format=3 uid="uid://bn27i47yjmifx"]
 
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_6qr1c"]
-[ext_resource type="Script" path="res://scripts/passive/modify_status_passive_effect.gd" id="1_cgrow"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_6qr1c"]
+[ext_resource type="Script" uid="uid://c5gfmyosppbco" path="res://scripts/passive/modify_status_passive_effect.gd" id="1_cgrow"]
 
 [resource]
 script = ExtResource("1_cgrow")

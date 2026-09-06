@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://d2tdowml3lm3j"]
 
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_vvb2u"]
-[ext_resource type="Resource" path="res://resources/techniques/passive_operations/cursed_barrier.tres" id="2_lyaeh"]
-[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="2_vvb2u"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_vvb2u"]
+[ext_resource type="Resource" uid="uid://k5n8r4g4d5of" path="res://resources/techniques/passive_operations/cursed_barrier.tres" id="2_lyaeh"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_vvb2u"]
 
 [resource]
 script = ExtResource("2_vvb2u")

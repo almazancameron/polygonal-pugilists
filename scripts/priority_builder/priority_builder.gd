@@ -49,24 +49,22 @@ const DEFINITION_ORDER: Array[String] = [
 @onready var probe_message: Label = $Columns/RightColumn/StateProbe/Rows/Message
 
 ## True once anything has structurally changed since the last setup() call
-## -- i.e. the player actually touched the build area (not just the mock
-## probe, which doesn't affect what gets saved). Reset to false at the end
-## of every setup(), after that call's own reconstruction has already
-## (harmlessly) flipped it true via the same signal a real edit would use.
-var _dirty: bool = false
-
-var _no_changes_dialog: ConfirmationDialog
+## -- i.e. the player actually touched the build area this session (not
+## just the mock probe, which doesn't affect what gets saved). Public so
+## battle_controller.gd's pre-fight screen can tell "opened and edited"
+## apart from "opened and just looked" across possibly several open/close
+## cycles in one round -- it accumulates its own round-level flag from
+## this, since this one resets on every setup() call and a single session
+## is all it can see. Reset to false at the end of every setup(), after
+## that call's own reconstruction has already (harmlessly) flipped it true
+## via the same signal a real edit would use.
+var has_unsaved_changes: bool = false
 
 func _ready() -> void:
 	state_probe.state_changed.connect(_refresh)
 	segment_list.structure_changed.connect(_on_build_structure_changed)
 	add_slot_button.pressed.connect(_on_add_slot_pressed)
 	confirm_button.pressed.connect(_on_confirm_pressed)
-
-	_no_changes_dialog = ConfirmationDialog.new()
-	_no_changes_dialog.dialog_text = "You haven't changed anything this round. Continue anyway?"
-	_no_changes_dialog.confirmed.connect(func() -> void: confirm_requested.emit())
-	add_child(_no_changes_dialog)
 
 	# Only true when opened as the standalone scene, with both exports
 	# already assigned in the Inspector -- battle_controller.gd instead
@@ -75,19 +73,15 @@ func _ready() -> void:
 		setup(builder_familiar, opponent_familiar)
 
 func _on_build_structure_changed() -> void:
-	_dirty = true
+	has_unsaved_changes = true
 	state_probe.reset_simulation(segment_list.compile()["rules"])
 	_refresh()
 
-## Nudges rather than blocks: a player who genuinely wants to carry on
-## unchanged (nothing to rearrange this round) can still confirm through
-## it, but an accidental click-through on a screen that quietly did
-## nothing gets caught first.
+## No "did anything actually change" gate here any more -- battle_controller.gd's
+## pre-fight screen now owns that question (a player who skips the editor
+## entirely, or opens and confirms it without editing, gets asked there).
 func _on_confirm_pressed() -> void:
-	if _dirty:
-		confirm_requested.emit()
-	else:
-		_no_changes_dialog.popup_centered()
+	confirm_requested.emit()
 
 ## Rebuilds every familiar-dependent part of the screen from scratch: the
 ## familiar panel, both palettes, the mock-state probe, and one segment per
@@ -132,9 +126,9 @@ func setup(familiar: Familiar, opponent: Familiar) -> void:
 
 	# The reconstruction above legitimately flows through the same
 	# structure_changed path a real edit does (loading segments, connecting
-	# blocks) -- consume that now so _dirty accurately reflects only what
-	# happens after setup() returns.
-	_dirty = false
+	# blocks) -- consume that now so has_unsaved_changes accurately reflects
+	# only what happens after setup() returns.
+	has_unsaved_changes = false
 
 ## The single accessor battle_controller.gd needs once the player confirms --
 ## keeps it from reaching through priority_builder.segment_list.compile()

@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://d1w06igu0adrp"]
 
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_h6o84"]
-[ext_resource type="Resource" path="res://resources/techniques/passive_operations/venomous_rhythm.tres" id="2_4ys5c"]
-[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="2_h6o84"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="1_h6o84"]
+[ext_resource type="Resource" uid="uid://cort5p5p1dym6" path="res://resources/techniques/passive_operations/venomous_rhythm.tres" id="2_4ys5c"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="2_h6o84"]
 
 [resource]
 script = ExtResource("2_h6o84")

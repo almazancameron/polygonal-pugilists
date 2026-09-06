@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3 uid="uid://d06a1fxcd7jlk"]
 
-[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
-[ext_resource type="Resource" path="res://resources/techniques/passive_operations/chlorophyll.tres" id="2_technique"]
-[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="3_condition"]
+[ext_resource type="Script" uid="uid://c4jawah678pod" path="res://scripts/passive/operation_passive_effect.gd" id="1_passive"]
+[ext_resource type="Resource" uid="uid://db0lc0i8ad37k" path="res://resources/techniques/passive_operations/chlorophyll.tres" id="2_technique"]
+[ext_resource type="Script" uid="uid://cxmgmfm1r6evo" path="res://scripts/condition/condition.gd" id="3_condition"]
 
 [resource]
 script = ExtResource("1_passive")
