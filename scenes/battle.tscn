@@ -84,6 +84,7 @@
 [ext_resource type="Resource" uid="uid://cftrsfdw1iapr" path="res://resources/passives/taste_for_blood.tres" id="64_36g0w"]
 [ext_resource type="Resource" uid="uid://d1w06igu0adrp" path="res://resources/passives/venomous_rhythm.tres" id="65_yb105"]
 [ext_resource type="PackedScene" uid="uid://vjdrxuhv1ynl" path="res://scenes/priority_builder/priority_builder.tscn" id="76_1w6ws"]
+[ext_resource type="Script" uid="uid://reqqbounkxb5" path="res://scripts/bracket/bracket_screen.gd" id="85_cqddr"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
 
@@ -396,3 +397,69 @@ text = "Open Priority Builder"
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Begin Combat"
+
+[node name="BracketScreen" type="VBoxContainer" parent="." unique_id=511430675]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = -16.0
+offset_bottom = 620.0
+script = ExtResource("85_cqddr")
+
+[node name="TitleLabel" type="Label" parent="BracketScreen" unique_id=854426622]
+layout_mode = 2
+text = "Choose your familiar"
+horizontal_alignment = 1
+
+[node name="Body" type="HBoxContainer" parent="BracketScreen" unique_id=1658176427]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EntrantScroll" type="ScrollContainer" parent="BracketScreen/Body" unique_id=1751780073]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EntrantList" type="VBoxContainer" parent="BracketScreen/Body/EntrantScroll" unique_id=157412023]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailPanel" type="VBoxContainer" parent="BracketScreen/Body" unique_id=1850694439]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="DetailName" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=12517013]
+layout_mode = 2
+
+[node name="DetailPortrait" type="TextureRect" parent="BracketScreen/Body/DetailPanel" unique_id=1227340989]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+stretch_mode = 5
+
+[node name="DetailTags" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=1608955013]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DetailStats" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=1181272063]
+layout_mode = 2
+
+[node name="DetailTechniques" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=610959949]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DetailOdds" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=739501460]
+layout_mode = 2
+
+[node name="SelectButton" type="Button" parent="BracketScreen/Body/DetailPanel" unique_id=795626927]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Select Fighter"
+
+[node name="ContinueButton" type="Button" parent="BracketScreen" unique_id=771854374]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Continue"
