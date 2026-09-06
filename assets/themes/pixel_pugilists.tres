@@ -1,6 +1,6 @@
 [gd_resource type="Theme" format=3]
 
-[ext_resource type="FontFile" path="res://assets/fonts/BoldPixels.ttf" id="1_duftc"]
+[ext_resource type="FontFile" path="res://assets/fonts/yoster.ttf" id="1_duftc"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nk1x1"]
 content_margin_left = 6.0
