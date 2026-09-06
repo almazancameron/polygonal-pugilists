@@ -108,6 +108,8 @@ var _last_round_results: Array[Dictionary] = []
 @onready var priority_builder_button: Button = $BeginCombatPanel/PriorityBuilderButton
 @onready var begin_combat_button: Button = $BeginCombatPanel/BeginButton
 
+@onready var bracket_screen: BracketScreen = $BracketScreen
+
 ## Emitted once the player picks a path off the pre-fight screen -- true for
 ## "open the priority builder", false for "begin the fight as-is". A plain
 ## signal rather than reusing priority_builder.confirm_requested since this
@@ -197,6 +199,8 @@ func _ready() -> void:
 	priority_builder_button.pressed.connect(func() -> void: pre_fight_choice_made.emit(true))
 	begin_combat_button.pressed.connect(_on_begin_fight_pressed)
 
+	bracket_screen.tooltip_layer = tooltip_layer
+
 	_no_priority_changes_dialog = ConfirmationDialog.new()
 	_no_priority_changes_dialog.dialog_text = "You haven't edited your priorities this round. Begin anyway?"
 	_no_priority_changes_dialog.confirmed.connect(func() -> void: pre_fight_choice_made.emit(false))
@@ -225,6 +229,7 @@ func _on_begin_fight_pressed() -> void:
 ## run rather than a full-health replay of whatever matchup just ended.
 func _start_new_run() -> void:
 	_build_bracket()
+	await _select_entrant()
 	current_round = 0
 	_priority_rules_edited_this_round = false
 
@@ -296,15 +301,29 @@ func _build_bracket() -> void:
 	# the player then joins keeps its label but never reads it again.
 	BracketResolver.scout_round(bracket.rounds[0])
 
-	_auto_pick_entrant(rng)
+## Round 1's character select. Every round-1 match is already scouted by
+## the time this shows, so the player can weigh each pairing's odds while
+## choosing -- the pick's own match then stops being scouting material and
+## becomes a real fight.
+func _select_entrant() -> void:
+	panels.visible = false
+	speed_toggle_button.visible = false
+	log_scroll.visible = false
 
-func _auto_pick_entrant(rng: RandomNumberGenerator) -> void:
-	var first_round: BracketRound = bracket.rounds[0]
-	var chosen: BracketMatch = first_round.matches[rng.randi_range(0, first_round.matches.size() - 1)]
-	chosen.is_player_match = true
+	bracket_screen.setup(bracket, 0, true)
+	bracket_screen.visible = true
 
-	player_familiar_data = chosen.entrant_a
-	enemy_familiar_data = chosen.entrant_b
+	var chosen: Familiar = await bracket_screen.entrant_selected
+
+	bracket_screen.visible = false
+
+	for bracket_match in bracket.rounds[0].matches:
+		if bracket_match.has_entrant(chosen):
+			bracket_match.is_player_match = true
+			bracket_match.odds_label = ""
+			player_familiar_data = chosen
+			enemy_familiar_data = bracket_match.other_entrant(chosen)
+			break
 
 ## The match the player is fighting this round.
 func player_bracket_match() -> BracketMatch:
