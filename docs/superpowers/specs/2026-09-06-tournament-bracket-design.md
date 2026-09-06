@@ -233,9 +233,15 @@ uses, auto-resolved:
   candidate (auto-select Run, since there's no player judgment call to
   make — Run is the slot actually informed by what the build already has).
 - The stat-upgrade point auto-applies to whichever of the five stats
-  (`max_hp`/`power`/`defense`/`speed`/`focus`) is currently lowest in
-  absolute terms on that familiar — simplest deterministic rule, not meant
-  to be a sophisticated AI, just "also growing."
+  (`max_hp`/`power`/`defense`/`speed`/`focus`) is currently *lowest as a
+  fraction of its own typical range* — not lowest in absolute terms, which
+  would never pick `max_hp` at all (it runs ~40-90 while the other four
+  run ~2-20, per `scripts/tools/_stat_search.gd`'s own bounds, so it would
+  always look "highest" regardless of how undernourished it actually is).
+  Each stat's fraction is `(current - typical_min) / (typical_max -
+  typical_min)`, using those same bounds (`max_hp`: 35-85; the other four:
+  2-20); the lowest fraction gets the point. Still a deliberately simple,
+  build-unaware rule (no read of techniques/passives/playstyle) — see §11.
 
 This is exactly why the reward-tagging pass (species_affinities, tags,
 role_\*) had to be finished before this design could be written — every AI
@@ -294,3 +300,9 @@ Carried forward from §2/§4.3, not resolved by this design on purpose:
   as one shared scene or two similar ones is an implementation-plan
   decision, not a design one — both use the identical hover/click
   component either way.
+- AI buildcrafting sophistication (§7) is intentionally minimal for this
+  pass — deterministic stat-fraction picking, an auto-selected Run-slot
+  reward, no awareness of synergy or playstyle. This is a deliberate "V1,
+  tune later" choice, same as the odds formula: expected to get smarter
+  once there's a real bracket to observe AI builds in, not a gap to close
+  before this ships.
