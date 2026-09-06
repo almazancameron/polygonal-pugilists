@@ -135,9 +135,11 @@ rounds resolve.
 
 ### 4.3 Margin, odds, and the roll
 
-A single free function, `BracketOdds.resolve(sim_winner: Familiar,
-margin: float) -> Dictionary` (`scripts/bracket/bracket_odds.gd`), is the
-one place all of this logic lives — everything else just calls it.
+All of this lives in `scripts/bracket/bracket_odds.gd` as four small
+static functions — `margin()`, `advance_probability()`, `winner_label()`,
+`loser_label()` — rather than one combined call. Each is a pure function
+of numbers only, which is what makes §10's "assert the exact label at
+each bucket edge" validation possible without constructing a match first.
 
 **Margin**: `winner_final_hp_pct - loser_final_hp_pct` from the simulated
 `BattleEngine.run_to_completion()` result (0.0 for a razor-thin finish, 1.0
@@ -161,16 +163,18 @@ swingy or too flat once real brackets are played.
 | 0.70 ≤ p < 0.90 | Favorite | Underdog |
 | p < 0.70 | Toss-up | Toss-up |
 
-`resolve()` returns `{"advance_probability": float, "odds_label_winner":
-String, "odds_label_loser": String}`. Scouting stores the label; the reveal
-step re-derives (or the same call caches) the probability to roll against.
+Scouting stores only the label on the match. The reveal step re-derives
+the probability by re-simulating: the sim is deterministic for a given
+pair of builds, and nothing about those builds changes between scouting
+and revealing, so this reproduces the same number without `BracketMatch`
+needing a field to cache it in.
 
 ## 5. Character select
 
 Replaces `_randomize_matchup()` as the run's opening screen. On `_start_new_run()`:
 
 1. `var bracket := Bracket.generate(full_roster)`.
-2. For every round-1 match, run the real sim and call `BracketOdds.resolve()`
+2. For every round-1 match, run the real sim and derive its odds label
    — **all 8**, not "all but the player's," since nobody's picked a side
    yet. Store each match's `odds_label`.
 3. Show the character-select screen: a browsable list of all 16 entrants
@@ -197,7 +201,7 @@ is the one exception — its scouting already happened during character
 select (§5), so this flow starts from round 2 onward:
 
 1. For every match in *this round* except the player's, run the sim +
-   `BracketOdds.resolve()`, store `odds_label`. (Each entrant's build
+   `BracketOdds`' label functions, store `odds_label`. (Each entrant's build
    already reflects every prior round's auto-applied rewards — see §7 —
    so later rounds' sims are just as meaningful as round 1's.)
 2. Show the scouting screen: same hover/click component as character
@@ -236,7 +240,8 @@ uses, auto-resolved:
   (`max_hp`/`power`/`defense`/`speed`/`focus`) is currently *lowest as a
   fraction of its own typical range* — not lowest in absolute terms, which
   would never pick `max_hp` at all (it runs ~40-90 while the other four
-  run ~2-20, per `scripts/tools/_stat_search.gd`'s own bounds, so it would
+  run ~2-20, per the bounds the session-7 stat-search pass used (recorded
+  in `DECISIONS.md`; that script was a throwaway and is deleted), so it would
   always look "highest" regardless of how undernourished it actually is).
   Each stat's fraction is `(current - typical_min) / (typical_max -
   typical_min)`, using those same bounds (`max_hp`: 35-85; the other four:
@@ -282,7 +287,7 @@ after-use pattern):
   matches, rounds 2–4 start empty.
 - Round-to-round pairing math: a hand-traced bracket confirms round *N*
   match *k* correctly draws from round *N-1* matches `2k`/`2k+1`.
-- `BracketOdds.resolve()`: boundary values (margin 0.0, 0.5, 1.0) produce
+- `BracketOdds`: boundary values (margin 0.0, 0.5, 1.0) produce
   the expected probability and label at each bucket edge.
 - A full multi-round run-through built directly from `Combatant`/
   `BattleEngine` (mirroring the existing stack-overflow repro pattern) —

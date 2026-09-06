@@ -51,7 +51,7 @@ familiar instead of one.
 - Re-optimizing priorities after every draft pick, not just once (§4.6).
 - A new balance-testing tool, `scripts/tools/draft_balance_test.gd`,
   extending `balance_test.gd`'s existing round-robin the same way
-  `_stat_search.gd` already does (`extends
+  the deleted `_stat_search.gd` throwaway did (`extends
   "res://scripts/tools/balance_test.gd"`) — runs each familiar through
   several full simulated drafts (one per personality) before the
   round-robin, instead of testing default kits only.
@@ -299,7 +299,7 @@ ability to write rules.
   necessary (most techniques get hints; not a mandatory pass over all 33
   up front — see §2).
 - `scripts/tools/draft_balance_test.gd` (new, extends `balance_test.gd`
-  the way `_stat_search.gd` already does).
+  the way the deleted `_stat_search.gd` throwaway did).
 
 ## 6. Validation
 
