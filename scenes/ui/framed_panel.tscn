@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cy3eo120wbtj0"]
+
+[ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="1_11yep"]
+
+[node name="FramedPanel" type="Control" unique_id=1671442616]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_11yep")
