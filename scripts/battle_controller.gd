@@ -107,9 +107,7 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var priority_builder: PriorityBuilder = $PriorityBuilder
 
-@onready var game_over_panel: Control = $GameOverPanel
-@onready var game_over_message_label: Label = $GameOverPanel/Content/MessageLabel
-@onready var restart_button: Button = $GameOverPanel/Content/RestartButton
+@onready var game_over_panel: GameOverPanel = $GameOverPanel
 
 @onready var begin_combat_panel: Control = $BeginCombatPanel
 @onready var begin_combat_round_label: Label = $BeginCombatPanel/Content/TitleBlock/RoundLabel
@@ -260,7 +258,7 @@ func _ready() -> void:
 
 	skip_button.pressed.connect(_on_skip_pressed)
 	next_round_button.pressed.connect(_on_next_round_pressed)
-	restart_button.pressed.connect(_on_restart_pressed)
+	game_over_panel.restart_requested.connect(_on_restart_pressed)
 	bracket_summary_button.pressed.connect(_on_next_opponent_panel_pressed)
 	build_view_button.pressed.connect(_on_build_view_pressed)
 
@@ -1134,8 +1132,7 @@ func show_game_over(message: String) -> void:
 	log_background.visible = false
 	log_outer_frame.visible = false
 
-	game_over_message_label.text = message
-	game_over_panel.visible = true
+	game_over_panel.show_message(message)
 
 func _on_restart_pressed() -> void:
 	await _start_new_run()

@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_panels/game_over_panel.gd" id="1_gopanel"]
+[ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_framed"]
+
+[node name="GameOverPanel" type="Control" unique_id=1048520037]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 150.0
+offset_right = -16.0
+offset_bottom = 590.0
+grow_horizontal = 2
+script = ExtResource("1_gopanel")
+
+[node name="Background" type="Control" parent="." unique_id=829935797]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+
+[node name="Content" type="VBoxContainer" parent="." unique_id=424323279]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="MessageLabel" type="Label" parent="Content" unique_id=1387639829]
+layout_mode = 2
+text = "Game Over"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Content" unique_id=545872067]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Restart"

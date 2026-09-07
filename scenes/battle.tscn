@@ -88,6 +88,7 @@
 [ext_resource type="Script" uid="uid://reqqbounkxb5" path="res://scripts/bracket/bracket_screen.gd" id="85_cqddr"]
 [ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="88_hauko"]
 [ext_resource type="PackedScene" uid="uid://cahe4vcmvjswf" path="res://scenes/battle_panels/build_view_panel.tscn" id="89_bvpanel"]
+[ext_resource type="PackedScene" path="res://scenes/battle_panels/game_over_panel.tscn" id="90_gopanel"]
 
 [sub_resource type="Theme" id="Theme_n6c5v"]
 default_font = ExtResource("82_d2g17")
@@ -302,44 +303,8 @@ script = ExtResource("4_logview")
 visible = false
 layout_mode = 1
 
-[node name="GameOverPanel" type="Control" parent="." unique_id=1048520037]
+[node name="GameOverPanel" parent="." unique_id=1048520037 instance=ExtResource("90_gopanel")]
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 150.0
-offset_right = -16.0
-offset_bottom = 590.0
-grow_horizontal = 2
-
-[node name="Background" type="Control" parent="GameOverPanel" unique_id=829935797]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("88_hauko")
-
-[node name="Content" type="VBoxContainer" parent="GameOverPanel" unique_id=424323279]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="MessageLabel" type="Label" parent="GameOverPanel/Content" unique_id=1387639829]
-layout_mode = 2
-text = "Game Over"
-horizontal_alignment = 1
-
-[node name="RestartButton" type="Button" parent="GameOverPanel/Content" unique_id=545872067]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Restart"
 
 [node name="TitleBanner" type="Label" parent="." unique_id=773084411]
 layout_mode = 1
