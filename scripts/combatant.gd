@@ -24,6 +24,13 @@ var opponent: Combatant = null
 var _passive_fire_counts: Dictionary[PassiveEffect, int] = {}
 # var first_act_override: bool = false
 
+## Guards against a specific reduce-Absorption-while-Stasis-is-up cascade
+## re-triggering itself unboundedly -- see Status.stacks's own setter for
+## the full mechanism. Not underscore-prefixed since Status (a different
+## class) needs to read and set it on its owner; reset once per turn
+## alongside _passive_fire_counts, in reset_turn_passive_limits().
+var absorption_stasis_redirect_used_this_turn: bool = false
+
 ## Populated by Technique.apply_status() immediately before add_status()
 ## runs, mapping each currently-active status's id to its stacks as they
 ## were right before this application. StatusPresentBeforeApplicationCondition
@@ -510,6 +517,7 @@ func reset_turn_passive_limits() -> void:
 	for passive in _passive_fire_counts.keys().duplicate():
 		if passive.limiter == PassiveEffect.Limiter.ONCE_PER_TURN or passive.limiter == PassiveEffect.Limiter.ONCE_PER_TECHNIQUE:
 			_passive_fire_counts.erase(passive)
+	absorption_stasis_redirect_used_this_turn = false
 
 ## Runs a matched OperationPassiveEffect's Technique against (self, opponent)
 ## and joins whatever messages its steps produce, the same way take_turn()

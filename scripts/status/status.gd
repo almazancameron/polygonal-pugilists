@@ -10,20 +10,37 @@ enum StatusEffect { NONE, POISON, BURN, ACID, BLEED, STAGGER, FORETELL, STUN, DE
 var stacks: int = 1:
 	set(value):
 		if value < stacks and owner != null and status_id() != Status.status_effect_id(Status.StatusEffect.STASIS):
-			var stasis: Status = owner.get_status(Status.StatusEffect.STASIS)
-			if stasis != null:
-				# This status's own reduction is redirected into Stasis instead
-				# (stacks left untouched below), so Stasis is the one whose
-				# stacks actually just changed -- notify for *it*, not for
-				# self, or STATUS_REDUCED/REMOVED never fires for Stasis at
-				# all (every caller of _notify_stack_change() only ever knows
-				# to check the status object it thinks it's ticking).
-				var stasis_stacks_before: int = stasis.stacks
-				stasis.stacks -= 1
-				owner._notify_stack_change(stasis, stasis_stacks_before)
-				if stasis.is_expired():
-					owner.statuses.erase(stasis)
-				return
+			# Absorption is the one status a single hit can touch twice in
+			# the same cascade: redirecting its reduction into Stasis below
+			# fires STATUS_REDUCED (for Stasis), which can trigger a
+			# retaliation passive (e.g. Portent's Toll) whose own hit lands
+			# on this same Combatant and asks to reduce Absorption again --
+			# a loop with no other exit than Stasis eventually running out,
+			# which never happens if it can't outpace however many times
+			# retaliation re-triggers per hit. No other status re-attempts
+			# a reduction like this from a passive it itself woke up, so the
+			# guard is scoped to Absorption specifically rather than
+			# touching Stasis's redirect (or any retaliation passive's own
+			# firing limit) in general.
+			var is_absorption: bool = status_id() == Status.status_effect_id(Status.StatusEffect.ABSORPTION)
+			if not (is_absorption and owner.absorption_stasis_redirect_used_this_turn):
+				var stasis: Status = owner.get_status(Status.StatusEffect.STASIS)
+				if stasis != null:
+					if is_absorption:
+						owner.absorption_stasis_redirect_used_this_turn = true
+
+					# This status's own reduction is redirected into Stasis instead
+					# (stacks left untouched below), so Stasis is the one whose
+					# stacks actually just changed -- notify for *it*, not for
+					# self, or STATUS_REDUCED/REMOVED never fires for Stasis at
+					# all (every caller of _notify_stack_change() only ever knows
+					# to check the status object it thinks it's ticking).
+					var stasis_stacks_before: int = stasis.stacks
+					stasis.stacks -= 1
+					owner._notify_stack_change(stasis, stasis_stacks_before)
+					if stasis.is_expired():
+						owner.statuses.erase(stasis)
+					return
 		stacks = value
 
 var owner: Combatant = null
