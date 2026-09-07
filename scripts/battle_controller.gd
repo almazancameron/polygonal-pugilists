@@ -116,11 +116,11 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var begin_combat_panel: Control = $BeginCombatPanel
 @onready var begin_combat_round_label: Label = $BeginCombatPanel/Content/TitleBlock/RoundLabel
 @onready var begin_combat_player_name_label: Label = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/NameLabel
-@onready var begin_combat_player_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/PortraitFrame/Center/Portrait
-@onready var begin_combat_player_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatList
+@onready var begin_combat_player_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/PortraitFrame/Center/Portrait
+@onready var begin_combat_player_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/StatList
 @onready var begin_combat_opponent_name_label: Label = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/NameLabel
-@onready var begin_combat_opponent_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/PortraitFrame/Center/Portrait
-@onready var begin_combat_opponent_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatList
+@onready var begin_combat_opponent_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/PortraitFrame/Center/Portrait
+@onready var begin_combat_opponent_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/StatList
 @onready var priority_builder_button: Button = $BeginCombatPanel/Content/ButtonsRow/PriorityBuilderButton
 @onready var begin_combat_button: Button = $BeginCombatPanel/Content/ButtonsRow/BeginButton
 
