@@ -113,12 +113,13 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var game_over_message_label: Label = $GameOverPanel/Content/MessageLabel
 @onready var restart_button: Button = $GameOverPanel/Content/RestartButton
 
-@onready var begin_combat_panel: VBoxContainer = $BeginCombatPanel
-@onready var begin_combat_message_label: Label = $BeginCombatPanel/MessageLabel
-@onready var begin_combat_portrait: TextureRect = $BeginCombatPanel/OpponentPortrait
-@onready var begin_combat_name_label: Label = $BeginCombatPanel/OpponentNameLabel
-@onready var priority_builder_button: Button = $BeginCombatPanel/PriorityBuilderButton
-@onready var begin_combat_button: Button = $BeginCombatPanel/BeginButton
+@onready var begin_combat_panel: Control = $BeginCombatPanel
+@onready var begin_combat_frame: FramedPanel = $BeginCombatPanel/Background
+@onready var begin_combat_message_label: Label = $BeginCombatPanel/Content/MessageLabel
+@onready var begin_combat_portrait: TextureRect = $BeginCombatPanel/Content/PortraitFrame/Center/OpponentPortrait
+@onready var begin_combat_name_label: Label = $BeginCombatPanel/Content/OpponentNameLabel
+@onready var priority_builder_button: Button = $BeginCombatPanel/Content/PriorityBuilderButton
+@onready var begin_combat_button: Button = $BeginCombatPanel/Content/BeginButton
 
 @onready var bracket_screen: BracketScreen = $BracketScreen
 
@@ -642,7 +643,8 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	log_background.visible = false
 	log_outer_frame.visible = false
 
-	begin_combat_message_label.text = "Ready to fight?"
+	begin_combat_message_label.text = "%s — Ready to fight?" % Bracket.round_display_name(current_round)
+	begin_combat_frame.header_text = Bracket.round_display_name(current_round)
 	begin_combat_portrait.texture = opponent.familiar.sprite
 	begin_combat_name_label.text = opponent.familiar.familiar_name
 	priority_builder_button.visible = show_priority_option
