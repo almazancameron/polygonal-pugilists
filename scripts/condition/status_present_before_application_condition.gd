@@ -56,8 +56,11 @@ func is_met(user: Combatant, target: Combatant) -> bool:
 func describe() -> String:
 	var whose: String = "target's" if check_target == Target.TARGET else "user's"
 	var name_str: String = "total status stacks" if check_all else String(Status.status_effect_id(status_effect)).capitalize()
+	# Plain ASCII "<"/">" render as icon-like glyphs in yoster.ttf -- these
+	# fullwidth/mathematical variants are ones it draws as plain angle
+	# brackets instead. See condition_block.gd's matching COMPARATOR labels.
 	var comparator_str: String = {
-		Comparator.GREATER: ">", Comparator.GREATER_OR_EQUAL: ">=",
-		Comparator.LESS: "<", Comparator.LESS_OR_EQUAL: "<=", Comparator.EQUAL: "==",
+		Comparator.GREATER: "＞", Comparator.GREATER_OR_EQUAL: "≥",
+		Comparator.LESS: "＜", Comparator.LESS_OR_EQUAL: "≤", Comparator.EQUAL: "==",
 	}[comparator]
 	return "%s %s stacks (before this application) %s %d" % [whose, name_str, comparator_str, value]

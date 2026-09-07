@@ -216,11 +216,15 @@ func _options_for(source: SentencePart.OptionSource) -> Array[Dictionary]:
 			entries.append({"label": "user's", "value": 0})
 			entries.append({"label": "target's", "value": 1})
 		SentencePart.OptionSource.COMPARATOR:
-			entries.append({"label": "<", "value": 2})
-			entries.append({"label": "<=", "value": 3})
+			# Plain ASCII "<"/">" render as filled play/rewind-triangle icons
+			# in yoster.ttf -- confirmed by direct render comparison. These
+			# fullwidth/mathematical variants are glyphs yoster draws as
+			# plain angle brackets instead, so no font override is needed.
+			entries.append({"label": "＜", "value": 2})
+			entries.append({"label": "≤", "value": 3})
 			entries.append({"label": "==", "value": 4})
-			entries.append({"label": ">=", "value": 1})
-			entries.append({"label": ">", "value": 0})
+			entries.append({"label": "≥", "value": 1})
+			entries.append({"label": "＞", "value": 0})
 		SentencePart.OptionSource.STATUS_EFFECT:
 			for effect in Status.StatusEffect.values():
 				if effect == Status.StatusEffect.NONE:

@@ -220,6 +220,10 @@ static func from_id(id: StringName, initial_stacks: int = 1) -> Status:
 ## Wraps a status name in the [url=...] markup TooltipPanel resolves into a
 ## nested status tooltip -- shared by Technique.describe() and
 ## NumericBonus.describe_bonus() so both quote status names the same way.
+## Bold as well as underlined -- yoster.ttf's underline is thin enough that
+## it reads as barely-there on its own, so [b] (see yoster_bold.tres, an
+## embolden FontVariation set as both RichTextLabels' bold_font override)
+## carries most of the "this is a link" signal.
 static func status_link(effect: StatusEffect) -> String:
 	var id: StringName = status_effect_id(effect)
-	return "[url=%s]%s[/url]" % [id, String(id).capitalize()]
+	return "[url=%s][b]%s[/b][/url]" % [id, String(id).capitalize()]

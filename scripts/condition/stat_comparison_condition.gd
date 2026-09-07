@@ -54,9 +54,12 @@ func is_met(user: Combatant, target: Combatant) -> bool:
 func describe() -> String:
     var left_target_str: String = "target's" if left_target == Target.TARGET else "user's"
     var left_stat_str: String = Familiar.stat_name(left_stat)
+    # Plain ASCII "<"/">" render as icon-like glyphs in yoster.ttf -- these
+    # fullwidth/mathematical variants are ones it draws as plain angle
+    # brackets instead. See condition_block.gd's matching COMPARATOR labels.
     var comparator_str: String = {
-        Comparator.GREATER: ">", Comparator.GREATER_OR_EQUAL: ">=",
-        Comparator.LESS: "<", Comparator.LESS_OR_EQUAL: "<=", Comparator.EQUAL: "==",
+        Comparator.GREATER: "＞", Comparator.GREATER_OR_EQUAL: "≥",
+        Comparator.LESS: "＜", Comparator.LESS_OR_EQUAL: "≤", Comparator.EQUAL: "==",
     }[comparator]
 
     if compare_mode == CompareMode.FLAT_VALUE:

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cpoocf6py0tto" path="res://scripts/tooltip_panel.gd" id="1_5atpf"]
 [ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_u6ryj"]
+[ext_resource type="FontVariation" path="res://assets/fonts/yoster_bold.tres" id="3_mkpxh"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_u6ryj"]
 content_margin_left = 8.0
@@ -36,6 +37,8 @@ offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
+theme_override_fonts/bold_font = ExtResource("3_mkpxh")
+theme_override_font_sizes/bold_font_size = 16
 bbcode_enabled = true
 text = "EXAMPLE"
 fit_content = true

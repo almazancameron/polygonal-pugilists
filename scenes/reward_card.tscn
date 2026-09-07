@@ -1,34 +1,38 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://b18wycj8e53is"]
 
-[ext_resource type="Script" path="res://scripts/reward/reward_card.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://c87p10f66r8he" path="res://scripts/reward/reward_card.gd" id="1_card"]
+[ext_resource type="FontVariation" path="res://assets/fonts/yoster_bold.tres" id="2_b5dx5"]
 
-[node name="RewardCard" type="Button"]
+[node name="RewardCard" type="Button" unique_id=1679984179]
 custom_minimum_size = Vector2(180, 160)
 toggle_mode = true
 script = ExtResource("1_card")
 
-[node name="Content" type="VBoxContainer" parent="."]
-mouse_filter = 2
+[node name="Content" type="VBoxContainer" parent="." unique_id=1763830330]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-
-[node name="TitleLabel" type="Label" parent="Content"]
-layout_mode = 2
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-autowrap_mode = 3
+
+[node name="TitleLabel" type="Label" parent="Content" unique_id=1644227123]
+layout_mode = 2
 text = "Reward"
+autowrap_mode = 3
 
-[node name="IconArea" type="ColorRect" parent="Content"]
+[node name="IconArea" type="ColorRect" parent="Content" unique_id=933603122]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 mouse_filter = 2
-custom_minimum_size = Vector2(0, 48)
 color = Color(0.3, 0.3, 0.3, 1)
 
-[node name="DescriptionLabel" type="RichTextLabel" parent="Content"]
+[node name="DescriptionLabel" type="RichTextLabel" parent="Content" unique_id=1980191162]
 layout_mode = 2
 mouse_filter = 1
+theme_override_fonts/bold_font = ExtResource("2_b5dx5")
+theme_override_font_sizes/bold_font_size = 16
 bbcode_enabled = true
 fit_content = true
 scroll_active = false

@@ -339,6 +339,15 @@ func _build_side_display(into: VBoxContainer, label_text: String, editable_max_h
 	var background_style := StyleBoxFlat.new()
 	background_style.bg_color = HP_BAR_BACKGROUND_COLOR
 	hp_bar.bar_background_style = background_style
+	# HPBar.set_hp() only ever mutates .bg_color on whatever StyleBoxFlat it
+	# finds under "fill" -- without one already present here, it falls back
+	# to the engine's built-in default ProgressBar fill style (rounded),
+	# unlike battle.tscn's own HPBar instances, which have one authored
+	# directly in the scene. This one's color doesn't matter; set_hp()
+	# overwrites it on the very first call.
+	var fill_style := StyleBoxFlat.new()
+	fill_style.bg_color = Palette.HP_FULL
+	hp_bar.bar_fill_style = fill_style
 	into.add_child(hp_bar)
 
 	var status_row: StatusRow = preload("res://scenes/status_row.tscn").instantiate()

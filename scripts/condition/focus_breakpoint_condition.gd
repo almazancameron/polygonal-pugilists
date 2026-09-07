@@ -40,8 +40,11 @@ func is_met(user: Combatant, target: Combatant) -> bool:
 
 func describe() -> String:
 	var whose: String = "target's" if focus_target == Target.TARGET else "own"
+	# Plain ASCII "<"/">" render as icon-like glyphs in yoster.ttf -- these
+	# fullwidth/mathematical variants are ones it draws as plain angle
+	# brackets instead. See condition_block.gd's matching COMPARATOR labels.
 	var comparator_str: String = {
-		Comparator.GREATER: ">", Comparator.GREATER_OR_EQUAL: ">=",
-		Comparator.LESS: "<", Comparator.LESS_OR_EQUAL: "<=", Comparator.EQUAL: "==",
+		Comparator.GREATER: "＞", Comparator.GREATER_OR_EQUAL: "≥",
+		Comparator.LESS: "＜", Comparator.LESS_OR_EQUAL: "≤", Comparator.EQUAL: "==",
 	}[comparator]
 	return "%s Focus tier %s %d" % [whose, comparator_str, tier]

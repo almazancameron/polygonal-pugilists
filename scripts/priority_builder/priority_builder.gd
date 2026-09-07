@@ -33,20 +33,20 @@ const DEFINITION_ORDER: Array[String] = [
 
 @onready var tooltip_layer: TooltipLayer = $TooltipLayer/TooltipContainer
 
-@onready var familiar_name_label: Label = $Columns/LeftColumn/Content/FamiliarPanel/Rows/NameLabel
-@onready var portrait: TextureRect = $Columns/LeftColumn/Content/FamiliarPanel/Rows/Portrait
-@onready var stat_grid: GridContainer = $Columns/LeftColumn/Content/FamiliarPanel/Rows/StatGrid
-@onready var technique_palette: BlockPalette = $Columns/LeftColumn/Content/TechniqueScroll/TechniquePalette
-@onready var passive_palette: BlockPalette = $Columns/LeftColumn/Content/PassiveScroll/PassivePalette
+@onready var familiar_name_label: Label = $Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows/NameLabel
+@onready var portrait: TextureRect = $Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows/PortraitFrame/Center/Portrait
+@onready var stat_list: VBoxContainer = $Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows/StatList
+@onready var technique_palette: BlockPalette = $Columns/LeftColumn/TechniquesCard/Content/TechniqueScroll/TechniquePalette
+@onready var passive_palette: BlockPalette = $Columns/LeftColumn/PassivesCard/Content/PassiveScroll/PassivePalette
 
 @onready var add_slot_button: Button = $Footer/AddSlotButton
 @onready var confirm_button: Button = $Footer/ConfirmButton
 @onready var segment_list: SegmentList = $Columns/BuildColumn/Content/BuildScroll/SegmentList
 
-@onready var condition_palette: BlockPalette = $Columns/RightColumn/Content/ConditionScroll/ConditionPalette
-@onready var state_probe: StateProbe = $Columns/RightColumn/Content/StateProbe
-@onready var probe_controls: VBoxContainer = $Columns/RightColumn/Content/StateProbe/Rows/Controls
-@onready var probe_message: Label = $Columns/RightColumn/Content/StateProbe/Rows/Message
+@onready var condition_palette: BlockPalette = $Columns/RightColumn/ConditionsCard/Content/ConditionScroll/ConditionPalette
+@onready var state_probe: StateProbe = $Columns/RightColumn/MockStateCard/Content/Scroll/StateProbe
+@onready var probe_controls: VBoxContainer = $Columns/RightColumn/MockStateCard/Content/Scroll/StateProbe/Rows/Controls
+@onready var probe_message: Label = $Columns/RightColumn/MockStateCard/Content/Scroll/StateProbe/Rows/Message
 
 ## True once anything has structurally changed since the last setup() call
 ## -- i.e. the player actually touched the build area this session (not
@@ -119,7 +119,7 @@ func setup(familiar: Familiar, opponent: Familiar) -> void:
 		segment.load_rule(rule, _definitions())
 
 	# No auto-added trailing empty slot: the screen shows exactly what the
-	# familiar already has. "+ Add slot" is right there whenever the player
+	# familiar already has. "✚ Add slot" is right there whenever the player
 	# actually wants a new one -- an empty slot nobody asked for on every
 	# single reopen just reads as clutter.
 	_refresh()
@@ -192,23 +192,93 @@ func _refresh() -> void:
 
 ## Base stats, plus the effective value when a declared status changes it
 ## (Hone, Fortify, Enlarge, Ruin). stat_vs_value conditions read the
-## effective one, so showing only the base would mislead.
+## effective one, so showing only the base would mislead. MAX_HP has no
+## icon here -- it gets an actual HPBar instead (see _add_max_hp_row()),
+## matching how HP reads everywhere else in the game.
+const STAT_ICONS: Dictionary = {
+	Familiar.Stat.POWER: preload("res://assets/sprites/icons/power_icon.tres"),
+	Familiar.Stat.DEFENSE: preload("res://assets/sprites/icons/defense_icon.tres"),
+	Familiar.Stat.SPEED: preload("res://assets/sprites/icons/speed_icon.tres"),
+	Familiar.Stat.FOCUS: preload("res://assets/sprites/icons/focus_icon.tres"),
+}
+
+const HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
+
 func _refresh_stats() -> void:
 	# remove_child as well as queue_free: queue_free is deferred, so
 	# rebuilding in the same frame would otherwise append alongside the
 	# outgoing labels.
-	for child in stat_grid.get_children():
-		stat_grid.remove_child(child)
+	for child in stat_list.get_children():
+		stat_list.remove_child(child)
 		child.queue_free()
 
+	_add_max_hp_row()
+
 	for stat in Familiar.Stat.values():
+		if stat == Familiar.Stat.MAX_HP:
+			continue
+
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		stat_list.add_child(row)
+
+		var icon := TextureRect.new()
+		icon.texture = STAT_ICONS[stat]
+		icon.custom_minimum_size = Vector2(16, 16)
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+		icon.modulate = Palette.TEXT_MUTED
+		row.add_child(icon)
+
 		var name_label := Label.new()
 		name_label.text = Familiar.stat_name(stat)
-		stat_grid.add_child(name_label)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_label)
 
 		var base: int = builder_familiar.get_stat(stat)
 		var effective: int = state_probe.user.effective_stat(stat)
 
 		var value_label := Label.new()
 		value_label.text = str(base) if base == effective else "%d → %d" % [base, effective]
-		stat_grid.add_child(value_label)
+		row.add_child(value_label)
+
+const MAX_HP_ICON: Texture2D = preload("res://assets/sprites/icons/max_hp_icon.tres")
+
+## No status in this game scales MAX_HP (unlike Power/Defense/Speed/Focus,
+## which Hone/Fortify/Enlarge/Ruin can), so there's no base -> effective
+## case to show here -- just the familiar's own max HP, always full. Same
+## icon+label prefix as the other stat rows, with an actual (small) HPBar
+## standing in for the plain value label -- the heart there is this row's
+## own icon, so the bar's built-in one is hidden to avoid showing two.
+func _add_max_hp_row() -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	stat_list.add_child(row)
+
+	var icon := TextureRect.new()
+	icon.texture = MAX_HP_ICON
+	icon.custom_minimum_size = Vector2(16, 16)
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	icon.modulate = Palette.HP_ICON
+	row.add_child(icon)
+
+	var name_label := Label.new()
+	name_label.text = Familiar.stat_name(Familiar.Stat.MAX_HP)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(name_label)
+
+	var hp_bar: HPBar = HP_BAR_SCENE.instantiate()
+	hp_bar.custom_minimum_size = Vector2(90, 14)
+	row.add_child(hp_bar)
+
+	var background_style := StyleBoxFlat.new()
+	background_style.bg_color = Palette.HP_TRACK
+	hp_bar.bar_background_style = background_style
+
+	var fill_style := StyleBoxFlat.new()
+	fill_style.bg_color = Palette.HP_FULL
+	hp_bar.bar_fill_style = fill_style
+
+	hp_bar.heart_icon.visible = false
+
+	var max_hp: int = builder_familiar.get_stat(Familiar.Stat.MAX_HP)
+	hp_bar.set_hp(max_hp, max_hp)

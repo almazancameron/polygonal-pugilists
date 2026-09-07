@@ -522,6 +522,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="DetailPanel" type="Control" parent="BracketScreen/Body/Content" unique_id=2042057886]
+visible = false
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 
@@ -538,7 +539,6 @@ border_color = Color(1, 0.714, 0.282, 1)
 header_text = "DETAILS"
 
 [node name="Content" type="VBoxContainer" parent="BracketScreen/Body/Content/DetailPanel" unique_id=1850694439]
-custom_minimum_size = Vector2(320, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -552,6 +552,7 @@ grow_vertical = 2
 
 [node name="DetailName" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=12517013]
 layout_mode = 2
+autowrap_mode = 2
 
 [node name="DetailPortrait" type="TextureRect" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=1227340989]
 custom_minimum_size = Vector2(96, 96)
@@ -565,6 +566,7 @@ autowrap_mode = 2
 
 [node name="DetailStats" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=1181272063]
 layout_mode = 2
+autowrap_mode = 2
 
 [node name="DetailTechniques" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=610959949]
 layout_mode = 2
@@ -572,6 +574,7 @@ autowrap_mode = 2
 
 [node name="DetailOdds" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=739501460]
 layout_mode = 2
+autowrap_mode = 2
 
 [node name="SelectButton" type="Button" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=795626927]
 layout_mode = 2

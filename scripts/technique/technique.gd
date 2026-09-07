@@ -255,6 +255,19 @@ func apply_heal(user: Combatant, target: Combatant, heal: HealAction, numeric_bo
 
 	return message
 
+## True when at least one HitAction across this technique's step groups
+## actually scales with power_multiplier -- a HitAction with
+## ignore_power_and_defense set deals a flat amount instead (see
+## apply_hit()), so power_multiplier wouldn't describe its damage at all.
+## Used by the priority builder's palette to decide whether a "Power ×N"
+## subtitle is meaningful for this technique.
+func has_scaling_hit() -> bool:
+	for step_group in step_groups:
+		for action in step_group.actions:
+			if action is HitAction and not action.ignore_power_and_defense:
+				return true
+	return false
+
 ## A human-readable summary built from step_groups, for tooltips and reward
 ## offers. The only content class that lacked a describe() -- Status,
 ## Condition and UpgradeOption all had one -- which is why

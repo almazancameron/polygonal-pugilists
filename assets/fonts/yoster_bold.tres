@@ -1,0 +1,7 @@
+[gd_resource type="FontVariation" load_steps=2 format=3]
+
+[ext_resource type="FontFile" uid="uid://dx5mcc8hoc7sk" path="res://assets/fonts/yoster.ttf" id="1_yoster"]
+
+[resource]
+base_font = ExtResource("1_yoster")
+variation_embolden = 0.9

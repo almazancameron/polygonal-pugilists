@@ -64,8 +64,9 @@ func setup_technique(technique_data: Technique, layer: TooltipLayer) -> void:
 	icon_rect.modulate = Palette.PLAYER_ACCENT
 	icon_rect.visible = true
 
-	subtitle_label.text = "Power ×%s" % _format_multiplier(technique.power_multiplier)
-	subtitle_label.visible = true
+	subtitle_label.visible = technique.has_scaling_hit()
+	if subtitle_label.visible:
+		subtitle_label.text = "Power ×%s" % _format_multiplier(technique.power_multiplier)
 
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)

@@ -17,6 +17,7 @@ signal dismissed
 
 @onready var title_label: Label = $TitleLabel
 @onready var entrant_list: VBoxContainer = $Body/Content/EntrantScroll/Content/EntrantList
+@onready var detail_panel: Control = $Body/Content/DetailPanel
 @onready var detail_name: Label = $Body/Content/DetailPanel/Content/DetailName
 @onready var detail_portrait: TextureRect = $Body/Content/DetailPanel/Content/DetailPortrait
 @onready var detail_tags: Label = $Body/Content/DetailPanel/Content/DetailTags
@@ -168,7 +169,12 @@ func _on_row_pressed(familiar: Familiar) -> void:
 		detail_odds.text = "Matchup: %s" % odds
 
 	select_button.disabled = false
+	detail_panel.visible = true
 
+## Also hides the panel entirely rather than leaving an empty frame sitting
+## next to the entrant list -- EntrantScroll's own EXPAND_FILL size flags
+## mean it just grows into the freed column once DetailPanel is hidden,
+## Content being an HBoxContainer.
 func _clear_detail() -> void:
 	detail_name.text = ""
 	detail_portrait.texture = null
@@ -177,6 +183,7 @@ func _clear_detail() -> void:
 	detail_techniques.text = ""
 	detail_odds.text = ""
 	select_button.disabled = true
+	detail_panel.visible = false
 
 func _on_select_pressed() -> void:
 	if _selected == null:
