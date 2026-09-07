@@ -39,9 +39,28 @@ var _widgets: Dictionary = {}
 ## already-authored priority_rules) instead of always minting a fresh one --
 ## the sentence widgets below already read their initial value from
 ## _condition.get(part.property), so nothing else here needs to change.
+## Same category -> color mapping PaletteBlock uses for the palette entry
+## this block was dragged from, so a placed condition still reads as the
+## same kind once it's sitting in a rule.
+const CATEGORY_COLORS: Dictionary = {
+	"Status": Color(0.976, 0.451, 0.086),
+	"HP": Color(0.898, 0.224, 0.208),
+	"Stat": Color(0.243, 0.812, 0.769),
+	"Logic": Color(0.541, 0.561, 0.596),
+}
+
 func setup(block_definition: ConditionBlockDefinition, existing_condition: Condition = null) -> void:
 	definition = block_definition
 	_condition = existing_condition if existing_condition != null else definition.condition_script.new()
+
+	var color: Color = CATEGORY_COLORS.get(definition.category, Palette.TEXT_MUTED)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Palette.BACKGROUND
+	style.border_color = color
+	style.set_border_width_all(2)
+	style.set_content_margin_all(6)
+	style.set_corner_radius_all(2)
+	add_theme_stylebox_override("panel", style)
 
 	for key in definition.fixed_values:
 		_condition.set(key, definition.fixed_values[key])

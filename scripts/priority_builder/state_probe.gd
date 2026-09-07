@@ -212,7 +212,7 @@ func evaluate(compiled: Dictionary) -> void:
 
 	for segment in compiled["incomplete"]:
 		_verdicts[segment] = Verdict.INCOMPLETE
-		segment.set_verdict("⚠ incomplete", _incomplete_reason(segment))
+		segment.set_verdict(Verdict.INCOMPLETE, "⚠ incomplete", _incomplete_reason(segment))
 
 	var winner: int = -1
 
@@ -221,7 +221,7 @@ func evaluate(compiled: Dictionary) -> void:
 
 		if winner != -1:
 			_verdicts[segment] = Verdict.UNREACHED
-			segment.set_verdict("– unreached", "an earlier rule fired")
+			segment.set_verdict(Verdict.UNREACHED, "– unreached", "an earlier rule fired")
 			continue
 
 		var failed: Condition = null
@@ -233,10 +233,10 @@ func evaluate(compiled: Dictionary) -> void:
 		if failed == null:
 			winner = i
 			_verdicts[segment] = Verdict.FIRES
-			segment.set_verdict("✓ FIRES", rules[i].technique.technique_name)
+			segment.set_verdict(Verdict.FIRES, "✓ FIRES", rules[i].technique.technique_name)
 		else:
 			_verdicts[segment] = Verdict.SKIPPED
-			segment.set_verdict("✗ skipped", failed.describe())
+			segment.set_verdict(Verdict.SKIPPED, "✗ skipped", failed.describe())
 
 	if winner == -1:
 		_no_match = "No rule matched — add a slot with a technique and no conditions."

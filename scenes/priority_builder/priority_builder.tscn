@@ -26,6 +26,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 54.0
+offset_bottom = -56.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
@@ -75,10 +76,6 @@ stretch_mode = 5
 layout_mode = 2
 columns = 2
 
-[node name="TechniqueLabel" type="Label" parent="Columns/LeftColumn/Content" unique_id=1548285851]
-layout_mode = 2
-text = "TECHNIQUES"
-
 [node name="TechniqueScroll" type="ScrollContainer" parent="Columns/LeftColumn/Content" unique_id=1115238117]
 layout_mode = 2
 size_flags_vertical = 3
@@ -126,26 +123,6 @@ offset_right = -10.0
 offset_bottom = -10.0
 size_flags_horizontal = 3
 
-[node name="Header" type="HBoxContainer" parent="Columns/BuildColumn/Content" unique_id=1846722877]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Columns/BuildColumn/Content/Header" unique_id=248032231]
-layout_mode = 2
-text = "PRIORITY"
-
-[node name="Spacer" type="Control" parent="Columns/BuildColumn/Content/Header" unique_id=333957175]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-
-[node name="AddSlotButton" type="Button" parent="Columns/BuildColumn/Content/Header" unique_id=751606923]
-layout_mode = 2
-text = "+ Add slot"
-
-[node name="ConfirmButton" type="Button" parent="Columns/BuildColumn/Content/Header" unique_id=966138334]
-layout_mode = 2
-text = "Confirm Priorities"
-
 [node name="BuildScroll" type="ScrollContainer" parent="Columns/BuildColumn/Content" unique_id=281569208]
 layout_mode = 2
 size_flags_vertical = 3
@@ -183,10 +160,6 @@ offset_top = 10.0
 offset_right = -10.0
 offset_bottom = -10.0
 
-[node name="ConditionLabel" type="Label" parent="Columns/RightColumn/Content" unique_id=845176829]
-layout_mode = 2
-text = "CONDITIONS"
-
 [node name="ConditionScroll" type="ScrollContainer" parent="Columns/RightColumn/Content" unique_id=1983763367]
 layout_mode = 2
 size_flags_vertical = 3
@@ -216,3 +189,25 @@ layout_mode = 2
 autowrap_mode = 3
 
 [node name="TooltipLayer" parent="." unique_id=1148912503 instance=ExtResource("5_tooltip")]
+
+[node name="Footer" type="HBoxContainer" parent="." unique_id=1041008094]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -48.0
+offset_right = -16.0
+offset_bottom = -8.0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="AddSlotButton" type="Button" parent="Footer" unique_id=751606923]
+layout_mode = 2
+text = "+ Add slot"
+
+[node name="ConfirmButton" type="Button" parent="Footer" unique_id=966138334]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+text = "Confirm Priorities"

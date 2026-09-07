@@ -12,34 +12,42 @@ script = ExtResource("1_rseg")
 [node name="Rows" type="VBoxContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
+theme_override_constants/separation = 6
 
 [node name="Header" type="HBoxContainer" parent="Rows"]
 layout_mode = 2
 mouse_filter = 2
+theme_override_constants/separation = 8
 
 [node name="Handle" type="Label" parent="Rows/Header"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
 tooltip_text = "drag to reorder"
 text = "  ≡  "
 
 [node name="IndexLabel" type="Label" parent="Rows/Header"]
 layout_mode = 2
 mouse_filter = 2
+theme_override_font_sizes/font_size = 22
 text = "1"
 
 [node name="VerdictLabel" type="Label" parent="Rows/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 4
 clip_text = true
 mouse_filter = 2
 
 [node name="DeleteButton" type="Button" parent="Rows/Header"]
+custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
+size_flags_vertical = 4
 text = "×"
 
 [node name="ConditionBody" type="VBoxContainer" parent="Rows"]
 layout_mode = 2
 mouse_filter = 2
+theme_override_constants/separation = 4
 script = ExtResource("2_dzone")
 empty_text = "drop conditions here"
 empty_height = 30.0

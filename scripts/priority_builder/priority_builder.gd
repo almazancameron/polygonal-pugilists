@@ -39,8 +39,8 @@ const DEFINITION_ORDER: Array[String] = [
 @onready var technique_palette: BlockPalette = $Columns/LeftColumn/Content/TechniqueScroll/TechniquePalette
 @onready var passive_palette: BlockPalette = $Columns/LeftColumn/Content/PassiveScroll/PassivePalette
 
-@onready var add_slot_button: Button = $Columns/BuildColumn/Content/Header/AddSlotButton
-@onready var confirm_button: Button = $Columns/BuildColumn/Content/Header/ConfirmButton
+@onready var add_slot_button: Button = $Footer/AddSlotButton
+@onready var confirm_button: Button = $Footer/ConfirmButton
 @onready var segment_list: SegmentList = $Columns/BuildColumn/Content/BuildScroll/SegmentList
 
 @onready var condition_palette: BlockPalette = $Columns/RightColumn/Content/ConditionScroll/ConditionPalette

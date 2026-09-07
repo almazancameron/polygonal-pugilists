@@ -263,8 +263,31 @@ func receive_condition_block(block: ConditionBlock, at_index: int = -1) -> void:
 func _on_block_structure_changed() -> void:
 	structure_changed.emit()
 
+## Matches state_probe.gd's own StateProbe.Verdict enum values -- FIRES
+## reads cyan (matching the mockup's own "FIRES" state), INCOMPLETE gold,
+## UNREACHED/SKIPPED both a muted gray (SKIPPED has no separate mockup
+## reference state to match, so it shares UNREACHED's "not happening right
+## now" read rather than inventing a fifth color).
+const VERDICT_COLORS: Dictionary = {
+	StateProbe.Verdict.FIRES: Color(0.243, 0.812, 0.769),
+	StateProbe.Verdict.INCOMPLETE: Color(1.0, 0.714, 0.282),
+	StateProbe.Verdict.UNREACHED: Color(0.541, 0.561, 0.596),
+	StateProbe.Verdict.SKIPPED: Color(0.541, 0.561, 0.596),
+}
+
 func set_index(index: int) -> void:
 	index_label.text = str(index)
 
-func set_verdict(badge: String, detail: String) -> void:
+func set_verdict(verdict: StateProbe.Verdict, badge: String, detail: String) -> void:
 	verdict_label.text = badge if detail == "" else "%s — %s" % [badge, detail]
+
+	var color: Color = VERDICT_COLORS.get(verdict, Color(0.541, 0.561, 0.596))
+	verdict_label.add_theme_color_override("font_color", color)
+
+	var style := StyleBoxFlat.new()
+	style.bg_color = Palette.BACKGROUND
+	style.border_color = color
+	style.set_border_width_all(2)
+	style.set_content_margin_all(8)
+	style.set_corner_radius_all(2)
+	add_theme_stylebox_override("panel", style)
