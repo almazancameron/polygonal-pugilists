@@ -550,7 +550,7 @@ offset_bottom = 48.0
 grow_horizontal = 0
 text = "AUTO: ON"
 
-[node name="StepButton" type="Button" parent="." unique_id=1524887644]
+[node name="AdvanceButton" type="Button" parent="." unique_id=1524887644]
 visible = false
 layout_mode = 1
 anchors_preset = 1
@@ -561,4 +561,4 @@ offset_top = 16.0
 offset_right = -16.0
 offset_bottom = 48.0
 grow_horizontal = 0
-text = "Step"
+text = "Advance"

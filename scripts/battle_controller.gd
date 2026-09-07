@@ -102,7 +102,7 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var speed_toggle_button: Button = $SpeedToggleButton
 @onready var auto_toggle_button: Button = $AutoToggleButton
-@onready var step_button: Button = $StepButton
+@onready var advance_button: Button = $AdvanceButton
 
 @onready var priority_builder: PriorityBuilder = $PriorityBuilder
 
@@ -176,9 +176,16 @@ const SPEED_MULTIPLIERS: Array[int] = [1, 2, 4]
 var speed_index: int = 0
 
 ## True = existing always-on pacing (paused only by the speed multiplier).
-## False = each turn pauses after resolving, awaiting a manual step
-## (gated on step_button.pressed directly -- see take_turn()).
+## False = each turn pauses after resolving, awaiting a manual advance
+## (see take_turn()'s turn_gate_opened gate).
 var auto_enabled: bool = true
+
+## Wakes up take_turn()'s turn-boundary gate -- fired by AdvanceButton, and
+## also by switching Auto back on, since a gate already suspended on
+## advance_button.pressed would otherwise never notice auto_enabled flipped
+## back to true and stay frozen forever (the button that could unstick it
+## is itself hidden the moment Auto turns on).
+signal turn_gate_opened
 
 var player: Combatant
 var enemy: Combatant
@@ -196,7 +203,8 @@ func _ready() -> void:
 
 	speed_toggle_button.pressed.connect(_on_speed_toggle_pressed)
 	auto_toggle_button.pressed.connect(_on_auto_toggle_pressed)
-	step_button.visible = false
+	advance_button.pressed.connect(turn_gate_opened.emit)
+	advance_button.visible = false
 
 	_slot_columns = {
 		RewardSelector.RewardSlot.SPECIES: species_column,
@@ -327,7 +335,7 @@ func _show_scouting() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
-	step_button.visible = false
+	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -346,7 +354,7 @@ func _select_entrant() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
-	step_button.visible = false
+	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -378,7 +386,9 @@ func _on_auto_toggle_pressed() -> void:
 	auto_enabled = not auto_enabled
 	auto_toggle_button.text = "AUTO: %s" % ("ON" if auto_enabled else "OFF")
 	speed_toggle_button.visible = auto_enabled
-	step_button.visible = not auto_enabled
+	advance_button.visible = not auto_enabled
+	if auto_enabled:
+		turn_gate_opened.emit()
 
 ## Spawns a button on the shared choice panel (used for the round-4
 ## sacrifice screen) that calls on_pressed when clicked.
@@ -414,7 +424,7 @@ func begin_reward_sequence() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
-	step_button.visible = false
+	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -609,7 +619,7 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	panels.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
-	step_button.visible = false
+	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -671,7 +681,7 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 	log_scroll.visible = true
 	log_background.visible = true
 	auto_toggle_button.visible = true
-	step_button.visible = not auto_enabled
+	advance_button.visible = not auto_enabled
 
 	for child in build_select_panel.get_children():
 		child.queue_free()
@@ -768,7 +778,8 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 		if combatant.is_defeated():
 			return await check_victory()
 
-		await get_tree().create_timer(0.6).timeout
+		if auto_enabled:
+			await get_tree().create_timer(0.6).timeout
 
 	return await check_victory()
 
@@ -785,7 +796,7 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 		update_hp_display(actor)
 		update_hp_display(target)
 
-		if entry.paced:
+		if entry.paced and auto_enabled:
 			await get_tree().create_timer(0.6).timeout
 
 	if show_priority_skip_log:
@@ -793,7 +804,7 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 			combat_log.add_entry(reason, source)
 
 	if not auto_enabled:
-		await step_button.pressed
+		await turn_gate_opened
 
 	await advance_turn(actor)
 
@@ -857,7 +868,7 @@ func show_game_over(message: String) -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
-	step_button.visible = false
+	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
