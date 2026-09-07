@@ -62,6 +62,15 @@ func _update_header_label() -> void:
 	_header_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 func _draw() -> void:
+	# A zero/near-zero rect (e.g. one frame before a Container first lays out
+	# its children, or a screen that's currently hidden) produces a
+	# self-intersecting notch polygon once CORNER_CUT exceeds half the
+	# rect's own size -- Godot's triangulator rejects that outright
+	# ("Invalid polygon data, triangulation failed"). Skip drawing entirely
+	# rather than draw garbage for one frame.
+	if size.x <= 0.0 or size.y <= 0.0:
+		return
+
 	var rect := Rect2(Vector2.ZERO, size)
 	var has_header: bool = header_text != ""
 	var header_width: float = 0.0
@@ -95,7 +104,9 @@ func _draw() -> void:
 ## rectangular tab cut upward out of the top edge (left-aligned, just
 ## inside the top-left notch) for the header label to sit in.
 func _outline_points(rect: Rect2, has_header: bool, header_width: float) -> Array[Vector2]:
-	var c := CORNER_CUT
+	# Clamped so a rect smaller than 2*CORNER_CUT in either dimension can't
+	# push the notch points past each other into a self-intersecting polygon.
+	var c := minf(CORNER_CUT, minf(rect.size.x, rect.size.y) / 2.0)
 	var points: Array[Vector2] = [
 		Vector2(rect.position.x, rect.position.y + c),
 		Vector2(rect.position.x + c, rect.position.y),

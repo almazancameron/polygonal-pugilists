@@ -165,7 +165,8 @@ layout_mode = 1
 anchor_left = -0.015
 anchor_right = 0.8
 anchor_bottom = 1.0
-offset_bottom = 6.0
+offset_top = -8.0
+offset_bottom = 8.0
 mouse_filter = 2
 script = ExtResource("88_hauko")
 
@@ -173,6 +174,7 @@ script = ExtResource("88_hauko")
 layout_mode = 1
 anchor_right = 0.78
 anchor_bottom = 1.0
+offset_right = 4.0
 mouse_filter = 2
 script = ExtResource("88_hauko")
 border_color = Color(0.91, 0.329, 0.18, 1)
@@ -182,9 +184,9 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.78
 anchor_bottom = 1.0
-offset_left = 8.0
+offset_left = 16.0
 offset_top = 6.0
-offset_right = -8.0
+offset_right = -16.0
 offset_bottom = -6.0
 size_flags_horizontal = 3
 
@@ -198,6 +200,7 @@ bar_fill_style = SubResource("StyleBoxFlat_66ngm")
 [node name="StatusRow" parent="Panels/PlayerPanel/Content" unique_id=42082652 instance=ExtResource("7_yahae")]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="EnemyPanel" type="Control" parent="Panels" unique_id=1049994733]
 layout_mode = 2
@@ -208,7 +211,8 @@ layout_mode = 1
 anchor_left = 0.2
 anchor_right = 1.015
 anchor_bottom = 1.0
-offset_bottom = 6.0
+offset_top = -8.0
+offset_bottom = 8.0
 mouse_filter = 2
 script = ExtResource("88_hauko")
 
@@ -217,6 +221,7 @@ layout_mode = 1
 anchor_left = 0.22
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -4.0
 mouse_filter = 2
 script = ExtResource("88_hauko")
 border_color = Color(0.243, 0.812, 0.769, 1)
@@ -227,9 +232,9 @@ anchors_preset = -1
 anchor_left = 0.22
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
+offset_left = 16.0
 offset_top = 6.0
-offset_right = -8.0
+offset_right = -16.0
 offset_bottom = -6.0
 size_flags_horizontal = 3
 
@@ -243,15 +248,16 @@ bar_fill_style = SubResource("StyleBoxFlat_f4pi3")
 [node name="StatusRow" parent="Panels/EnemyPanel/Content" unique_id=1299416147 instance=ExtResource("7_yahae")]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="LogOuterFrame" type="Control" parent="." unique_id=700371262]
 layout_mode = 1
 anchor_top = 0.601
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.0
+offset_left = 8.0
 offset_top = 18.0
-offset_right = -6.0
+offset_right = -8.0
 offset_bottom = -47.0
 mouse_filter = 2
 script = ExtResource("88_hauko")
@@ -444,6 +450,7 @@ offset_left = 16.0
 offset_top = 40.0
 offset_right = -16.0
 offset_bottom = 620.0
+theme_override_constants/separation = 24
 script = ExtResource("85_cqddr")
 
 [node name="TitleLabel" type="Label" parent="BracketScreen" unique_id=854426622]
@@ -451,47 +458,122 @@ layout_mode = 2
 text = "Choose your familiar"
 horizontal_alignment = 1
 
-[node name="Body" type="HBoxContainer" parent="BracketScreen" unique_id=1658176427]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="EntrantScroll" type="ScrollContainer" parent="BracketScreen/Body" unique_id=1751780073]
+[node name="Body" type="Control" parent="BracketScreen" unique_id=1946195015]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="EntrantList" type="VBoxContainer" parent="BracketScreen/Body/EntrantScroll" unique_id=157412023]
+[node name="OuterFrame" type="Control" parent="BracketScreen/Body" unique_id=1368757903]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+
+[node name="Content" type="HBoxContainer" parent="BracketScreen/Body" unique_id=1658176427]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="EntrantScroll" type="Control" parent="BracketScreen/Body/Content" unique_id=1346090378]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Background" type="Control" parent="BracketScreen/Body/Content/EntrantScroll" unique_id=1411202320]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "ENTRANTS"
+
+[node name="Content" type="ScrollContainer" parent="BracketScreen/Body/Content/EntrantScroll" unique_id=1751780073]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EntrantList" type="VBoxContainer" parent="BracketScreen/Body/Content/EntrantScroll/Content" unique_id=157412023]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DetailPanel" type="VBoxContainer" parent="BracketScreen/Body" unique_id=1850694439]
+[node name="DetailPanel" type="Control" parent="BracketScreen/Body/Content" unique_id=2042057886]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="Background" type="Control" parent="BracketScreen/Body/Content/DetailPanel" unique_id=2147035683]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "DETAILS"
+
+[node name="Content" type="VBoxContainer" parent="BracketScreen/Body/Content/DetailPanel" unique_id=1850694439]
 custom_minimum_size = Vector2(320, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DetailName" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=12517013]
 layout_mode = 2
 
-[node name="DetailName" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=12517013]
-layout_mode = 2
-
-[node name="DetailPortrait" type="TextureRect" parent="BracketScreen/Body/DetailPanel" unique_id=1227340989]
+[node name="DetailPortrait" type="TextureRect" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=1227340989]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 stretch_mode = 5
 
-[node name="DetailTags" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=1608955013]
+[node name="DetailTags" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=1608955013]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="DetailStats" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=1181272063]
+[node name="DetailStats" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=1181272063]
 layout_mode = 2
 
-[node name="DetailTechniques" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=610959949]
+[node name="DetailTechniques" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=610959949]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="DetailOdds" type="Label" parent="BracketScreen/Body/DetailPanel" unique_id=739501460]
+[node name="DetailOdds" type="Label" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=739501460]
 layout_mode = 2
 
-[node name="SelectButton" type="Button" parent="BracketScreen/Body/DetailPanel" unique_id=795626927]
+[node name="SelectButton" type="Button" parent="BracketScreen/Body/Content/DetailPanel/Content" unique_id=795626927]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Select Fighter"

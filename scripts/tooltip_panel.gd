@@ -11,6 +11,13 @@ signal close_requested
 @onready var content_label: RichTextLabel = $Content/RichTextLabel
 @onready var close_button: Button = $Content/CloseButton
 
+## Matches RichTextLabel's own offset_left/top/right/bottom in
+## tooltip_panel.tscn -- the gap between its text and Background's drawn
+## border, which PanelContainer's own panel-style margin can't provide
+## since it insets every direct child (Background included) by the same
+## amount rather than padding Content relative to Background.
+const TEXT_INSET: float = 6.0
+
 var pinned: bool = false
 
 ## Set by TooltipLayer right after instantiating this panel, so a hovered
@@ -68,7 +75,8 @@ func set_text(text: String) -> void:
 	content_label.text = text
 	var content: Control = content_label.get_parent()
 	content.custom_minimum_size = Vector2(
-		content_label.custom_minimum_size.x, content_label.get_minimum_size().y
+		content_label.custom_minimum_size.x + TEXT_INSET * 2,
+		content_label.get_minimum_size().y + TEXT_INSET * 2
 	)
 
 ## Switches between a plain transient tooltip (no close button, not

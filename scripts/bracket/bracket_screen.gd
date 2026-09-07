@@ -16,14 +16,14 @@ signal entrant_selected(familiar: Familiar)
 signal dismissed
 
 @onready var title_label: Label = $TitleLabel
-@onready var entrant_list: VBoxContainer = $Body/EntrantScroll/EntrantList
-@onready var detail_name: Label = $Body/DetailPanel/DetailName
-@onready var detail_portrait: TextureRect = $Body/DetailPanel/DetailPortrait
-@onready var detail_tags: Label = $Body/DetailPanel/DetailTags
-@onready var detail_stats: Label = $Body/DetailPanel/DetailStats
-@onready var detail_techniques: Label = $Body/DetailPanel/DetailTechniques
-@onready var detail_odds: Label = $Body/DetailPanel/DetailOdds
-@onready var select_button: Button = $Body/DetailPanel/SelectButton
+@onready var entrant_list: VBoxContainer = $Body/Content/EntrantScroll/Content/EntrantList
+@onready var detail_name: Label = $Body/Content/DetailPanel/Content/DetailName
+@onready var detail_portrait: TextureRect = $Body/Content/DetailPanel/Content/DetailPortrait
+@onready var detail_tags: Label = $Body/Content/DetailPanel/Content/DetailTags
+@onready var detail_stats: Label = $Body/Content/DetailPanel/Content/DetailStats
+@onready var detail_techniques: Label = $Body/Content/DetailPanel/Content/DetailTechniques
+@onready var detail_odds: Label = $Body/Content/DetailPanel/Content/DetailOdds
+@onready var select_button: Button = $Body/Content/DetailPanel/Content/SelectButton
 @onready var continue_button: Button = $ContinueButton
 
 var tooltip_layer: TooltipLayer
