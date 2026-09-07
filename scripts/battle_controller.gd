@@ -177,6 +177,15 @@ const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/
 @onready var rerolls_remaining_label: Label = $RewardSelectPanel/ActionRow/RerollsRemainingLabel
 @onready var skip_button: Button = $RewardSelectPanel/ActionRow/SkipButton
 @onready var next_round_button: Button = $RewardSelectPanel/ActionRow/NextRoundButton
+@onready var build_view_button: Button = $RewardSelectPanel/ActionRow/ViewBuildButton
+
+@onready var build_view_panel: Control = $BuildViewPanel
+@onready var build_view_close_button: Button = $BuildViewPanel/CloseButton
+@onready var build_view_name_label: Label = $BuildViewPanel/Content/FamiliarCard/Content/NameLabel
+@onready var build_view_portrait: TextureRect = $BuildViewPanel/Content/FamiliarCard/Content/PortraitFrame/Center/Portrait
+@onready var build_view_stat_list: VBoxContainer = $BuildViewPanel/Content/FamiliarCard/Content/StatList
+@onready var build_view_technique_list: VBoxContainer = $BuildViewPanel/Content/RightColumn/TechniquesCard/TechniqueList
+@onready var build_view_passive_list: VBoxContainer = $BuildViewPanel/Content/RightColumn/PassivesCard/PassiveList
 
 ## The 3 RewardCards share one ButtonGroup (exactly one selected at a
 ## time) but each column keeps its own separate RerollButton outside the
@@ -242,6 +251,8 @@ func _ready() -> void:
 	next_round_button.pressed.connect(_on_next_round_pressed)
 	restart_button.pressed.connect(_on_restart_pressed)
 	next_opponent_panel.pressed.connect(_on_next_opponent_panel_pressed)
+	build_view_button.pressed.connect(_on_build_view_pressed)
+	build_view_close_button.pressed.connect(_on_build_view_closed_pressed)
 
 	priority_builder_button.pressed.connect(func() -> void: pre_fight_choice_made.emit(true))
 	begin_combat_button.pressed.connect(_on_begin_fight_pressed)
@@ -1013,6 +1024,35 @@ func show_game_over(message: String) -> void:
 
 func _on_restart_pressed() -> void:
 	await _start_new_run()
+
+## Read-only look at the player's current build from the reward screen --
+## the mockup's "[Z] INSPECT" hint, but as an actual button rather than a
+## keyboard-only affordance (per the developer's explicit "avoid all
+## keyboard prompts" direction). Reuses the same familiar-card and
+## PaletteBlock-list patterns already established for the priority
+## builder/prefight/stat-upgrade screens rather than the plain Labels a
+## first pass might reach for.
+func _on_build_view_pressed() -> void:
+	_populate_fighter_card(player_familiar_data, build_view_name_label, build_view_portrait, build_view_stat_list)
+
+	for child in build_view_technique_list.get_children():
+		child.queue_free()
+	for technique in player_familiar_data.techniques:
+		var technique_block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
+		build_view_technique_list.add_child(technique_block)
+		technique_block.setup_technique(technique, tooltip_layer)
+
+	for child in build_view_passive_list.get_children():
+		child.queue_free()
+	for passive in player_familiar_data.passives:
+		var passive_block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
+		build_view_passive_list.add_child(passive_block)
+		passive_block.setup_passive(passive, tooltip_layer)
+
+	build_view_panel.visible = true
+
+func _on_build_view_closed_pressed() -> void:
+	build_view_panel.visible = false
 
 ## Read-only look at the bracket from the reward screen, reusing
 ## BracketScreen exactly as the between-round scouting screen already
