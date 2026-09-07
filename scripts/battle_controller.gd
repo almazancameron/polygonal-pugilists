@@ -137,22 +137,9 @@ var _priority_rules_edited_this_round: bool = false
 
 ## -- Reward sequence (Phase A stat allocation + Phase B reward cards) --
 const REWARD_CARD_SCENE: PackedScene = preload("res://scenes/reward_card.tscn")
-const STAT_UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/stat_upgrade_row.tscn")
+const WINNER_HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
 
-## Same technique/passive card look the priority builder's palette uses
-## (icon + colored name + subtitle) -- reused as-is rather than rebuilt,
-## since nothing about it is priority-builder-specific.
-const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/palette_block.tscn")
-
-@onready var stat_upgrade_panel: Control = $StatUpgradePanel
-@onready var stat_name_label: Label = $StatUpgradePanel/Content/LeftColumn/Content/NameLabel
-@onready var stat_portrait: TextureRect = $StatUpgradePanel/Content/LeftColumn/Content/PortraitFrame/Center/Portrait
-@onready var stat_stat_list: VBoxContainer = $StatUpgradePanel/Content/LeftColumn/Content/StatList
-@onready var stat_header_label: Label = $StatUpgradePanel/Content/CenterColumn/HeaderLabel
-@onready var stat_rows_container: VBoxContainer = $StatUpgradePanel/Content/CenterColumn/RowsContainer
-@onready var stat_confirm_button: Button = $StatUpgradePanel/Content/CenterColumn/ConfirmButton
-@onready var stat_technique_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/TechniquesCard/TechniqueList
-@onready var stat_passive_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/PassivesCard/PassiveList
+@onready var stat_upgrade_panel: StatUpgradePanel = $StatUpgradePanel
 
 @onready var reward_select_panel: Control = $RewardSelectPanel
 @onready var reward_title_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/TitleLabel
@@ -288,7 +275,6 @@ func _start_new_run() -> void:
 	# Clear every screen the previous run could have left up *before*
 	# showing character select -- Restart is reached from the Game Over
 	# panel, which would otherwise sit there for the whole bracket screen.
-	stat_confirm_button.disabled = true
 	stat_upgrade_panel.visible = false
 	reward_select_panel.visible = false
 	game_over_panel.visible = false
@@ -499,7 +485,7 @@ func _populate_winner_card() -> void:
 		winner_content.remove_child(child)
 		child.queue_free()
 
-	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
+	var hp_bar: HPBar = WINNER_HP_BAR_SCENE.instantiate()
 	hp_bar.custom_minimum_size = Vector2(0, 24)
 	hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -517,62 +503,19 @@ func _populate_winner_card() -> void:
 
 	winner_portrait.texture = player.familiar.sprite
 
-## Builds one StatUpgradeRow per stat_upgrade_pool entry and shows the
-## panel. on_confirmed is called once the player commits their
-## allocation -- parameterized so this same screen serves both the
-## post-reward-pick pass (1 point) and the skip-triggered pass (2 points).
+## Shows the stat-upgrade panel. on_confirmed is called once the player
+## commits their allocation -- parameterized so this same screen serves
+## both the post-reward-pick pass (1 point) and the skip-triggered pass
+## (2 points). StatUpgradePanel owns its own rows/lists and the actual
+## allocate/available-points bookkeeping lives on reward_flow already, so
+## this is just handing the panel what it needs and reacting to confirmed.
 func populate_stat_upgrade_rows(points: int, on_confirmed: Callable) -> void:
 	reward_flow.begin_stat_phase(points)
+	stat_upgrade_panel.show_for(player_familiar_data, reward_flow, stat_upgrade_pool, tooltip_layer)
 
-	_populate_fighter_card(player_familiar_data, stat_name_label, stat_portrait, stat_stat_list)
-
-	for child in stat_rows_container.get_children():
-		child.queue_free()
-
-	for upgrade in stat_upgrade_pool:
-		var row: StatUpgradeRow = STAT_UPGRADE_ROW_SCENE.instantiate()
-		stat_rows_container.add_child(row)
-		row.setup(upgrade, player_familiar_data.get_stat(upgrade.stat))
-		row.allocate_requested.connect(_on_stat_allocate_requested)
-
-	if stat_confirm_button.pressed.is_connected(_on_stat_confirm_pressed):
-		stat_confirm_button.pressed.disconnect(_on_stat_confirm_pressed)
-	stat_confirm_button.pressed.connect(_on_stat_confirm_pressed.bind(on_confirmed))
-
-	for child in stat_technique_list.get_children():
-		child.queue_free()
-	for technique in player_familiar_data.techniques:
-		var technique_block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
-		stat_technique_list.add_child(technique_block)
-		technique_block.setup_technique(technique, tooltip_layer)
-
-	for child in stat_passive_list.get_children():
-		child.queue_free()
-	for passive in player_familiar_data.passives:
-		var passive_block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
-		stat_passive_list.add_child(passive_block)
-		passive_block.setup_passive(passive, tooltip_layer)
-
-	_refresh_stat_rows()
-	stat_upgrade_panel.visible = true
-
-func _on_stat_allocate_requested(stat: Familiar.Stat, delta: int) -> void:
-	if not reward_flow.try_allocate(stat, delta):
-		return
-
-	for row in stat_rows_container.get_children():
-		if row.upgrade.stat == stat:
-			row.set_allocated_count(reward_flow.allocated.get(stat, 0))
-
-	_refresh_stat_rows()
-
-func _refresh_stat_rows() -> void:
-	for row in stat_rows_container.get_children():
-		row.refresh_availability(reward_flow.available_points)
-	stat_confirm_button.disabled = reward_flow.available_points > 0
-	stat_header_label.text = "%d stat upgrade%s to apply" % [
-		reward_flow.available_points, "s" if reward_flow.available_points != 1 else ""
-	]
+	if stat_upgrade_panel.confirmed.is_connected(_on_stat_confirm_pressed):
+		stat_upgrade_panel.confirmed.disconnect(_on_stat_confirm_pressed)
+	stat_upgrade_panel.confirmed.connect(_on_stat_confirm_pressed.bind(on_confirmed))
 
 func _on_stat_confirm_pressed(on_confirmed: Callable) -> void:
 	reward_flow.confirm_stat_phase(player_familiar_data, stat_upgrade_pool)
@@ -805,77 +748,6 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 
 	begin_combat_panel.visible = false
 	return open_priority_builder
-
-## Mirrors priority_builder.gd's own _add_max_hp_row() approach (icon +
-## label + value rows, Max HP shown as an actual HPBar rather than a plain
-## number) -- duplicated here rather than shared, since this is a
-## read-only pre-fight display, not an editable build, and the only other
-## user of that pattern is a different screen entirely.
-const PREFIGHT_HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
-
-func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: TextureRect, stat_list: VBoxContainer) -> void:
-	name_label.text = familiar.familiar_name
-	portrait.texture = familiar.sprite
-
-	for child in stat_list.get_children():
-		stat_list.remove_child(child)
-		child.queue_free()
-
-	var hp_row := HBoxContainer.new()
-	hp_row.add_theme_constant_override("separation", 8)
-	stat_list.add_child(hp_row)
-
-	var hp_icon := TextureRect.new()
-	hp_icon.texture = Familiar.stat_icon(Familiar.Stat.MAX_HP)
-	hp_icon.custom_minimum_size = Vector2(24, 24)
-	hp_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-	hp_icon.modulate = Palette.HP_ICON
-	hp_row.add_child(hp_icon)
-
-	var hp_name_label := Label.new()
-	hp_name_label.text = Familiar.stat_name(Familiar.Stat.MAX_HP)
-	hp_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hp_name_label.add_theme_font_size_override("font_size", 22)
-	hp_row.add_child(hp_name_label)
-
-	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
-	hp_bar.custom_minimum_size = Vector2(110, 24)
-	hp_row.add_child(hp_bar)
-
-	var background_style := StyleBoxFlat.new()
-	background_style.bg_color = Palette.HP_TRACK
-	hp_bar.bar_background_style = background_style
-	var fill_style := StyleBoxFlat.new()
-	fill_style.bg_color = Palette.HP_FULL
-	hp_bar.bar_fill_style = fill_style
-	hp_bar.heart_icon.visible = false
-	hp_bar.set_hp(familiar.max_hp, familiar.max_hp)
-
-	for stat in Familiar.Stat.values():
-		if stat == Familiar.Stat.MAX_HP:
-			continue
-
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		stat_list.add_child(row)
-
-		var icon := TextureRect.new()
-		icon.texture = Familiar.stat_icon(stat)
-		icon.custom_minimum_size = Vector2(24, 24)
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-		icon.modulate = Palette.TEXT_MUTED
-		row.add_child(icon)
-
-		var row_name_label := Label.new()
-		row_name_label.text = Familiar.stat_name(stat)
-		row_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row_name_label.add_theme_font_size_override("font_size", 22)
-		row.add_child(row_name_label)
-
-		var value_label := Label.new()
-		value_label.text = str(familiar.get_stat(stat))
-		value_label.add_theme_font_size_override("font_size", 22)
-		row.add_child(value_label)
 
 ## Shows the pre-fight screen first (GAME_DESIGN.md §9.2 step 4's entry
 ## point), looping back to it after every priority-editor session rather
