@@ -1,0 +1,162 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" uid="uid://reqqbounkxb5" path="res://scripts/bracket/bracket_screen.gd" id="1_bracket"]
+[ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_framed"]
+
+[node name="BracketScreen" type="VBoxContainer" unique_id=511430675]
+layout_mode = 3
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = -16.0
+offset_bottom = 620.0
+theme_override_constants/separation = 24
+script = ExtResource("1_bracket")
+
+[node name="TitleLabel" type="Label" parent="." unique_id=854426622]
+layout_mode = 2
+text = "Choose your familiar"
+horizontal_alignment = 1
+
+[node name="Body" type="Control" parent="." unique_id=1946195015]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OuterFrame" type="Control" parent="Body" unique_id=1368757903]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+
+[node name="Content" type="HBoxContainer" parent="Body" unique_id=1658176427]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="EntrantScroll" type="Control" parent="Body/Content" unique_id=1346090378]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Background" type="Control" parent="Body/Content/EntrantScroll" unique_id=1411202320]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "ENTRANTS"
+
+[node name="Content" type="ScrollContainer" parent="Body/Content/EntrantScroll" unique_id=1751780073]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EntrantList" type="VBoxContainer" parent="Body/Content/EntrantScroll/Content" unique_id=157412023]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailPanel" type="Control" parent="Body/Content" unique_id=2042057886]
+visible = false
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="Background" type="Control" parent="Body/Content/DetailPanel" unique_id=2147035683]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "DETAILS"
+
+[node name="Content" type="VBoxContainer" parent="Body/Content/DetailPanel" unique_id=1850694439]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DetailName" type="Label" parent="Body/Content/DetailPanel/Content" unique_id=12517013]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DetailPortrait" type="TextureRect" parent="Body/Content/DetailPanel/Content" unique_id=1227340989]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+stretch_mode = 5
+
+[node name="DetailTags" type="Label" parent="Body/Content/DetailPanel/Content" unique_id=1608955013]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DetailStats" type="Label" parent="Body/Content/DetailPanel/Content" unique_id=1181272063]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DetailTechniques" type="Label" parent="Body/Content/DetailPanel/Content" unique_id=610959949]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="DetailOdds" type="Label" parent="Body/Content/DetailPanel/Content" unique_id=739501460]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="SelectButton" type="Button" parent="Body/Content/DetailPanel/Content" unique_id=795626927]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Select Fighter"
+
+[node name="CloseButton" type="Button" parent="Body" unique_id=1847178523]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = 38.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "×"
+
+[node name="ContinueButton" type="Button" parent="." unique_id=771854374]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Continue"
