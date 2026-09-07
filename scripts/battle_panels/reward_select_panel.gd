@@ -155,7 +155,6 @@ func begin_reward_cards(familiar: Familiar, reward_flow: RewardFlowController, t
 
 	_in_sacrifice_pick_step = false
 	choose_reward_label.text = "CHOOSE YOUR REWARD"
-	rerolls_remaining_label.visible = true
 	sacrifice_card_row.visible = false
 	card_row.visible = true
 
@@ -256,7 +255,13 @@ func begin_sacrifice_screen(familiar: Familiar, reward_flow: RewardFlowControlle
 	next_round_button.disabled = true
 
 	choose_reward_label.text = "SACRIFICE A PASSIVE"
-	rerolls_remaining_label.visible = false
+	# Blanked, not hidden -- RerollsRemainingLabel is the ActionRow's only
+	# size_flags_horizontal=EXPAND_FILL child, so hiding it outright (as
+	# opposed to leaving it present with empty text) removes it from the
+	# HBoxContainer's layout entirely, collapsing the Skip/View
+	# Build/Confirm buttons to the left edge instead of the right, unlike
+	# every other reward screen.
+	rerolls_remaining_label.text = ""
 	card_row.visible = false
 	sacrifice_card_row.visible = true
 
