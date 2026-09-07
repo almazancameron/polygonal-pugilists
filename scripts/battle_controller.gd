@@ -109,16 +109,7 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var game_over_panel: GameOverPanel = $GameOverPanel
 
-@onready var begin_combat_panel: Control = $BeginCombatPanel
-@onready var begin_combat_round_label: Label = $BeginCombatPanel/Content/TitleBlock/RoundLabel
-@onready var begin_combat_player_name_label: Label = $BeginCombatPanel/Content/CardsRow/PlayerCard/Content/NameLabel
-@onready var begin_combat_player_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/PortraitFrame/Center/Portrait
-@onready var begin_combat_player_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/StatList
-@onready var begin_combat_opponent_name_label: Label = $BeginCombatPanel/Content/CardsRow/OpponentCard/Content/NameLabel
-@onready var begin_combat_opponent_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/PortraitFrame/Center/Portrait
-@onready var begin_combat_opponent_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/StatList
-@onready var priority_builder_button: Button = $BeginCombatPanel/Content/ButtonsRow/PriorityBuilderButton
-@onready var begin_combat_button: Button = $BeginCombatPanel/Content/ButtonsRow/BeginButton
+@onready var begin_combat_panel: BeginCombatPanel = $BeginCombatPanel
 
 @onready var bracket_screen: BracketScreen = $BracketScreen
 
@@ -262,8 +253,8 @@ func _ready() -> void:
 	bracket_summary_button.pressed.connect(_on_next_opponent_panel_pressed)
 	build_view_button.pressed.connect(_on_build_view_pressed)
 
-	priority_builder_button.pressed.connect(func() -> void: pre_fight_choice_made.emit(true))
-	begin_combat_button.pressed.connect(_on_begin_fight_pressed)
+	begin_combat_panel.priority_builder_requested.connect(func() -> void: pre_fight_choice_made.emit(true))
+	begin_combat_panel.begin_requested.connect(_on_begin_fight_pressed)
 
 	bracket_screen.tooltip_layer = tooltip_layer
 
@@ -283,7 +274,7 @@ func _ready() -> void:
 ## "I opened it but didn't change anything" is exactly as worth confirming
 ## as "I never opened it at all."
 func _on_begin_fight_pressed() -> void:
-	if priority_builder_button.visible and not _priority_rules_edited_this_round:
+	if begin_combat_panel.priority_option_visible() and not _priority_rules_edited_this_round:
 		_no_priority_changes_dialog.popup_centered()
 	else:
 		pre_fight_choice_made.emit(false)
@@ -806,11 +797,9 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	log_background.visible = false
 	log_outer_frame.visible = false
 
-	begin_combat_round_label.text = Bracket.round_display_name(current_round)
-	_populate_fighter_card(player.familiar, begin_combat_player_name_label, begin_combat_player_portrait, begin_combat_player_stat_list)
-	_populate_fighter_card(opponent.familiar, begin_combat_opponent_name_label, begin_combat_opponent_portrait, begin_combat_opponent_stat_list)
-	priority_builder_button.visible = show_priority_option
-	begin_combat_panel.visible = true
+	begin_combat_panel.show_for(
+		player.familiar, opponent.familiar, Bracket.round_display_name(current_round), show_priority_option
+	)
 
 	var open_priority_builder: bool = await pre_fight_choice_made
 
