@@ -307,30 +307,6 @@ offset_right = -16.0
 offset_bottom = 640.0
 grow_horizontal = 2
 
-[node name="StatUpgradePanel" type="VBoxContainer" parent="." unique_id=1661631153]
-visible = false
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 150.0
-offset_right = -16.0
-offset_bottom = 590.0
-grow_horizontal = 2
-
-[node name="HeaderLabel" type="Label" parent="StatUpgradePanel" unique_id=855118998]
-layout_mode = 2
-text = "1 stat upgrade to apply"
-
-[node name="RowsContainer" type="VBoxContainer" parent="StatUpgradePanel" unique_id=813407388]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ConfirmButton" type="Button" parent="StatUpgradePanel" unique_id=439118741]
-layout_mode = 2
-disabled = true
-text = "Confirm"
-
 [node name="RewardSelectPanel" type="VBoxContainer" parent="." unique_id=1531917245]
 visible = false
 layout_mode = 1
@@ -932,3 +908,189 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
+
+[node name="StatUpgradePanel" type="Control" parent="." unique_id=138008774]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = -16.0
+offset_bottom = 620.0
+grow_horizontal = 2
+
+[node name="Background" type="Control" parent="StatUpgradePanel" unique_id=574591923]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+header_text = "CHOOSE YOUR STAT UPGRADE"
+
+[node name="Content" type="HBoxContainer" parent="StatUpgradePanel" unique_id=543092450]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="LeftColumn" type="Control" parent="StatUpgradePanel/Content" unique_id=739744560]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Background" type="Control" parent="StatUpgradePanel/Content/LeftColumn" unique_id=1009029535]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(0.91, 0.329, 0.18, 1)
+
+[node name="Content" type="VBoxContainer" parent="StatUpgradePanel/Content/LeftColumn" unique_id=1193988314]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="StatUpgradePanel/Content/LeftColumn/Content" unique_id=1697003142]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PortraitFrame" type="Control" parent="StatUpgradePanel/Content/LeftColumn/Content" unique_id=1071814277]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Background" type="ColorRect" parent="StatUpgradePanel/Content/LeftColumn/Content/PortraitFrame" unique_id=1394152664]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
+[node name="Center" type="CenterContainer" parent="StatUpgradePanel/Content/LeftColumn/Content/PortraitFrame" unique_id=1569117268]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Portrait" type="TextureRect" parent="StatUpgradePanel/Content/LeftColumn/Content/PortraitFrame/Center" unique_id=1600571055]
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="StatList" type="VBoxContainer" parent="StatUpgradePanel/Content/LeftColumn/Content" unique_id=1933562268]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CenterColumn" type="VBoxContainer" parent="StatUpgradePanel/Content" unique_id=516832897]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="StatUpgradePanel/Content/CenterColumn" unique_id=855118998]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.714, 0.282, 1)
+theme_override_font_sizes/font_size = 22
+text = "1 stat upgrade to apply"
+horizontal_alignment = 1
+
+[node name="RowsContainer" type="VBoxContainer" parent="StatUpgradePanel/Content/CenterColumn" unique_id=813407388]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ConfirmButton" type="Button" parent="StatUpgradePanel/Content/CenterColumn" unique_id=439118741]
+layout_mode = 2
+size_flags_horizontal = 4
+disabled = true
+text = "Confirm Upgrades"
+
+[node name="RightColumn" type="Control" parent="StatUpgradePanel/Content" unique_id=1280376589]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="TechniquesCard" type="Control" parent="StatUpgradePanel/Content/RightColumn" unique_id=146841310]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 0.55
+
+[node name="Background" type="Control" parent="StatUpgradePanel/Content/RightColumn/TechniquesCard" unique_id=1101745343]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+header_text = "TECHNIQUES"
+
+[node name="TechniqueList" type="VBoxContainer" parent="StatUpgradePanel/Content/RightColumn/TechniquesCard" unique_id=412957057]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="PassivesCard" type="Control" parent="StatUpgradePanel/Content/RightColumn" unique_id=1395503589]
+layout_mode = 1
+anchor_top = 0.58
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="Control" parent="StatUpgradePanel/Content/RightColumn/PassivesCard" unique_id=972852686]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+header_text = "PASSIVES"
+
+[node name="PassiveList" type="VBoxContainer" parent="StatUpgradePanel/Content/RightColumn/PassivesCard" unique_id=1224173351]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6

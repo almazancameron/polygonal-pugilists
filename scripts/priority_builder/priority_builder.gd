@@ -190,18 +190,6 @@ func _refresh() -> void:
 		messages.append("EVALUATOR MISMATCH: %s" % state_probe.mismatch_message())
 	probe_message.text = "\n".join(messages)
 
-## Base stats, plus the effective value when a declared status changes it
-## (Hone, Fortify, Enlarge, Ruin). stat_vs_value conditions read the
-## effective one, so showing only the base would mislead. MAX_HP has no
-## icon here -- it gets an actual HPBar instead (see _add_max_hp_row()),
-## matching how HP reads everywhere else in the game.
-const STAT_ICONS: Dictionary = {
-	Familiar.Stat.POWER: preload("res://assets/sprites/icons/power_icon.tres"),
-	Familiar.Stat.DEFENSE: preload("res://assets/sprites/icons/defense_icon.tres"),
-	Familiar.Stat.SPEED: preload("res://assets/sprites/icons/speed_icon.tres"),
-	Familiar.Stat.FOCUS: preload("res://assets/sprites/icons/focus_icon.tres"),
-}
-
 const HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
 
 func _refresh_stats() -> void:
@@ -223,7 +211,7 @@ func _refresh_stats() -> void:
 		stat_list.add_child(row)
 
 		var icon := TextureRect.new()
-		icon.texture = STAT_ICONS[stat]
+		icon.texture = Familiar.stat_icon(stat)
 		icon.custom_minimum_size = Vector2(16, 16)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 		icon.modulate = Palette.TEXT_MUTED
@@ -241,8 +229,6 @@ func _refresh_stats() -> void:
 		value_label.text = str(base) if base == effective else "%d → %d" % [base, effective]
 		row.add_child(value_label)
 
-const MAX_HP_ICON: Texture2D = preload("res://assets/sprites/icons/max_hp_icon.tres")
-
 ## No status in this game scales MAX_HP (unlike Power/Defense/Speed/Focus,
 ## which Hone/Fortify/Enlarge/Ruin can), so there's no base -> effective
 ## case to show here -- just the familiar's own max HP, always full. Same
@@ -255,7 +241,7 @@ func _add_max_hp_row() -> void:
 	stat_list.add_child(row)
 
 	var icon := TextureRect.new()
-	icon.texture = MAX_HP_ICON
+	icon.texture = Familiar.stat_icon(Familiar.Stat.MAX_HP)
 	icon.custom_minimum_size = Vector2(16, 16)
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	icon.modulate = Palette.HP_ICON

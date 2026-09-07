@@ -73,6 +73,25 @@ static func stat_name(stat: Stat) -> String:
 		_:
 			return "Stat"
 
+## Icon for a Stat value -- was duplicated as a local dict in
+## priority_builder.gd and battle_controller.gd; stat_upgrade_row.gd
+## needing the same pairing again justified pulling it in next to
+## stat_name(), which every one of those call sites already used too.
+static func stat_icon(stat: Stat) -> Texture2D:
+	match stat:
+		Stat.MAX_HP:
+			return preload("res://assets/sprites/icons/max_hp_icon.tres")
+		Stat.POWER:
+			return preload("res://assets/sprites/icons/power_icon.tres")
+		Stat.DEFENSE:
+			return preload("res://assets/sprites/icons/defense_icon.tres")
+		Stat.SPEED:
+			return preload("res://assets/sprites/icons/speed_icon.tres")
+		Stat.FOCUS:
+			return preload("res://assets/sprites/icons/focus_icon.tres")
+		_:
+			return null
+
 func get_stat(stat: Stat) -> int:
 	match stat:
 		Stat.MAX_HP:

@@ -152,10 +152,20 @@ var _priority_rules_edited_this_round: bool = false
 const REWARD_CARD_SCENE: PackedScene = preload("res://scenes/reward_card.tscn")
 const STAT_UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/stat_upgrade_row.tscn")
 
-@onready var stat_upgrade_panel: VBoxContainer = $StatUpgradePanel
-@onready var stat_header_label: Label = $StatUpgradePanel/HeaderLabel
-@onready var stat_rows_container: VBoxContainer = $StatUpgradePanel/RowsContainer
-@onready var stat_confirm_button: Button = $StatUpgradePanel/ConfirmButton
+## Same technique/passive card look the priority builder's palette uses
+## (icon + colored name + subtitle) -- reused as-is rather than rebuilt,
+## since nothing about it is priority-builder-specific.
+const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/palette_block.tscn")
+
+@onready var stat_upgrade_panel: Control = $StatUpgradePanel
+@onready var stat_name_label: Label = $StatUpgradePanel/Content/LeftColumn/Content/NameLabel
+@onready var stat_portrait: TextureRect = $StatUpgradePanel/Content/LeftColumn/Content/PortraitFrame/Center/Portrait
+@onready var stat_stat_list: VBoxContainer = $StatUpgradePanel/Content/LeftColumn/Content/StatList
+@onready var stat_header_label: Label = $StatUpgradePanel/Content/CenterColumn/HeaderLabel
+@onready var stat_rows_container: VBoxContainer = $StatUpgradePanel/Content/CenterColumn/RowsContainer
+@onready var stat_confirm_button: Button = $StatUpgradePanel/Content/CenterColumn/ConfirmButton
+@onready var stat_technique_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/TechniquesCard/TechniqueList
+@onready var stat_passive_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/PassivesCard/PassiveList
 
 @onready var reward_select_panel: VBoxContainer = $RewardSelectPanel
 @onready var species_column: VBoxContainer = $RewardSelectPanel/CardRow/SpeciesColumn
@@ -457,6 +467,8 @@ func begin_reward_sequence() -> void:
 func populate_stat_upgrade_rows(points: int, on_confirmed: Callable) -> void:
 	reward_flow.begin_stat_phase(points)
 
+	_populate_fighter_card(player_familiar_data, stat_name_label, stat_portrait, stat_stat_list)
+
 	for child in stat_rows_container.get_children():
 		child.queue_free()
 
@@ -469,6 +481,20 @@ func populate_stat_upgrade_rows(points: int, on_confirmed: Callable) -> void:
 	if stat_confirm_button.pressed.is_connected(_on_stat_confirm_pressed):
 		stat_confirm_button.pressed.disconnect(_on_stat_confirm_pressed)
 	stat_confirm_button.pressed.connect(_on_stat_confirm_pressed.bind(on_confirmed))
+
+	for child in stat_technique_list.get_children():
+		child.queue_free()
+	for technique in player_familiar_data.techniques:
+		var technique_block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
+		stat_technique_list.add_child(technique_block)
+		technique_block.setup_technique(technique, tooltip_layer)
+
+	for child in stat_passive_list.get_children():
+		child.queue_free()
+	for passive in player_familiar_data.passives:
+		var passive_block: PaletteBlock = PALETTE_BLOCK_SCENE.instantiate()
+		stat_passive_list.add_child(passive_block)
+		passive_block.setup_passive(passive, tooltip_layer)
 
 	_refresh_stat_rows()
 	stat_upgrade_panel.visible = true
@@ -657,18 +683,11 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	begin_combat_panel.visible = false
 	return open_priority_builder
 
-## Mirrors priority_builder.gd's own STAT_ICONS/_add_max_hp_row() approach
-## (icon + label + value rows, Max HP shown as an actual HPBar rather than
-## a plain number) -- duplicated here rather than shared, since this is a
+## Mirrors priority_builder.gd's own _add_max_hp_row() approach (icon +
+## label + value rows, Max HP shown as an actual HPBar rather than a plain
+## number) -- duplicated here rather than shared, since this is a
 ## read-only pre-fight display, not an editable build, and the only other
 ## user of that pattern is a different screen entirely.
-const PREFIGHT_STAT_ICONS: Dictionary = {
-	Familiar.Stat.POWER: preload("res://assets/sprites/icons/power_icon.tres"),
-	Familiar.Stat.DEFENSE: preload("res://assets/sprites/icons/defense_icon.tres"),
-	Familiar.Stat.SPEED: preload("res://assets/sprites/icons/speed_icon.tres"),
-	Familiar.Stat.FOCUS: preload("res://assets/sprites/icons/focus_icon.tres"),
-}
-const PREFIGHT_MAX_HP_ICON: Texture2D = preload("res://assets/sprites/icons/max_hp_icon.tres")
 const PREFIGHT_HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
 
 func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: TextureRect, stat_list: VBoxContainer) -> void:
@@ -684,7 +703,7 @@ func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: Tex
 	stat_list.add_child(hp_row)
 
 	var hp_icon := TextureRect.new()
-	hp_icon.texture = PREFIGHT_MAX_HP_ICON
+	hp_icon.texture = Familiar.stat_icon(Familiar.Stat.MAX_HP)
 	hp_icon.custom_minimum_size = Vector2(24, 24)
 	hp_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	hp_icon.modulate = Palette.HP_ICON
@@ -718,17 +737,17 @@ func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: Tex
 		stat_list.add_child(row)
 
 		var icon := TextureRect.new()
-		icon.texture = PREFIGHT_STAT_ICONS[stat]
+		icon.texture = Familiar.stat_icon(stat)
 		icon.custom_minimum_size = Vector2(24, 24)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 		icon.modulate = Palette.TEXT_MUTED
 		row.add_child(icon)
 
-		var stat_name_label := Label.new()
-		stat_name_label.text = Familiar.stat_name(stat)
-		stat_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		stat_name_label.add_theme_font_size_override("font_size", 22)
-		row.add_child(stat_name_label)
+		var row_name_label := Label.new()
+		row_name_label.text = Familiar.stat_name(stat)
+		row_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row_name_label.add_theme_font_size_override("font_size", 22)
+		row.add_child(row_name_label)
 
 		var value_label := Label.new()
 		value_label.text = str(familiar.get_stat(stat))
