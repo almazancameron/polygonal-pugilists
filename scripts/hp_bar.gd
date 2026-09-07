@@ -35,7 +35,7 @@ func set_hp(current: int, max_hp: int) -> void:
 	if fill_style == null:
 		fill_style = StyleBoxFlat.new()
 	var hp_fraction: float = float(current) / float(max_hp) if max_hp > 0 else 0.0
-	fill_style.bg_color = Palette.HP_FULL if hp_fraction > 0.35 else Palette.HP_LOW
+	fill_style.bg_color = Palette.HP_FULL if hp_fraction > 0.30 else Palette.HP_LOW
 	bar.add_theme_stylebox_override("fill", fill_style)
 
 
@@ -76,3 +76,4 @@ func _ready() -> void:
 	if bar_fill_style != null:
 		bar.add_theme_stylebox_override("fill", bar_fill_style)
 	heart_icon.texture = HEART_TEXTURE
+	heart_icon.modulate = Palette.HP_ICON
