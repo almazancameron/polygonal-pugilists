@@ -22,6 +22,7 @@ const EXPECTED_CHECKS: Array[String] = [
 	"ai_drafter_grows_a_build",
 	"resolver_scouts_and_resolves",
 	"entrants_are_isolated_from_base_resources",
+	"round_display_name_maps_correctly",
 ]
 
 var _failures: Array[String] = []
@@ -39,6 +40,7 @@ func _init() -> void:
 	_check_ai_drafter_grows_a_build()
 	_check_resolver_scouts_and_resolves()
 	_check_entrants_are_isolated_from_base_resources()
+	_check_round_display_name_maps_correctly()
 	_report()
 
 func _check_generate_shape() -> void:
@@ -269,6 +271,13 @@ func _check_entrants_are_isolated_from_base_resources() -> void:
 				_expect(entrant.techniques.size() == base_techniques,
 					"a second run's %s still carried the first run's upgrades" % base_name)
 	_done("entrants_are_isolated_from_base_resources")
+
+func _check_round_display_name_maps_correctly() -> void:
+	_expect(Bracket.round_display_name(0) == "Preliminary", "round 0 should be Preliminary")
+	_expect(Bracket.round_display_name(1) == "Quarterfinal", "round 1 should be Quarterfinal")
+	_expect(Bracket.round_display_name(2) == "Semifinal", "round 2 should be Semifinal")
+	_expect(Bracket.round_display_name(3) == "Final", "round 3 should be Final")
+	_done("round_display_name_maps_correctly")
 
 ## Tool-only DirAccess scan -- fine here (this never runs from an exported
 ## .pck), same as balance_test.gd's own loader.

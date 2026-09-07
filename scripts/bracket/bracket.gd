@@ -80,3 +80,13 @@ func advance_round(round_index: int) -> void:
 			target.entrant_a = source.winner
 		else:
 			target.entrant_b = source.winner
+
+const ROUND_NAMES: Array[String] = ["Preliminary", "Quarterfinal", "Semifinal", "Final"]
+
+## Tournament terminology for a 0-indexed round -- always 4 rounds
+## (§4.7 of the design spec), so this is a fixed lookup, not derived from
+## rounds.size() (which would be wrong mid-generation, before all 4 exist).
+static func round_display_name(round_index: int) -> String:
+	if round_index < 0 or round_index >= ROUND_NAMES.size():
+		return "Round %d" % (round_index + 1)
+	return ROUND_NAMES[round_index]
