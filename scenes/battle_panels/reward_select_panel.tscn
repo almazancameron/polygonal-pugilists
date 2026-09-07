@@ -1,0 +1,368 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_panels/reward_select_panel.gd" id="1_rspanel"]
+[ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_framed"]
+
+[node name="RewardSelectPanel" type="Control" unique_id=1322811496]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = -16.0
+offset_bottom = 620.0
+grow_horizontal = 2
+script = ExtResource("1_rspanel")
+
+[node name="Background" type="Control" parent="." unique_id=1792352807]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+
+[node name="Content" type="VBoxContainer" parent="." unique_id=1531917245]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TopArea" type="HBoxContainer" parent="Content" unique_id=574105591]
+custom_minimum_size = Vector2(0, 170)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="WinnerCard" type="Control" parent="Content/TopArea" unique_id=1876678159]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="Background" type="Control" parent="Content/TopArea/WinnerCard" unique_id=1140199089]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(0.91, 0.329, 0.18, 1)
+header_text = "WINNER"
+
+[node name="Content" type="VBoxContainer" parent="Content/TopArea/WinnerCard" unique_id=25094992]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="Content/TopArea/WinnerCard/Content" unique_id=2093463966]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="Row" type="HBoxContainer" parent="Content/TopArea/WinnerCard/Content" unique_id=959041879]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PortraitFrame" type="Control" parent="Content/TopArea/WinnerCard/Content/Row" unique_id=1463347054]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Background" type="ColorRect" parent="Content/TopArea/WinnerCard/Content/Row/PortraitFrame" unique_id=1820532672]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
+[node name="Center" type="CenterContainer" parent="Content/TopArea/WinnerCard/Content/Row/PortraitFrame" unique_id=5177628]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Portrait" type="TextureRect" parent="Content/TopArea/WinnerCard/Content/Row/PortraitFrame/Center" unique_id=1744591932]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="TitleBlock" type="VBoxContainer" parent="Content/TopArea" unique_id=849305492]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Content/TopArea/TitleBlock" unique_id=1665681410]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.714, 0.282, 1)
+theme_override_font_sizes/font_size = 40
+text = "BOUT WON!"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Content/TopArea/TitleBlock" unique_id=28713353]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="RightColumn" type="VBoxContainer" parent="Content/TopArea" unique_id=881736211]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NextOpponentCard" type="Control" parent="Content/TopArea/RightColumn" unique_id=2057845756]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="Background" type="Control" parent="Content/TopArea/RightColumn/NextOpponentCard" unique_id=1368460274]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(0.243, 0.812, 0.769, 1)
+header_text = "NEXT OPPONENT"
+
+[node name="Content" type="HBoxContainer" parent="Content/TopArea/RightColumn/NextOpponentCard" unique_id=1160786686]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PortraitFrame" type="Control" parent="Content/TopArea/RightColumn/NextOpponentCard/Content" unique_id=738418755]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Background" type="ColorRect" parent="Content/TopArea/RightColumn/NextOpponentCard/Content/PortraitFrame" unique_id=443142662]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
+[node name="Center" type="CenterContainer" parent="Content/TopArea/RightColumn/NextOpponentCard/Content/PortraitFrame" unique_id=1014650697]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Portrait" type="TextureRect" parent="Content/TopArea/RightColumn/NextOpponentCard/Content/PortraitFrame/Center" unique_id=1910896247]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Content/TopArea/RightColumn/NextOpponentCard/Content" unique_id=371998049]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.243, 0.812, 0.769, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="BracketSummaryCard" type="Button" parent="Content/TopArea/RightColumn" unique_id=1690043294]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="Content/TopArea/RightColumn/BracketSummaryCard" unique_id=343420922]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="RoundLabel" type="Label" parent="Content/TopArea/RightColumn/BracketSummaryCard/Rows" unique_id=72667187]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.714, 0.282, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="RemainingLabel" type="Label" parent="Content/TopArea/RightColumn/BracketSummaryCard/Rows" unique_id=1396340244]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="ChooseRewardLabel" type="Label" parent="Content" unique_id=1256237482]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
+theme_override_font_sizes/font_size = 20
+text = "CHOOSE YOUR REWARD"
+horizontal_alignment = 1
+
+[node name="CardRowSpacer" type="Control" parent="Content" unique_id=1685532432]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="CardRow" type="HBoxContainer" parent="Content" unique_id=663900416]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SpeciesColumn" type="Control" parent="Content/CardRow" unique_id=1079997522]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Background" type="Control" parent="Content/CardRow/SpeciesColumn" unique_id=859495239]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "SPECIES"
+
+[node name="Content" type="VBoxContainer" parent="Content/CardRow/SpeciesColumn" unique_id=1587109415]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="RerollButton" type="Button" parent="Content/CardRow/SpeciesColumn/Content" unique_id=2062995085]
+layout_mode = 2
+text = "Reroll"
+
+[node name="RunColumn" type="Control" parent="Content/CardRow" unique_id=867372741]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Background" type="Control" parent="Content/CardRow/RunColumn" unique_id=386702941]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "RUN"
+
+[node name="Content" type="VBoxContainer" parent="Content/CardRow/RunColumn" unique_id=2106150200]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="RerollButton" type="Button" parent="Content/CardRow/RunColumn/Content" unique_id=428489786]
+layout_mode = 2
+text = "Reroll"
+
+[node name="PivotColumn" type="Control" parent="Content/CardRow" unique_id=1389730460]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Background" type="Control" parent="Content/CardRow/PivotColumn" unique_id=122151911]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_framed")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "WILDCARD"
+
+[node name="Content" type="VBoxContainer" parent="Content/CardRow/PivotColumn" unique_id=33612925]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="RerollButton" type="Button" parent="Content/CardRow/PivotColumn/Content" unique_id=755980464]
+layout_mode = 2
+text = "Reroll"
+
+[node name="SacrificeCardRow" type="HBoxContainer" parent="Content" unique_id=1409694737]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="ActionRow" type="HBoxContainer" parent="Content" unique_id=1515370735]
+layout_mode = 2
+
+[node name="RerollsRemainingLabel" type="Label" parent="Content/ActionRow" unique_id=70945478]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Rerolls left: 3"
+
+[node name="SkipButton" type="Button" parent="Content/ActionRow" unique_id=1616817643]
+layout_mode = 2
+text = "Skip"
+
+[node name="ViewBuildButton" type="Button" parent="Content/ActionRow" unique_id=851091201]
+layout_mode = 2
+text = "View My Build"
+
+[node name="NextRoundButton" type="Button" parent="Content/ActionRow" unique_id=1184232685]
+layout_mode = 2
+disabled = true
+text = "Confirm Selection"

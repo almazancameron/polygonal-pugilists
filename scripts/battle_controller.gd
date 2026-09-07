@@ -135,53 +135,9 @@ var _no_priority_changes_dialog: ConfirmationDialog
 ## start of every pre-fight loop.
 var _priority_rules_edited_this_round: bool = false
 
-## -- Reward sequence (Phase A stat allocation + Phase B reward cards) --
-const REWARD_CARD_SCENE: PackedScene = preload("res://scenes/reward_card.tscn")
-const WINNER_HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
-
 @onready var stat_upgrade_panel: StatUpgradePanel = $StatUpgradePanel
-
-@onready var reward_select_panel: Control = $RewardSelectPanel
-@onready var reward_title_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/TitleLabel
-@onready var reward_subtitle_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/SubtitleLabel
-@onready var winner_name_label: Label = $RewardSelectPanel/Content/TopArea/WinnerCard/Content/NameLabel
-@onready var winner_content: HBoxContainer = $RewardSelectPanel/Content/TopArea/WinnerCard/Content/Row
-@onready var winner_portrait: TextureRect = $RewardSelectPanel/Content/TopArea/WinnerCard/Content/Row/PortraitFrame/Center/Portrait
-@onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/Content/TopArea/RightColumn/NextOpponentCard/Content/PortraitFrame/Center/Portrait
-@onready var next_opponent_name_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/NextOpponentCard/Content/NameLabel
-@onready var bracket_summary_button: Button = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard
-@onready var bracket_summary_round_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard/Rows/RoundLabel
-@onready var bracket_summary_remaining_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard/Rows/RemainingLabel
-@onready var choose_reward_label: Label = $RewardSelectPanel/Content/ChooseRewardLabel
-@onready var card_row: HBoxContainer = $RewardSelectPanel/Content/CardRow
-@onready var species_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/SpeciesColumn/Content
-@onready var run_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/RunColumn/Content
-@onready var pivot_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/PivotColumn/Content
-@onready var sacrifice_card_row: HBoxContainer = $RewardSelectPanel/Content/SacrificeCardRow
-@onready var rerolls_remaining_label: Label = $RewardSelectPanel/Content/ActionRow/RerollsRemainingLabel
-@onready var skip_button: Button = $RewardSelectPanel/Content/ActionRow/SkipButton
-@onready var next_round_button: Button = $RewardSelectPanel/Content/ActionRow/NextRoundButton
-@onready var build_view_button: Button = $RewardSelectPanel/Content/ActionRow/ViewBuildButton
-
+@onready var reward_select_panel: RewardSelectPanel = $RewardSelectPanel
 @onready var build_view_panel: BuildViewPanel = $BuildViewPanel
-
-## The 3 RewardCards share one ButtonGroup (exactly one selected at a
-## time) but each column keeps its own separate RerollButton outside the
-## group -- see the reward-screen plan's note on why ButtonGroup still
-## fits despite per-slot rerolls.
-var _reward_card_group: ButtonGroup = ButtonGroup.new()
-var _reward_cards: Dictionary = {}  # RewardSelector.RewardSlot -> RewardCard
-var _slot_columns: Dictionary = {}  # RewardSelector.RewardSlot -> VBoxContainer
-var selected_reward_option: UpgradeOption = null
-
-## -- Sacrifice screen (round 4's PASSIVE_TRADE cadence, step 1 of 2) --
-## Its own ButtonGroup/selection state rather than reusing the reward-card
-## ones above: a genuinely separate screen and step, never shown at the
-## same time, so there's no reason for one's stale selection to have any
-## chance of bleeding into the other's.
-var _sacrifice_card_group: ButtonGroup = ButtonGroup.new()
-var _in_sacrifice_pick_step: bool = false
-var selected_sacrifice_passive: PassiveEffect = null
 
 var reward_flow: RewardFlowController = RewardFlowController.new()
 
@@ -224,21 +180,11 @@ func _ready() -> void:
 	advance_button.pressed.connect(turn_gate_opened.emit)
 	advance_button.visible = false
 
-	_slot_columns = {
-		RewardSelector.RewardSlot.SPECIES: species_column,
-		RewardSelector.RewardSlot.RUN: run_column,
-		RewardSelector.RewardSlot.PIVOT: pivot_column,
-	}
-
-	for slot in _slot_columns:
-		var column: VBoxContainer = _slot_columns[slot]
-		column.get_node("RerollButton").pressed.connect(_on_reroll_pressed.bind(slot))
-
-	skip_button.pressed.connect(_on_skip_pressed)
-	next_round_button.pressed.connect(_on_next_round_pressed)
+	reward_select_panel.skip_requested.connect(_on_skip_pressed)
+	reward_select_panel.reward_confirmed.connect(_on_reward_confirmed)
+	reward_select_panel.next_opponent_requested.connect(_on_next_opponent_panel_pressed)
+	reward_select_panel.build_view_requested.connect(_on_build_view_pressed)
 	game_over_panel.restart_requested.connect(_on_restart_pressed)
-	bracket_summary_button.pressed.connect(_on_next_opponent_panel_pressed)
-	build_view_button.pressed.connect(_on_build_view_pressed)
 
 	begin_combat_panel.priority_builder_requested.connect(func() -> void: pre_fight_choice_made.emit(true))
 	begin_combat_panel.begin_requested.connect(_on_begin_fight_pressed)
@@ -433,23 +379,10 @@ func begin_reward_sequence() -> void:
 	# the winner's actual post-battle HP/statuses and the name of whoever
 	# was just defeated (enemy_familiar_data has already moved on to the
 	# *next* opponent by this point -- see DECISIONS.md).
-	reward_title_label.text = "BOUT WON!"
-	reward_subtitle_label.text = "%s defeated %s!" % [player.familiar.familiar_name, enemy.familiar.familiar_name]
-	winner_name_label.text = player.familiar.familiar_name
-	_populate_winner_card()
-
-	next_opponent_portrait.texture = enemy_familiar_data.sprite
-	next_opponent_name_label.text = enemy_familiar_data.familiar_name
-
-	if facing_boss:
-		bracket_summary_round_label.text = "Champion"
-		bracket_summary_remaining_label.text = "Final bout"
-	else:
-		bracket_summary_round_label.text = Bracket.round_display_name(current_round)
-		var rounds_remaining: int = bracket.rounds.size() - current_round
-		bracket_summary_remaining_label.text = "%d round%s remain" % [
-			rounds_remaining, "s" if rounds_remaining != 1 else ""
-		]
+	reward_select_panel.show_top_area(
+		player, enemy.familiar.familiar_name, enemy_familiar_data,
+		current_round, facing_boss, bracket.rounds.size() - current_round
+	)
 
 	# Hidden for the whole reward sequence (Phase B and whichever Phase A
 	# pass follows it) -- shown again once begin_fight() resumes the next
@@ -469,39 +402,6 @@ func begin_reward_sequence() -> void:
 	log_outer_frame.visible = false
 
 	begin_phase_b()
-
-## Rebuilds the HPBar next to the static PortraitFrame -- built fresh each
-## time rather than kept as a static scene child, same reasoning as every
-## other "rebuild per round" list on these screens (a fresh HPBar needs its
-## own StyleBoxFlat instances, per HPBar.set_hp()'s own documented quirk of
-## only ever mutating whatever fill style it finds).
-## No StatusRow here -- per the mockup, WinnerCard shows name + sprite + HP
-## only, not the winner's lingering statuses.
-func _populate_winner_card() -> void:
-	var portrait_frame: Control = winner_content.get_node("PortraitFrame")
-	for child in winner_content.get_children():
-		if child == portrait_frame:
-			continue
-		winner_content.remove_child(child)
-		child.queue_free()
-
-	var hp_bar: HPBar = WINNER_HP_BAR_SCENE.instantiate()
-	hp_bar.custom_minimum_size = Vector2(0, 24)
-	hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	# Appended after the scene's static PortraitFrame -- sprite on the
-	# left, HP bar on the right.
-	winner_content.add_child(hp_bar)
-
-	var background_style := StyleBoxFlat.new()
-	background_style.bg_color = Palette.HP_TRACK
-	hp_bar.bar_background_style = background_style
-	var fill_style := StyleBoxFlat.new()
-	fill_style.bg_color = Palette.HP_FULL
-	hp_bar.bar_fill_style = fill_style
-	hp_bar.set_hp(player.current_hp, player.familiar.max_hp)
-
-	winner_portrait.texture = player.familiar.sprite
 
 ## Shows the stat-upgrade panel. on_confirmed is called once the player
 ## commits their allocation -- parameterized so this same screen serves
@@ -549,141 +449,9 @@ func begin_phase_b() -> void:
 		RewardProgression.RewardKind.NONE:
 			populate_stat_upgrade_rows(1, advance_to_priority_editor)
 		RewardProgression.RewardKind.PASSIVE_TRADE:
-			begin_sacrifice_screen()
+			reward_select_panel.begin_sacrifice_screen(player_familiar_data, reward_flow, tooltip_layer)
 		_:
-			_show_reward_cards(true)
-
-## Sacrifice screen, step 1 of 2 (round 4's PASSIVE_TRADE cadence): pick
-## which currently-held passive to give up. Styled like the normal
-## reward-cards screen it shares a panel with (same TopArea/title-row
-## shell, RewardCard-shaped options) but without the SPECIES/RUN/WILDCARD
-## named-slot framing -- there's no fixed-slot concept here, just
-## "however many passives are currently held". A selection is toggled,
-## not immediate-fire -- the same misclick protection RewardCard's own
-## toggle-then-confirm interaction already gives every other one-way
-## reward pick applies here too, arguably more so: unlike a normal pick,
-## there's no way to reconsider which passive got chosen once step 2
-## (the replacement-passive cards) is showing. Confirming moves to that
-## step 2 via reward_flow.resolve_sacrifice() + _show_reward_cards().
-func begin_sacrifice_screen() -> void:
-	_in_sacrifice_pick_step = true
-	selected_sacrifice_passive = null
-	next_round_button.disabled = true
-
-	choose_reward_label.text = "SACRIFICE A PASSIVE"
-	rerolls_remaining_label.visible = false
-	card_row.visible = false
-	sacrifice_card_row.visible = true
-
-	_populate_sacrifice_cards()
-
-	skip_button.visible = true
-	reward_select_panel.visible = true
-
-## One RewardCard per currently-held passive, sharing their own
-## ButtonGroup (kept separate from the reward-cards screen's -- see
-## selected_sacrifice_passive's own declaration for why). See
-## GiveUpPassiveOption's docstring for why these carry no real apply().
-func _populate_sacrifice_cards() -> void:
-	for child in sacrifice_card_row.get_children():
-		child.queue_free()
-
-	for passive in reward_flow.sacrifice_options(player_familiar_data):
-		var option := GiveUpPassiveOption.new()
-		option.passive = passive
-		option.label = "Give up %s" % passive.passive_name
-
-		var card: RewardCard = REWARD_CARD_SCENE.instantiate()
-		sacrifice_card_row.add_child(card)
-		card.button_group = _sacrifice_card_group
-		card.setup(option, tooltip_layer)
-		card.toggled.connect(_on_sacrifice_card_toggled.bind(passive))
-
-func _on_sacrifice_card_toggled(pressed: bool, passive: PassiveEffect) -> void:
-	if not pressed:
-		return
-	selected_sacrifice_passive = passive
-	next_round_button.disabled = false
-
-## Shared by both the sacrifice screen's step 2 (replacement passives) and
-## every normal TECHNIQUE/PASSIVE round -- resets every bit of UI state
-## the sacrifice screen's step 1 touches, so a fresh reward screen never
-## silently inherits sacrifice-mode leftovers from a previous round.
-func _show_reward_cards(show_skip: bool) -> void:
-	_in_sacrifice_pick_step = false
-	choose_reward_label.text = "CHOOSE YOUR REWARD"
-	rerolls_remaining_label.visible = true
-	sacrifice_card_row.visible = false
-	card_row.visible = true
-
-	_populate_reward_cards()
-	skip_button.visible = show_skip
-	reward_select_panel.visible = true
-
-## Destroys and recreates all 3 slot cards for a fresh screen (a reroll
-## instead reuses the existing card -- see _on_reroll_pressed()).
-func _populate_reward_cards() -> void:
-	selected_reward_option = null
-	next_round_button.disabled = true
-
-	for slot in _slot_columns:
-		var column: VBoxContainer = _slot_columns[slot]
-
-		if _reward_cards.has(slot):
-			var old_card: RewardCard = _reward_cards[slot]
-			column.remove_child(old_card)
-			old_card.queue_free()
-			_reward_cards.erase(slot)
-
-		var option: UpgradeOption = reward_flow.candidate_for_slot(slot)
-		if option == null:
-			continue
-
-		var card: RewardCard = REWARD_CARD_SCENE.instantiate()
-		column.add_child(card)
-		column.move_child(card, 0)  # before RerollButton -- the column's own FramedPanel tab is the slot label now
-		card.button_group = _reward_card_group
-		card.setup(option, tooltip_layer)
-		card.toggled.connect(_on_reward_card_toggled.bind(slot))
-		_reward_cards[slot] = card
-
-	_refresh_reroll_buttons()
-
-func _on_reward_card_toggled(pressed: bool, slot: RewardSelector.RewardSlot) -> void:
-	if not pressed:
-		return
-	selected_reward_option = reward_flow.candidate_for_slot(slot)
-	next_round_button.disabled = selected_reward_option == null
-
-func _refresh_reroll_buttons() -> void:
-	rerolls_remaining_label.text = "Rerolls left: %d" % reward_flow.rerolls_remaining
-	var available: bool = reward_flow.rerolls_remaining > 0 and reward_flow.has_unseen_candidates()
-	for slot in _slot_columns:
-		var column: VBoxContainer = _slot_columns[slot]
-		column.get_node("RerollButton").disabled = not available
-
-## Rerolls exactly one slot in place -- reuses the existing RewardCard
-## node (re-setup() with the new candidate) rather than destroying and
-## recreating it, so the shared ButtonGroup never needs re-registering.
-func _on_reroll_pressed(slot: RewardSelector.RewardSlot) -> void:
-	if not reward_flow.reroll_slot(slot, player_familiar_data):
-		return
-
-	var card: RewardCard = _reward_cards.get(slot)
-	var option: UpgradeOption = reward_flow.candidate_for_slot(slot)
-	if card == null or option == null:
-		return
-
-	# The rerolled slot's previous content is gone -- clear its selection
-	# state (through the ButtonGroup) rather than leave a stale choice
-	# pointing at an option that's no longer offered.
-	if card.button_pressed:
-		selected_reward_option = null
-		next_round_button.disabled = true
-	card.button_pressed = false
-	card.setup(option, tooltip_layer)
-
-	_refresh_reroll_buttons()
+			reward_select_panel.begin_reward_cards(player_familiar_data, reward_flow, tooltip_layer, true)
 
 ## Declining the reward grants 2 stat points on the single allocation
 ## pass that follows, instead of running that screen a second time. Also
@@ -693,29 +461,15 @@ func _on_skip_pressed() -> void:
 	reward_select_panel.visible = false
 	populate_stat_upgrade_rows(2, advance_to_priority_editor)
 
-## Confirm button shared by the sacrifice screen's step 1 (which passive
-## to give up) and every other reward pick (step 2 included) -- dispatches
-## on _in_sacrifice_pick_step rather than needing two separately-wired
-## buttons for what the player experiences as one "confirm" action.
-func _on_next_round_pressed() -> void:
-	if _in_sacrifice_pick_step:
-		_confirm_sacrifice_pick()
-		return
-
-	if selected_reward_option == null:
-		return
-	selected_reward_option.apply(player_familiar_data)
+## RewardSelectPanel only ever hands back the chosen option -- applying it
+## also means healing the familiar back to full and refreshing the battle
+## HUD, both outside that panel's own remit.
+func _on_reward_confirmed(option: UpgradeOption) -> void:
+	option.apply(player_familiar_data)
 	player.current_hp = player.familiar.max_hp
 	update_hp_display(player)
 	reward_select_panel.visible = false
 	populate_stat_upgrade_rows(1, advance_to_priority_editor)
-
-func _confirm_sacrifice_pick() -> void:
-	if selected_sacrifice_passive == null:
-		return
-	_in_sacrifice_pick_step = false
-	reward_flow.resolve_sacrifice(selected_sacrifice_passive, player_familiar_data)
-	_show_reward_cards(false)
 
 ## Shows a "get ready" screen with the upcoming opponent's portrait/name and
 ## waits for the player to choose a path, before begin_fight() actually
