@@ -1,0 +1,99 @@
+[gd_resource type="Resource" script_class="Technique" format=3]
+
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="1_technique"]
+[ext_resource type="Script" path="res://scripts/technique/technique_step_group.gd" id="2_stepgroup"]
+[ext_resource type="Script" path="res://scripts/technique/technique_action.gd" id="3_action"]
+[ext_resource type="Script" path="res://scripts/technique/modify_status_action.gd" id="4_modifystatus"]
+
+[sub_resource type="Resource" id="Resource_defending"]
+script = ExtResource("4_modifystatus")
+effect = 8
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_hone"]
+script = ExtResource("4_modifystatus")
+effect = 10
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_fortify"]
+script = ExtResource("4_modifystatus")
+effect = 11
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_enlarge"]
+script = ExtResource("4_modifystatus")
+effect = 12
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_thorns"]
+script = ExtResource("4_modifystatus")
+effect = 14
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_ward"]
+script = ExtResource("4_modifystatus")
+effect = 15
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_absorption"]
+script = ExtResource("4_modifystatus")
+effect = 17
+modifier = 5.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_retaliation"]
+script = ExtResource("4_modifystatus")
+effect = 19
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_stasis"]
+script = ExtResource("4_modifystatus")
+effect = 20
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_renewal"]
+script = ExtResource("4_modifystatus")
+effect = 21
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_lifesteal"]
+script = ExtResource("4_modifystatus")
+effect = 22
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_regeneration"]
+script = ExtResource("4_modifystatus")
+effect = 23
+modifier = 2.0
+operator = 3
+target = 0
+
+[sub_resource type="Resource" id="Resource_stepgroup"]
+script = ExtResource("2_stepgroup")
+actions = Array[ExtResource("3_action")]([SubResource("Resource_defending"), SubResource("Resource_hone"), SubResource("Resource_fortify"), SubResource("Resource_enlarge"), SubResource("Resource_thorns"), SubResource("Resource_ward"), SubResource("Resource_absorption"), SubResource("Resource_retaliation"), SubResource("Resource_stasis"), SubResource("Resource_renewal"), SubResource("Resource_lifesteal"), SubResource("Resource_regeneration")])
+
+[resource]
+script = ExtResource("1_technique")
+technique_name = "Taste of Immortality"
+step_groups = Array[ExtResource("2_stepgroup")]([SubResource("Resource_stepgroup")])

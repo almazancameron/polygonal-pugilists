@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Technique" format=3]
+
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="1_technique"]
+[ext_resource type="Script" path="res://scripts/technique/technique_step_group.gd" id="2_stepgroup"]
+[ext_resource type="Script" path="res://scripts/technique/technique_action.gd" id="3_action"]
+[ext_resource type="Script" path="res://scripts/technique/status_application_action.gd" id="4_statusapp"]
+
+[sub_resource type="Resource" id="Resource_stasis"]
+script = ExtResource("4_statusapp")
+target = 0
+effect = 20
+stacks = 2
+
+[sub_resource type="Resource" id="Resource_stepgroup"]
+script = ExtResource("2_stepgroup")
+actions = Array[ExtResource("3_action")]([SubResource("Resource_stasis")])
+
+[resource]
+script = ExtResource("1_technique")
+technique_name = "Refute Death"
+step_groups = Array[ExtResource("2_stepgroup")]([SubResource("Resource_stepgroup")])

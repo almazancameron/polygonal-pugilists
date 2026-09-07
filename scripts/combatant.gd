@@ -132,11 +132,19 @@ func add_status(new_status: Status, is_self_applied: bool = false) -> Dictionary
 			var settle_message: String = _combine_messages([reapply_message, absorb_message, _settle_status(existing, stacks_before)])
 			return {"message": _combine_messages([settle_message, trigger_on_status_applied(existing)]), "created": false}
 
+	# Notified before new_status joins statuses, so an existing status (e.g.
+	# Hex) reacts to this genuinely new arrival without new_status also
+	# reacting to its own first-ever appearance -- new_status re-applying
+	# onto an *existing* copy of itself (the merge branch above, which
+	# passes the already-listed `existing`) is the one case that's meant to
+	# see itself in this notification; a fresh creation isn't.
+	var notify_message: String = trigger_on_status_applied(new_status)
+
 	statuses.append(new_status)
 	new_status.owner = self
 	apply_passive_field_bonuses(new_status)
 	var appended_message: String = _combine_messages([absorb_message, _settle_status(new_status, new_status.stacks)])
-	return {"message": _combine_messages([appended_message, trigger_on_status_applied(new_status)]), "created": true}
+	return {"message": _combine_messages([appended_message, notify_message]), "created": true}
 
 ## ModifyStatusPassiveEffect's field_name/field_bonus (see PassiveEffect) --
 ## called from add_status() itself, on whichever Status instance is about

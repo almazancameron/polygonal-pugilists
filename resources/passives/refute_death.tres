@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="OperationPassiveEffect" format=3]
+
+[ext_resource type="Script" path="res://scripts/condition/condition.gd" id="1_condition"]
+[ext_resource type="Script" path="res://scripts/condition/hp_comparison_condition.gd" id="2_hpcond"]
+[ext_resource type="Script" path="res://scripts/passive/operation_passive_effect.gd" id="3_operation"]
+[ext_resource type="Resource" path="res://resources/techniques/passive_operations/refute_death.tres" id="4_technique"]
+
+[sub_resource type="Resource" id="Resource_below_half"]
+script = ExtResource("2_hpcond")
+compare_mode = 1
+right_value = 0.5
+comparator = 2
+
+[resource]
+script = ExtResource("3_operation")
+operation = ExtResource("4_technique")
+passive_name = "Refute Death"
+trigger = 5
+trigger_target = 0
+conditions = Array[ExtResource("1_condition")]([SubResource("Resource_below_half")])
+limiter = 2

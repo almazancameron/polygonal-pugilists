@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Technique" format=3]
+
+[ext_resource type="Script" path="res://scripts/technique/technique.gd" id="1_technique"]
+[ext_resource type="Script" path="res://scripts/technique/technique_step_group.gd" id="2_stepgroup"]
+[ext_resource type="Script" path="res://scripts/technique/technique_action.gd" id="3_action"]
+[ext_resource type="Script" path="res://scripts/technique/hit_action.gd" id="4_hit"]
+[ext_resource type="Script" path="res://scripts/numeric_bonus/numeric_bonus.gd" id="5_bonus"]
+[ext_resource type="Script" path="res://scripts/numeric_bonus/total_status_count_numeric_bonus.gd" id="6_statuscount"]
+
+[sub_resource type="Resource" id="Resource_hit"]
+script = ExtResource("4_hit")
+
+[sub_resource type="Resource" id="Resource_bonus"]
+script = ExtResource("6_statuscount")
+applies_to = 0
+flat_bonus = 10
+
+[sub_resource type="Resource" id="Resource_stepgroup"]
+script = ExtResource("2_stepgroup")
+actions = Array[ExtResource("3_action")]([SubResource("Resource_hit")])
+numeric_bonuses = Array[ExtResource("5_bonus")]([SubResource("Resource_bonus")])
+
+[resource]
+script = ExtResource("1_technique")
+technique_name = "Reap"
+power_multiplier = 0.333
+step_groups = Array[ExtResource("2_stepgroup")]([SubResource("Resource_stepgroup")])
