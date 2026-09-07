@@ -23,10 +23,10 @@ const MAX_AUTO_STEPS: int = 50
 const PLAY_INTERVAL: float = 0.6
 
 ## Matches the flat, cornerless StyleBoxFlat battle.tscn's own HPBar
-## instances already use (Panels/PlayerPanel|EnemyPanel/HPBar) -- left null,
-## HPBar falls back to the default theme's ProgressBar style, which has
-## rounded corners. Fill color isn't set here: HPBar.set_hp() recolors it
-## every call based on HP fraction (Palette.HP_FULL/HP_LOW).
+## instances already use (Panels/PlayerPanel|EnemyPanel/Content/HPBar) --
+## left null, HPBar falls back to the default theme's ProgressBar style,
+## which has rounded corners. Fill color isn't set here: HPBar.set_hp()
+## recolors it every call based on HP fraction (Palette.HP_FULL/HP_LOW).
 const HP_BAR_BACKGROUND_COLOR: Color = Palette.HP_TRACK
 
 var user: Combatant

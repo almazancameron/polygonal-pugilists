@@ -85,17 +85,18 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var panels: HBoxContainer = $Panels
 @onready var log_scroll: ScrollContainer = $LogScroll
 @onready var log_view: CombatLogView = $LogScroll/LogView
+@onready var log_background: Control = $LogBackground
 
-@onready var player_name_label: Label = $Panels/PlayerPanel/NameLabel
-@onready var enemy_name_label: Label = $Panels/EnemyPanel/NameLabel
+@onready var player_name_label: Label = $Panels/PlayerPanel/Content/NameLabel
+@onready var enemy_name_label: Label = $Panels/EnemyPanel/Content/NameLabel
 
-@onready var player_hp_bar: HPBar = $Panels/PlayerPanel/HPBar
-@onready var enemy_hp_bar: HPBar = $Panels/EnemyPanel/HPBar
-@onready var player_status_row: StatusRow = $Panels/PlayerPanel/StatusRow
-@onready var enemy_status_row: StatusRow = $Panels/EnemyPanel/StatusRow
+@onready var player_hp_bar: HPBar = $Panels/PlayerPanel/Content/HPBar
+@onready var enemy_hp_bar: HPBar = $Panels/EnemyPanel/Content/HPBar
+@onready var player_status_row: StatusRow = $Panels/PlayerPanel/Content/StatusRow
+@onready var enemy_status_row: StatusRow = $Panels/EnemyPanel/Content/StatusRow
 
-@onready var player_portrait: TextureRect = $Panels/PlayerPanel/Portrait
-@onready var enemy_portrait: TextureRect = $Panels/EnemyPanel/Portrait
+@onready var player_portrait: TextureRect = $Panels/PlayerPanel/Content/Portrait
+@onready var enemy_portrait: TextureRect = $Panels/EnemyPanel/Content/Portrait
 
 @onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
@@ -317,6 +318,7 @@ func _show_scouting() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
+	log_background.visible = false
 
 	bracket_screen.setup(bracket, current_round, false)
 	bracket_screen.visible = true
@@ -333,6 +335,7 @@ func _select_entrant() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
+	log_background.visible = false
 
 	bracket_screen.setup(bracket, 0, true)
 	bracket_screen.visible = true
@@ -392,6 +395,7 @@ func begin_reward_sequence() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
+	log_background.visible = false
 
 	begin_phase_b()
 
@@ -584,6 +588,7 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
+	log_background.visible = false
 
 	begin_combat_message_label.text = "Ready to fight?"
 	begin_combat_portrait.texture = opponent.familiar.sprite
@@ -641,6 +646,7 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 	panels.visible = true
 	speed_toggle_button.visible = true
 	log_scroll.visible = true
+	log_background.visible = true
 
 	for child in build_select_panel.get_children():
 		child.queue_free()
@@ -823,6 +829,7 @@ func show_game_over(message: String) -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
 	log_scroll.visible = false
+	log_background.visible = false
 
 	game_over_message_label.text = message
 	game_over_panel.visible = true
