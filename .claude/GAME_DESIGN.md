@@ -253,6 +253,8 @@ CURRENT DIRECTION — **implemented** as of the bracket pass; see
 
 No separate upgrade choice happens before the very first fight beyond the draft itself — a freshly-drafted familiar's built-in loadout (one passive, two techniques) is the starting point step 3 then builds on.
 
+The 4 rounds are named Preliminary, Quarterfinal, Semifinal, and Final (`Bracket.round_display_name()`) — shown on the prefight screen and available anywhere a round needs a human label instead of "Round N".
+
 ## 9.3 Simulated off-screen fights
 
 Matches elsewhere in the bracket that the player doesn't take part in *are* played through the full combat engine — the original plan to approximate them with a stat comparison turned out to be solving a cost problem that doesn't exist. A run needs at most 11 off-screen matches (7 + 3 + 1 + 0 across the four rounds) and `balance_test.gd` measures a full headless battle at roughly 7.5ms, so simulating them properly is cheaper than maintaining a second, cruder combat model that would need its own balancing.
@@ -306,7 +308,7 @@ Tracked in detail in `LEARNING_ROADMAP.md`; summarized here for design context.
 
 **Done (bracket pass):** the tournament bracket (§9) itself — `Bracket`/`BracketRound`/`BracketMatch` resources, generation from the 16-familiar roster, character select doubling as the bracket screen, off-screen matches simulated then rolled for upsets, between-round scouting showing odds and species tags alongside the previous round's results, AI entrants growing their builds through the player's own reward system, and a placeholder final-boss encounter. This completes Milestone 1's feature set: a full run now plays start to finish, from drafting an entrant out of a real bracket to the champion fight. Covered by a committed, re-runnable regression harness (`scripts/tools/bracket_test.gd`) rather than throwaway verification scripts.
 
-**Next:** the mockup-matching visual style pass across battle/builder/reward/stat/bracket, previously deprioritized behind the bracket and now the top remaining item. After that: authoring the final boss's real kit (the current one is a deliberate placeholder), the AI drafting/priority-optimizer system (§11), and remaining content-pass scope (traits/augments, if still wanted — see `LEARNING_ROADMAP.md`).
+**In progress:** the mockup-matching visual style pass. Done so far: the shared `Theme`/`Palette`/`FramedPanel` foundation, the battle screen, the bracket/entrant screen, the priority builder (including a content-level card pass, not just framing), bracket round display names, and a full rebuild of the prefight and stat-upgrade screens (both ended up needing more than their original scoped tasks once compared closely against their mockups — see `DEVLOG.md`). **Next:** the reward screen and two smaller popups (next-opponent preview, "view my build") — the remaining items in `docs/superpowers/plans/2026-09-06-visual-overhaul.md`. After that: authoring the final boss's real kit (the current one is a deliberate placeholder), the AI drafting/priority-optimizer system (§11), and remaining content-pass scope (traits/augments, if still wanted — see `LEARNING_ROADMAP.md`).
 
 # 11. AI drafting and balance-testing methodology
 

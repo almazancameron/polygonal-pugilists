@@ -127,6 +127,8 @@ keyed by the wrong granularity, a cached-vs-on-demand Control size read too earl
 genuine `RichTextLabel` reliability gap confirmed by reading Godot's own engine source) —
 see `DEVLOG.md`/`DECISIONS.md`.
 
+**Session 10 update:** most of the mockup-matching visual pass (`docs/superpowers/plans/2026-09-06-visual-overhaul.md`) — a shared `Theme`/`Palette`/`FramedPanel` foundation, the battle/bracket/priority-builder screens, and full rebuilds of the prefight and stat-upgrade screens. Entirely Claude-implemented UI/GDScript; the developer's contribution was art direction and mockup-fidelity review (see `DEVLOG.md` for what that review actually caught, including a real overflow bug and a font-glyph rendering issue). Only the reward screen and two small popups remain unbuilt from that plan.
+
 **Session 8, continued (same day):** five rounds of live-tested drag-and-drop feel fixes
 on the priority builder, a `PassiveEffect.describe()` overhaul, and the mock-state panel
 rewritten from "declare a hypothetical state" into "play the current build out for real
@@ -313,6 +315,11 @@ runtime error aborts only its own function; that mechanism caught real crashes
 twice during the build instead of reporting false passes. Worth reading as the
 model for how future systems get covered.
 
+### Visual overhaul pass (in progress, session 10) — mockup-matching restyle across every screen
+`docs/superpowers/plans/2026-09-06-visual-overhaul.md`'s 17 tasks, Claude-implemented, developer reviewing against `assets/ui_mockup/*.png`. A shared `Theme`/`Palette`/`FramedPanel` foundation, then the battle, bracket, priority-builder, prefight, and stat-upgrade screens — the last two each needed real course-correction after an initial pass undershot the mockup (see `DEVLOG.md`). Only the reward screen and two small popups remain.
+
+**Worth naming as its own lesson, not just implementation history:** two screens in a row needed multiple rounds of post-implementation correction before the developer said outright that they'd lost confidence the remaining screens would go well without much more hand-holding. What actually fixed it wasn't more caution in general, it was a specific process change — read the mockup fully and compare it against a plan task's literal stated scope *before* writing any code, and flag real gaps as a short question rather than shipping the minimal literal reading and waiting to be corrected live. The very next screen (stat-upgrade) went through in one round instead of several once that was applied. Whether this holds for the remaining screens is still an open question, not a solved one — worth checking whether it actually keeps working, not assuming session 10's one success generalizes on its own.
+
 ### Step 8 — Final showdown + build-comparison pass (higher-level)
 The bracket's final match, opponents having accumulated a comparable amount of power to
 the player over the run, plus a deliberate comparison of two different drafted builds
@@ -394,17 +401,26 @@ independently, and this is worth a real check-in (not another silent extension) 
 starting the bracket, which is a large enough system that *how* it gets built matters as
 much as what gets built.
 
-**Immediate next step, per explicit developer direction ("bracket next")**: the tournament
-bracket (§9/Step 7, `GAME_DESIGN.md`). Read §9's own open questions (off-screen simulation
-odds/fidelity/cost) before implementing anything — this is the least-settled part of the
-design doc and a good candidate for the developer to drive more of the actual
-implementation on, given the check-in note above. The current random-matchup gauntlet
-(`full_roster` in `battle_controller.gd`) is a deliberate, throwaway stand-in for the
-bracket's real character-select/draft — expect it to be replaced outright, not extended.
-The Game Over/Restart flow and matchup randomization are now developer-verified
-end-to-end — the full non-bracket play loop genuinely works start to finish (§3). One
-known loose end before the bracket: Pebbloq needs an actual rebalance now that its
-Ancient Sentinel passive works (`DEVLOG.md`). Also re-export `build/FamiliarRPG0.exe`
-before any external playtest — the file on disk predates this session's fixes. The
-visual style pass and traits/augments remain open, lower-priority, and can slot in
-whenever.
+**Both the bracket (session 9) and most of the visual overhaul (session 10) are now done** —
+see the "Visual overhaul pass" step above and `DEVLOG.md` session 10 for what that
+covered. The developer-ownership check-in flagged above never happened as its own explicit
+conversation; instead, session 10 surfaced a narrower, related signal worth treating as
+real feedback rather than glossing over: after two visual-pass screens in a row needed
+several rounds of post-hoc correction, the developer said outright they'd lost confidence
+the remaining screens would go well without heavy guidance. That's specifically about
+mockup-fidelity process (now addressed — study the mockup and flag scope gaps before
+building, see the step above), not the same thing as the standing "developer implements
+ordinary features independently" north star, which this whole visual pass (like the
+bracket before it) still doesn't touch, since it was explicitly scoped as Claude-implemented
+UI work from the start. The two concerns shouldn't be conflated, but the broader check-in
+is still worth having deliberately at some point, not folded into "well, the mockup process
+got fixed."
+
+**Immediate next step**: finish the visual-overhaul plan — the reward screen and two small
+popups (next-opponent preview, "view my build") are what's left of
+`docs/superpowers/plans/2026-09-06-visual-overhaul.md`. After that: Pebbloq's rebalance
+(still unaddressed since session 8 — Ancient Sentinel actually working made it a real
+76.7% outlier), the final boss's real kit, and the AI-drafting/priority-optimizer system
+(§11), which has a concrete swap-in point already spec'd and waiting
+(`AIDrafter.apply_round_reward()`). Also re-export `build/FamiliarRPG0.exe` before any
+external playtest — the file on disk predates several sessions' worth of fixes now.
