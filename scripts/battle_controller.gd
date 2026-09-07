@@ -115,12 +115,12 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var begin_combat_panel: Control = $BeginCombatPanel
 @onready var begin_combat_round_label: Label = $BeginCombatPanel/Content/TitleBlock/RoundLabel
-@onready var begin_combat_player_name_label: Label = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/NameLabel
-@onready var begin_combat_player_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/PortraitFrame/Center/Portrait
-@onready var begin_combat_player_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/StatList
-@onready var begin_combat_opponent_name_label: Label = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/NameLabel
-@onready var begin_combat_opponent_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/PortraitFrame/Center/Portrait
-@onready var begin_combat_opponent_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/StatList
+@onready var begin_combat_player_name_label: Label = $BeginCombatPanel/Content/CardsRow/PlayerCard/Content/NameLabel
+@onready var begin_combat_player_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/PortraitFrame/Center/Portrait
+@onready var begin_combat_player_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/StatList
+@onready var begin_combat_opponent_name_label: Label = $BeginCombatPanel/Content/CardsRow/OpponentCard/Content/NameLabel
+@onready var begin_combat_opponent_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/PortraitFrame/Center/Portrait
+@onready var begin_combat_opponent_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/StatList
 @onready var priority_builder_button: Button = $BeginCombatPanel/Content/ButtonsRow/PriorityBuilderButton
 @onready var begin_combat_button: Button = $BeginCombatPanel/Content/ButtonsRow/BeginButton
 
@@ -680,12 +680,12 @@ func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: Tex
 		child.queue_free()
 
 	var hp_row := HBoxContainer.new()
-	hp_row.add_theme_constant_override("separation", 6)
+	hp_row.add_theme_constant_override("separation", 8)
 	stat_list.add_child(hp_row)
 
 	var hp_icon := TextureRect.new()
 	hp_icon.texture = PREFIGHT_MAX_HP_ICON
-	hp_icon.custom_minimum_size = Vector2(16, 16)
+	hp_icon.custom_minimum_size = Vector2(24, 24)
 	hp_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	hp_icon.modulate = Palette.HP_ICON
 	hp_row.add_child(hp_icon)
@@ -693,10 +693,11 @@ func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: Tex
 	var hp_name_label := Label.new()
 	hp_name_label.text = Familiar.stat_name(Familiar.Stat.MAX_HP)
 	hp_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hp_name_label.add_theme_font_size_override("font_size", 22)
 	hp_row.add_child(hp_name_label)
 
 	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
-	hp_bar.custom_minimum_size = Vector2(90, 14)
+	hp_bar.custom_minimum_size = Vector2(110, 24)
 	hp_row.add_child(hp_bar)
 
 	var background_style := StyleBoxFlat.new()
@@ -713,12 +714,12 @@ func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: Tex
 			continue
 
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 6)
+		row.add_theme_constant_override("separation", 8)
 		stat_list.add_child(row)
 
 		var icon := TextureRect.new()
 		icon.texture = PREFIGHT_STAT_ICONS[stat]
-		icon.custom_minimum_size = Vector2(16, 16)
+		icon.custom_minimum_size = Vector2(24, 24)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 		icon.modulate = Palette.TEXT_MUTED
 		row.add_child(icon)
@@ -726,10 +727,12 @@ func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: Tex
 		var stat_name_label := Label.new()
 		stat_name_label.text = Familiar.stat_name(stat)
 		stat_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		stat_name_label.add_theme_font_size_override("font_size", 22)
 		row.add_child(stat_name_label)
 
 		var value_label := Label.new()
 		value_label.text = str(familiar.get_stat(stat))
+		value_label.add_theme_font_size_override("font_size", 22)
 		row.add_child(value_label)
 
 ## Shows the pre-fight screen first (GAME_DESIGN.md §9.2 step 4's entry

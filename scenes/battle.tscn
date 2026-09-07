@@ -724,7 +724,7 @@ layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.18
 anchor_right = 1.0
-anchor_bottom = 0.68
+anchor_bottom = 0.56
 offset_left = 16.0
 offset_right = -16.0
 grow_horizontal = 2
@@ -732,7 +732,7 @@ grow_vertical = 2
 theme_override_constants/separation = 16
 
 [node name="PlayerCard" type="Control" parent="BeginCombatPanel/Content/CardsRow" unique_id=485181563]
-custom_minimum_size = Vector2(360, 0)
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 
 [node name="Background" type="Control" parent="BeginCombatPanel/Content/CardsRow/PlayerCard" unique_id=729266922]
@@ -746,7 +746,7 @@ mouse_filter = 2
 script = ExtResource("88_hauko")
 border_color = Color(0.91, 0.329, 0.18, 1)
 
-[node name="Scroll" type="ScrollContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard" unique_id=719487028]
+[node name="Content" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard" unique_id=775651484]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -757,27 +757,24 @@ offset_right = -10.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
-horizontal_scroll_mode = 0
+alignment = 1
 
-[node name="Content" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll" unique_id=775651484]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content" unique_id=360927536]
+[node name="NameLabel" type="Label" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content" unique_id=360927536]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
 
-[node name="StatsRow" type="HBoxContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content" unique_id=851638740]
+[node name="StatsRow" type="HBoxContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content" unique_id=851638740]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 
-[node name="PortraitFrame" type="Control" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow" unique_id=1184684710]
-custom_minimum_size = Vector2(100, 100)
+[node name="PortraitFrame" type="Control" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow" unique_id=1184684710]
+custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Background" type="ColorRect" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/PortraitFrame" unique_id=1135622736]
+[node name="Background" type="ColorRect" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/PortraitFrame" unique_id=1135622736]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -786,7 +783,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.18, 0.18, 0.18, 1)
 
-[node name="Center" type="CenterContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/PortraitFrame" unique_id=1642169505]
+[node name="Center" type="CenterContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/PortraitFrame" unique_id=1642169505]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -794,15 +791,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Portrait" type="TextureRect" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow/PortraitFrame/Center" unique_id=970035570]
-custom_minimum_size = Vector2(80, 80)
+[node name="Portrait" type="TextureRect" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow/PortraitFrame/Center" unique_id=970035570]
+custom_minimum_size = Vector2(124, 124)
 layout_mode = 2
 stretch_mode = 5
 
-[node name="StatList" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatsRow" unique_id=1533015765]
+[node name="StatList" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/PlayerCard/Content/StatsRow" unique_id=1533015765]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 6
 
 [node name="VSColumn" type="Control" parent="BeginCombatPanel/Content/CardsRow" unique_id=1224903828]
 layout_mode = 2
@@ -823,7 +820,7 @@ theme_override_font_sizes/font_size = 48
 text = "VS"
 
 [node name="OpponentCard" type="Control" parent="BeginCombatPanel/Content/CardsRow" unique_id=1895215195]
-custom_minimum_size = Vector2(360, 0)
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 
 [node name="Background" type="Control" parent="BeginCombatPanel/Content/CardsRow/OpponentCard" unique_id=870357798]
@@ -837,7 +834,7 @@ mouse_filter = 2
 script = ExtResource("88_hauko")
 border_color = Color(0.243, 0.812, 0.769, 1)
 
-[node name="Scroll" type="ScrollContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard" unique_id=1109692584]
+[node name="Content" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard" unique_id=1908430445]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -848,32 +845,29 @@ offset_right = -10.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
-horizontal_scroll_mode = 0
+alignment = 1
 
-[node name="Content" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll" unique_id=1908430445]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content" unique_id=2071240866]
+[node name="NameLabel" type="Label" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content" unique_id=2071240866]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.243, 0.812, 0.769, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
 
-[node name="StatsRow" type="HBoxContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content" unique_id=1527117440]
+[node name="StatsRow" type="HBoxContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content" unique_id=1527117440]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 
-[node name="StatList" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow" unique_id=1665470505]
+[node name="StatList" type="VBoxContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow" unique_id=1665470505]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 6
 
-[node name="PortraitFrame" type="Control" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow" unique_id=1890682494]
-custom_minimum_size = Vector2(100, 100)
+[node name="PortraitFrame" type="Control" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow" unique_id=1890682494]
+custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Background" type="ColorRect" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/PortraitFrame" unique_id=130414454]
+[node name="Background" type="ColorRect" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/PortraitFrame" unique_id=130414454]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -882,7 +876,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.18, 0.18, 0.18, 1)
 
-[node name="Center" type="CenterContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/PortraitFrame" unique_id=1449288958]
+[node name="Center" type="CenterContainer" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/PortraitFrame" unique_id=1449288958]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -890,8 +884,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Portrait" type="TextureRect" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatsRow/PortraitFrame/Center" unique_id=1546699802]
-custom_minimum_size = Vector2(80, 80)
+[node name="Portrait" type="TextureRect" parent="BeginCombatPanel/Content/CardsRow/OpponentCard/Content/StatsRow/PortraitFrame/Center" unique_id=1546699802]
+custom_minimum_size = Vector2(124, 124)
 layout_mode = 2
 size_flags_horizontal = 4
 stretch_mode = 5
