@@ -94,7 +94,7 @@ default_font = ExtResource("5_4k1nj")
 default_font_size = 16
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v7i3o"]
-bg_color = Color(0.74509805, 0, 0, 1)
+bg_color = Color(0.11, 0.13, 0.16, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_66ngm"]
 bg_color = Color(0, 0.74509805, 0, 1)
@@ -106,7 +106,7 @@ default_font = ExtResource("5_4k1nj")
 default_font_size = 16
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yahae"]
-bg_color = Color(0.74509805, 0, 0, 1)
+bg_color = Color(0.11, 0.13, 0.16, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4pi3"]
 bg_color = Color(0, 0.74509805, 0, 1)

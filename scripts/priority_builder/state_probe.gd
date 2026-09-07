@@ -22,12 +22,12 @@ enum Verdict { FIRES, SKIPPED, UNREACHED, INCOMPLETE }
 const MAX_AUTO_STEPS: int = 50
 const PLAY_INTERVAL: float = 0.6
 
-## Matches the flat, cornerless StyleBoxFlats battle.tscn's own HPBar
+## Matches the flat, cornerless StyleBoxFlat battle.tscn's own HPBar
 ## instances already use (Panels/PlayerPanel|EnemyPanel/HPBar) -- left null,
 ## HPBar falls back to the default theme's ProgressBar style, which has
-## rounded corners.
-const HP_BAR_BACKGROUND_COLOR: Color = Color(0.74509805, 0, 0, 1)
-const HP_BAR_FILL_COLOR: Color = Color(0, 0.74509805, 0, 1)
+## rounded corners. Fill color isn't set here: HPBar.set_hp() recolors it
+## every call based on HP fraction (Palette.HP_FULL/HP_LOW).
+const HP_BAR_BACKGROUND_COLOR: Color = Palette.HP_TRACK
 
 var user: Combatant
 var dummy: Combatant
@@ -338,10 +338,7 @@ func _build_side_display(into: VBoxContainer, label_text: String, editable_max_h
 	var hp_bar: HPBar = preload("res://scenes/hp_bar.tscn").instantiate()
 	var background_style := StyleBoxFlat.new()
 	background_style.bg_color = HP_BAR_BACKGROUND_COLOR
-	var fill_style := StyleBoxFlat.new()
-	fill_style.bg_color = HP_BAR_FILL_COLOR
 	hp_bar.bar_background_style = background_style
-	hp_bar.bar_fill_style = fill_style
 	into.add_child(hp_bar)
 
 	var status_row: StatusRow = preload("res://scenes/status_row.tscn").instantiate()

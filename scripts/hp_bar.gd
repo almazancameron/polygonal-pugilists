@@ -5,6 +5,9 @@ extends Control
 @onready var label: Label = $Bar/Label
 @onready var bar: ProgressBar = $Bar
 @onready var status_preview: Control = $StatusPreview
+@onready var heart_icon: TextureRect = $HeartIcon
+
+const HEART_TEXTURE: Texture2D = preload("res://assets/sprites/icons/max_hp_icon.tres")
 
 
 @export var bar_background_style: StyleBox:
@@ -27,6 +30,13 @@ func set_hp(current: int, max_hp: int) -> void:
 	bar.max_value = max_hp
 	bar.value = current
 	label.text = "%d / %d" % [current, max_hp]
+
+	var fill_style := bar.get_theme_stylebox("fill") as StyleBoxFlat
+	if fill_style == null:
+		fill_style = StyleBoxFlat.new()
+	var hp_fraction: float = float(current) / float(max_hp) if max_hp > 0 else 0.0
+	fill_style.bg_color = Palette.HP_FULL if hp_fraction > 0.35 else Palette.HP_LOW
+	bar.add_theme_stylebox_override("fill", fill_style)
 
 
 ## segments: each {"color": Color, "damage": int}, drawn back-to-back eating
@@ -65,3 +75,4 @@ func _ready() -> void:
 		bar.add_theme_stylebox_override("background", bar_background_style)
 	if bar_fill_style != null:
 		bar.add_theme_stylebox_override("fill", bar_fill_style)
+	heart_icon.texture = HEART_TEXTURE
