@@ -156,6 +156,7 @@ const STAT_UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/stat_upgrade_r
 ## (icon + colored name + subtitle) -- reused as-is rather than rebuilt,
 ## since nothing about it is priority-builder-specific.
 const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/palette_block.tscn")
+const STATUS_ROW_SCENE: PackedScene = preload("res://scenes/status_row.tscn")
 
 @onready var stat_upgrade_panel: Control = $StatUpgradePanel
 @onready var stat_name_label: Label = $StatUpgradePanel/Content/LeftColumn/Content/NameLabel
@@ -168,9 +169,15 @@ const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/
 @onready var stat_passive_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/PassivesCard/PassiveList
 
 @onready var reward_select_panel: Control = $RewardSelectPanel
-@onready var next_opponent_panel: Button = $RewardSelectPanel/Content/NextOpponentPanel
-@onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/Content/NextOpponentPanel/Row/Portrait
-@onready var next_opponent_name_label: Label = $RewardSelectPanel/Content/NextOpponentPanel/Row/NameLabel
+@onready var reward_title_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/TitleLabel
+@onready var reward_subtitle_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/SubtitleLabel
+@onready var winner_name_label: Label = $RewardSelectPanel/Content/TopArea/WinnerCard/Content/NameLabel
+@onready var winner_content: VBoxContainer = $RewardSelectPanel/Content/TopArea/WinnerCard/Content
+@onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/Content/TopArea/RightColumn/NextOpponentCard/Content/PortraitFrame/Center/Portrait
+@onready var next_opponent_name_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/NextOpponentCard/Content/NameLabel
+@onready var bracket_summary_button: Button = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard
+@onready var bracket_summary_round_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard/Rows/RoundLabel
+@onready var bracket_summary_remaining_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard/Rows/RemainingLabel
 @onready var species_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/SpeciesColumn/Content
 @onready var run_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/RunColumn/Content
 @onready var pivot_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/PivotColumn/Content
@@ -250,7 +257,7 @@ func _ready() -> void:
 	skip_button.pressed.connect(_on_skip_pressed)
 	next_round_button.pressed.connect(_on_next_round_pressed)
 	restart_button.pressed.connect(_on_restart_pressed)
-	next_opponent_panel.pressed.connect(_on_next_opponent_panel_pressed)
+	bracket_summary_button.pressed.connect(_on_next_opponent_panel_pressed)
 	build_view_button.pressed.connect(_on_build_view_pressed)
 	build_view_close_button.pressed.connect(_on_build_view_closed_pressed)
 
@@ -456,8 +463,29 @@ func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") 
 ## points on that single pass instead of 1, rather than showing the stat
 ## screen a second, separate time.
 func begin_reward_sequence() -> void:
+	# player/enemy are still the just-finished fight's Combatants here --
+	# start_next_round()/start_boss_fight() both reconstruct them only
+	# *after* this call returns, so this is the one place that can read
+	# the winner's actual post-battle HP/statuses and the name of whoever
+	# was just defeated (enemy_familiar_data has already moved on to the
+	# *next* opponent by this point -- see DECISIONS.md).
+	reward_title_label.text = "BOUT WON!"
+	reward_subtitle_label.text = "%s defeated %s!" % [player.familiar.familiar_name, enemy.familiar.familiar_name]
+	winner_name_label.text = player.familiar.familiar_name
+	_populate_winner_card()
+
 	next_opponent_portrait.texture = enemy_familiar_data.sprite
-	next_opponent_name_label.text = "Next: %s" % enemy_familiar_data.familiar_name
+	next_opponent_name_label.text = enemy_familiar_data.familiar_name
+
+	if facing_boss:
+		bracket_summary_round_label.text = "Champion"
+		bracket_summary_remaining_label.text = "Final bout"
+	else:
+		bracket_summary_round_label.text = Bracket.round_display_name(current_round)
+		var rounds_remaining: int = bracket.rounds.size() - current_round
+		bracket_summary_remaining_label.text = "%d round%s remain" % [
+			rounds_remaining, "s" if rounds_remaining != 1 else ""
+		]
 
 	# Hidden for the whole reward sequence (Phase B and whichever Phase A
 	# pass follows it) -- shown again once begin_fight() resumes the next
@@ -477,6 +505,35 @@ func begin_reward_sequence() -> void:
 	log_outer_frame.visible = false
 
 	begin_phase_b()
+
+## Rebuilds the HPBar + StatusRow under winner_name_label -- built fresh
+## each time rather than kept as static scene children, same reasoning as
+## every other "rebuild per round" list on these screens (a fresh HPBar
+## needs its own StyleBoxFlat instances, per HPBar.set_hp()'s own
+## documented quirk of only ever mutating whatever fill style it finds).
+func _populate_winner_card() -> void:
+	for child in winner_content.get_children():
+		if child == winner_name_label:
+			continue
+		winner_content.remove_child(child)
+		child.queue_free()
+
+	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
+	hp_bar.custom_minimum_size = Vector2(0, 24)
+	winner_content.add_child(hp_bar)
+
+	var background_style := StyleBoxFlat.new()
+	background_style.bg_color = Palette.HP_TRACK
+	hp_bar.bar_background_style = background_style
+	var fill_style := StyleBoxFlat.new()
+	fill_style.bg_color = Palette.HP_FULL
+	hp_bar.bar_fill_style = fill_style
+	hp_bar.set_hp(player.current_hp, player.familiar.max_hp)
+
+	var status_row: StatusRow = STATUS_ROW_SCENE.instantiate()
+	status_row.tooltip_layer = tooltip_layer
+	winner_content.add_child(status_row)
+	refresh_status_preview(player, hp_bar, status_row)
 
 ## Builds one StatUpgradeRow per stat_upgrade_pool entry and shows the
 ## panel. on_confirmed is called once the player commits their

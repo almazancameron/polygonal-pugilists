@@ -19,6 +19,7 @@ extends Button
 
 @onready var content: Control = $Content
 @onready var title_label: Label = $Content/TitleLabel
+@onready var icon_area: ColorRect = $Content/IconArea
 @onready var description_label: RichTextLabel = $Content/DescriptionLabel
 
 var option: UpgradeOption
@@ -30,6 +31,10 @@ func setup(upgrade_option: UpgradeOption, tooltip_layer: TooltipLayer) -> void:
 	_tooltip_layer = tooltip_layer
 
 	title_label.text = option.label
+	# No per-reward icon exists yet (UpgradeOption carries no icon data) --
+	# hide the placeholder rather than show an empty gray box. The node
+	# stays in the scene so a future icon pass has a slot ready to fill in.
+	icon_area.visible = false
 	description_label.text = option.describe()
 
 	if not description_label.meta_hover_started.is_connected(_on_description_meta_hover_started):
