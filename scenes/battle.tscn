@@ -307,105 +307,6 @@ offset_right = -16.0
 offset_bottom = 640.0
 grow_horizontal = 2
 
-[node name="RewardSelectPanel" type="VBoxContainer" parent="." unique_id=1531917245]
-visible = false
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 150.0
-offset_right = -16.0
-offset_bottom = 590.0
-grow_horizontal = 2
-
-[node name="NextOpponentPanel" type="Button" parent="RewardSelectPanel" unique_id=266292823]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-
-[node name="Row" type="HBoxContainer" parent="RewardSelectPanel/NextOpponentPanel" unique_id=1772325158]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="Portrait" type="TextureRect" parent="RewardSelectPanel/NextOpponentPanel/Row" unique_id=1809651432]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-mouse_filter = 2
-stretch_mode = 5
-
-[node name="NameLabel" type="Label" parent="RewardSelectPanel/NextOpponentPanel/Row" unique_id=1548441878]
-layout_mode = 2
-text = "Next: ???"
-
-[node name="CardRow" type="HBoxContainer" parent="RewardSelectPanel" unique_id=663900416]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="SpeciesColumn" type="VBoxContainer" parent="RewardSelectPanel/CardRow" unique_id=1587109415]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SlotLabel" type="Label" parent="RewardSelectPanel/CardRow/SpeciesColumn" unique_id=1294968131]
-layout_mode = 2
-text = "Species"
-horizontal_alignment = 1
-
-[node name="RerollButton" type="Button" parent="RewardSelectPanel/CardRow/SpeciesColumn" unique_id=2062995085]
-layout_mode = 2
-text = "Reroll"
-
-[node name="RunColumn" type="VBoxContainer" parent="RewardSelectPanel/CardRow" unique_id=2106150200]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SlotLabel" type="Label" parent="RewardSelectPanel/CardRow/RunColumn" unique_id=845245689]
-layout_mode = 2
-text = "Build"
-horizontal_alignment = 1
-
-[node name="RerollButton" type="Button" parent="RewardSelectPanel/CardRow/RunColumn" unique_id=428489786]
-layout_mode = 2
-text = "Reroll"
-
-[node name="PivotColumn" type="VBoxContainer" parent="RewardSelectPanel/CardRow" unique_id=33612925]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SlotLabel" type="Label" parent="RewardSelectPanel/CardRow/PivotColumn" unique_id=308469329]
-layout_mode = 2
-text = "Wildcard"
-horizontal_alignment = 1
-
-[node name="RerollButton" type="Button" parent="RewardSelectPanel/CardRow/PivotColumn" unique_id=755980464]
-layout_mode = 2
-text = "Reroll"
-
-[node name="ActionRow" type="HBoxContainer" parent="RewardSelectPanel" unique_id=1515370735]
-layout_mode = 2
-
-[node name="RerollsRemainingLabel" type="Label" parent="RewardSelectPanel/ActionRow" unique_id=70945478]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Rerolls left: 3"
-
-[node name="SkipButton" type="Button" parent="RewardSelectPanel/ActionRow" unique_id=1616817643]
-layout_mode = 2
-text = "Skip"
-
-[node name="ViewBuildButton" type="Button" parent="RewardSelectPanel/ActionRow" unique_id=851091201]
-layout_mode = 2
-text = "View My Build"
-
-[node name="NextRoundButton" type="Button" parent="RewardSelectPanel/ActionRow" unique_id=1184232685]
-layout_mode = 2
-disabled = true
-text = "Confirm Selection"
-
 [node name="PriorityBuilder" parent="." unique_id=1870533042 instance=ExtResource("76_1w6ws")]
 visible = false
 layout_mode = 1
@@ -1313,3 +1214,184 @@ offset_bottom = 38.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 22
 text = "×"
+
+[node name="RewardSelectPanel" type="Control" parent="." unique_id=1322811496]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = -16.0
+offset_bottom = 620.0
+grow_horizontal = 2
+
+[node name="Background" type="Control" parent="RewardSelectPanel" unique_id=1792352807]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+
+[node name="Content" type="VBoxContainer" parent="RewardSelectPanel" unique_id=1531917245]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NextOpponentPanel" type="Button" parent="RewardSelectPanel/Content" unique_id=266292823]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="RewardSelectPanel/Content/NextOpponentPanel" unique_id=1772325158]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Portrait" type="TextureRect" parent="RewardSelectPanel/Content/NextOpponentPanel/Row" unique_id=1809651432]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_filter = 2
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="RewardSelectPanel/Content/NextOpponentPanel/Row" unique_id=1548441878]
+layout_mode = 2
+text = "Next: ???"
+
+[node name="CardRow" type="HBoxContainer" parent="RewardSelectPanel/Content" unique_id=663900416]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SpeciesColumn" type="Control" parent="RewardSelectPanel/Content/CardRow" unique_id=1079997522]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Background" type="Control" parent="RewardSelectPanel/Content/CardRow/SpeciesColumn" unique_id=859495239]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "SPECIES"
+
+[node name="Content" type="VBoxContainer" parent="RewardSelectPanel/Content/CardRow/SpeciesColumn" unique_id=1587109415]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="RerollButton" type="Button" parent="RewardSelectPanel/Content/CardRow/SpeciesColumn/Content" unique_id=2062995085]
+layout_mode = 2
+text = "Reroll"
+
+[node name="RunColumn" type="Control" parent="RewardSelectPanel/Content/CardRow" unique_id=867372741]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Background" type="Control" parent="RewardSelectPanel/Content/CardRow/RunColumn" unique_id=386702941]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "RUN"
+
+[node name="Content" type="VBoxContainer" parent="RewardSelectPanel/Content/CardRow/RunColumn" unique_id=2106150200]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="RerollButton" type="Button" parent="RewardSelectPanel/Content/CardRow/RunColumn/Content" unique_id=428489786]
+layout_mode = 2
+text = "Reroll"
+
+[node name="PivotColumn" type="Control" parent="RewardSelectPanel/Content/CardRow" unique_id=1389730460]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Background" type="Control" parent="RewardSelectPanel/Content/CardRow/PivotColumn" unique_id=122151911]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(1, 0.714, 0.282, 1)
+header_text = "WILDCARD"
+
+[node name="Content" type="VBoxContainer" parent="RewardSelectPanel/Content/CardRow/PivotColumn" unique_id=33612925]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="RerollButton" type="Button" parent="RewardSelectPanel/Content/CardRow/PivotColumn/Content" unique_id=755980464]
+layout_mode = 2
+text = "Reroll"
+
+[node name="ActionRow" type="HBoxContainer" parent="RewardSelectPanel/Content" unique_id=1515370735]
+layout_mode = 2
+
+[node name="RerollsRemainingLabel" type="Label" parent="RewardSelectPanel/Content/ActionRow" unique_id=70945478]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Rerolls left: 3"
+
+[node name="SkipButton" type="Button" parent="RewardSelectPanel/Content/ActionRow" unique_id=1616817643]
+layout_mode = 2
+text = "Skip"
+
+[node name="ViewBuildButton" type="Button" parent="RewardSelectPanel/Content/ActionRow" unique_id=851091201]
+layout_mode = 2
+text = "View My Build"
+
+[node name="NextRoundButton" type="Button" parent="RewardSelectPanel/Content/ActionRow" unique_id=1184232685]
+layout_mode = 2
+disabled = true
+text = "Confirm Selection"

@@ -167,17 +167,17 @@ const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/
 @onready var stat_technique_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/TechniquesCard/TechniqueList
 @onready var stat_passive_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/PassivesCard/PassiveList
 
-@onready var reward_select_panel: VBoxContainer = $RewardSelectPanel
-@onready var next_opponent_panel: Button = $RewardSelectPanel/NextOpponentPanel
-@onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/NextOpponentPanel/Row/Portrait
-@onready var next_opponent_name_label: Label = $RewardSelectPanel/NextOpponentPanel/Row/NameLabel
-@onready var species_column: VBoxContainer = $RewardSelectPanel/CardRow/SpeciesColumn
-@onready var run_column: VBoxContainer = $RewardSelectPanel/CardRow/RunColumn
-@onready var pivot_column: VBoxContainer = $RewardSelectPanel/CardRow/PivotColumn
-@onready var rerolls_remaining_label: Label = $RewardSelectPanel/ActionRow/RerollsRemainingLabel
-@onready var skip_button: Button = $RewardSelectPanel/ActionRow/SkipButton
-@onready var next_round_button: Button = $RewardSelectPanel/ActionRow/NextRoundButton
-@onready var build_view_button: Button = $RewardSelectPanel/ActionRow/ViewBuildButton
+@onready var reward_select_panel: Control = $RewardSelectPanel
+@onready var next_opponent_panel: Button = $RewardSelectPanel/Content/NextOpponentPanel
+@onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/Content/NextOpponentPanel/Row/Portrait
+@onready var next_opponent_name_label: Label = $RewardSelectPanel/Content/NextOpponentPanel/Row/NameLabel
+@onready var species_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/SpeciesColumn/Content
+@onready var run_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/RunColumn/Content
+@onready var pivot_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/PivotColumn/Content
+@onready var rerolls_remaining_label: Label = $RewardSelectPanel/Content/ActionRow/RerollsRemainingLabel
+@onready var skip_button: Button = $RewardSelectPanel/Content/ActionRow/SkipButton
+@onready var next_round_button: Button = $RewardSelectPanel/Content/ActionRow/NextRoundButton
+@onready var build_view_button: Button = $RewardSelectPanel/Content/ActionRow/ViewBuildButton
 
 @onready var build_view_panel: Control = $BuildViewPanel
 @onready var build_view_close_button: Button = $BuildViewPanel/CloseButton
@@ -606,7 +606,7 @@ func _populate_reward_cards() -> void:
 
 		var card: RewardCard = REWARD_CARD_SCENE.instantiate()
 		column.add_child(card)
-		column.move_child(card, 1)  # between SlotLabel (0) and RerollButton
+		column.move_child(card, 0)  # before RerollButton -- the column's own FramedPanel tab is the slot label now
 		card.button_group = _reward_card_group
 		card.setup(option, tooltip_layer)
 		card.toggled.connect(_on_reward_card_toggled.bind(slot))
