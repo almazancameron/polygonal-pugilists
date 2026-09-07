@@ -10,24 +10,21 @@ enum StatusEffect { NONE, POISON, BURN, ACID, BLEED, STAGGER, FORETELL, STUN, DE
 var stacks: int = 1:
 	set(value):
 		if value < stacks and owner != null and status_id() != Status.status_effect_id(Status.StatusEffect.STASIS):
-			# Absorption is the one status a single hit can touch twice in
-			# the same cascade: redirecting its reduction into Stasis below
-			# fires STATUS_REDUCED (for Stasis), which can trigger a
-			# retaliation passive (e.g. Portent's Toll) whose own hit lands
-			# on this same Combatant and asks to reduce Absorption again --
-			# a loop with no other exit than Stasis eventually running out,
-			# which never happens if it can't outpace however many times
-			# retaliation re-triggers per hit. No other status re-attempts
-			# a reduction like this from a passive it itself woke up, so the
-			# guard is scoped to Absorption specifically rather than
-			# touching Stasis's redirect (or any retaliation passive's own
-			# firing limit) in general.
-			var is_absorption: bool = status_id() == Status.status_effect_id(Status.StatusEffect.ABSORPTION)
-			if not (is_absorption and owner.absorption_stasis_redirect_used_this_turn):
+			# Stasis protects each status from being reduced at most once per
+			# turn, not indefinitely -- otherwise a status whose redirected
+			# reduction here (Stasis notifying, not the status itself) wakes a
+			# passive whose own effect lands back on this same status (a
+			# retaliation passive triggered by STATUS_REDUCED, hitting a
+			# target whose incoming damage that same status absorbs, is the
+			# concrete case that happened) has no other exit than Stasis
+			# eventually running out -- which never happens if the loop
+			# outpaces however many stacks Stasis started with. Keyed by
+			# status_id rather than one flag per status: any status can be
+			# the one a passive cascade re-visits, not just today's case.
+			if not owner.stasis_redirect_used_this_turn.get(status_id(), false):
 				var stasis: Status = owner.get_status(Status.StatusEffect.STASIS)
 				if stasis != null:
-					if is_absorption:
-						owner.absorption_stasis_redirect_used_this_turn = true
+					owner.stasis_redirect_used_this_turn[status_id()] = true
 
 					# This status's own reduction is redirected into Stasis instead
 					# (stacks left untouched below), so Stasis is the one whose
