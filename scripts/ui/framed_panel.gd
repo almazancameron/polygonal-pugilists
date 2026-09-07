@@ -15,7 +15,8 @@ extends Control
 
 const BORDER_WIDTH: float = 2.0
 const CORNER_CUT: float = 10.0
-const RIVET_RADIUS: float = 3.5
+const RIVET_SIZE: float = 7.0
+const RIVET_CORNER_RADIUS: int = 2
 const RIVET_OFFSET: float = CORNER_CUT / 2.0
 const HEADER_HEIGHT: float = 22.0
 const HEADER_TAB_PADDING: float = 12.0
@@ -82,8 +83,13 @@ func _draw() -> void:
 	var corners: Array[Vector2] = [rect.position, Vector2(rect.end.x, rect.position.y),
 			Vector2(rect.position.x, rect.end.y), rect.end]
 	var corner_signs: Array[Vector2] = [Vector2(1, 1), Vector2(-1, 1), Vector2(1, -1), Vector2(-1, -1)]
+	var rivet_style := StyleBoxFlat.new()
+	rivet_style.bg_color = border_color
+	rivet_style.set_corner_radius_all(RIVET_CORNER_RADIUS)
 	for i in corners.size():
-		draw_circle(corners[i] + corner_signs[i] * RIVET_OFFSET, RIVET_RADIUS, border_color)
+		var rivet_center := corners[i] + corner_signs[i] * RIVET_OFFSET
+		var rivet_rect := Rect2(rivet_center - Vector2.ONE * RIVET_SIZE / 2.0, Vector2.ONE * RIVET_SIZE)
+		draw_style_box(rivet_style, rivet_rect)
 
 ## The panel's outline as a notched-corner polygon, with an optional
 ## rectangular tab cut upward out of the top edge (left-aligned, just
