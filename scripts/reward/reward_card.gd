@@ -26,6 +26,31 @@ var option: UpgradeOption
 var _tooltip_layer: TooltipLayer
 var _hovered_meta: Variant = null
 
+## The shared Theme's default hover/pressed borders are both a gold close
+## enough to Palette.GOLD_ACCENT to blend into this card's own gold-bordered
+## column frame (SpeciesColumn/RunColumn/PivotColumn) -- hovering a card was
+## barely distinguishable from the frame around it. Overridden per-instance
+## to Palette.PLAYER_ACCENT instead, on both "hover" and "pressed" (a
+## toggle_mode Button shows "pressed" continuously while selected, not just
+## while the mouse is held down, so this is also what keeps a chosen card
+## highlighted after the click ends).
+func _ready() -> void:
+	# Same bg_color as the shared Theme's own StyleBoxFlat for each state
+	# (pixel_pugilists.tres) -- only border_color changes here.
+	var bg_colors := {
+		"hover": Color(0.11, 0.13, 0.16, 1),
+		"focus": Color(0.11, 0.13, 0.16, 1),
+		"pressed": Color(0.16, 0.18, 0.22, 1),
+	}
+	for style_name in bg_colors:
+		var style := StyleBoxFlat.new()
+		style.bg_color = bg_colors[style_name]
+		style.border_color = Palette.PLAYER_ACCENT
+		style.set_border_width_all(2)
+		style.set_content_margin_all(6)
+		style.set_corner_radius_all(2)
+		add_theme_stylebox_override(style_name, style)
+
 func setup(upgrade_option: UpgradeOption, tooltip_layer: TooltipLayer) -> void:
 	option = upgrade_option
 	_tooltip_layer = tooltip_layer

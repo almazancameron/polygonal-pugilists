@@ -156,7 +156,6 @@ const STAT_UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/stat_upgrade_r
 ## (icon + colored name + subtitle) -- reused as-is rather than rebuilt,
 ## since nothing about it is priority-builder-specific.
 const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/palette_block.tscn")
-const STATUS_ROW_SCENE: PackedScene = preload("res://scenes/status_row.tscn")
 
 @onready var stat_upgrade_panel: Control = $StatUpgradePanel
 @onready var stat_name_label: Label = $StatUpgradePanel/Content/LeftColumn/Content/NameLabel
@@ -171,8 +170,9 @@ const STATUS_ROW_SCENE: PackedScene = preload("res://scenes/status_row.tscn")
 @onready var reward_select_panel: Control = $RewardSelectPanel
 @onready var reward_title_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/TitleLabel
 @onready var reward_subtitle_label: Label = $RewardSelectPanel/Content/TopArea/TitleBlock/SubtitleLabel
-@onready var winner_name_label: Label = $RewardSelectPanel/Content/TopArea/WinnerCard/Content/NameLabel
-@onready var winner_content: VBoxContainer = $RewardSelectPanel/Content/TopArea/WinnerCard/Content
+@onready var winner_frame: FramedPanel = $RewardSelectPanel/Content/TopArea/WinnerCard/Background
+@onready var winner_content: HBoxContainer = $RewardSelectPanel/Content/TopArea/WinnerCard/Content
+@onready var winner_portrait: TextureRect = $RewardSelectPanel/Content/TopArea/WinnerCard/Content/PortraitFrame/Center/Portrait
 @onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/Content/TopArea/RightColumn/NextOpponentCard/Content/PortraitFrame/Center/Portrait
 @onready var next_opponent_name_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/NextOpponentCard/Content/NameLabel
 @onready var bracket_summary_button: Button = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard
@@ -471,7 +471,7 @@ func begin_reward_sequence() -> void:
 	# *next* opponent by this point -- see DECISIONS.md).
 	reward_title_label.text = "BOUT WON!"
 	reward_subtitle_label.text = "%s defeated %s!" % [player.familiar.familiar_name, enemy.familiar.familiar_name]
-	winner_name_label.text = player.familiar.familiar_name
+	winner_frame.header_text = player.familiar.familiar_name
 	_populate_winner_card()
 
 	next_opponent_portrait.texture = enemy_familiar_data.sprite
@@ -506,20 +506,27 @@ func begin_reward_sequence() -> void:
 
 	begin_phase_b()
 
-## Rebuilds the HPBar + StatusRow under winner_name_label -- built fresh
-## each time rather than kept as static scene children, same reasoning as
-## every other "rebuild per round" list on these screens (a fresh HPBar
+## Rebuilds the HPBar to the left of the static PortraitFrame -- built
+## fresh each time rather than kept as a static scene child, same reasoning
+## as every other "rebuild per round" list on these screens (a fresh HPBar
 ## needs its own StyleBoxFlat instances, per HPBar.set_hp()'s own
 ## documented quirk of only ever mutating whatever fill style it finds).
+## No StatusRow here -- per the mockup, WinnerCard shows name (in the
+## header flag) + sprite + HP only, not the winner's lingering statuses.
 func _populate_winner_card() -> void:
+	var portrait_frame: Control = winner_content.get_node("PortraitFrame")
 	for child in winner_content.get_children():
-		if child == winner_name_label:
+		if child == portrait_frame:
 			continue
 		winner_content.remove_child(child)
 		child.queue_free()
 
 	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
 	hp_bar.custom_minimum_size = Vector2(0, 24)
+	hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	# Appended after the scene's static PortraitFrame -- sprite on the
+	# left, HP bar on the right.
 	winner_content.add_child(hp_bar)
 
 	var background_style := StyleBoxFlat.new()
@@ -530,10 +537,7 @@ func _populate_winner_card() -> void:
 	hp_bar.bar_fill_style = fill_style
 	hp_bar.set_hp(player.current_hp, player.familiar.max_hp)
 
-	var status_row: StatusRow = STATUS_ROW_SCENE.instantiate()
-	status_row.tooltip_layer = tooltip_layer
-	winner_content.add_child(status_row)
-	refresh_status_preview(player, hp_bar, status_row)
+	winner_portrait.texture = player.familiar.sprite
 
 ## Builds one StatUpgradeRow per stat_upgrade_pool entry and shows the
 ## panel. on_confirmed is called once the player commits their

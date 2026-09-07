@@ -1111,7 +1111,7 @@ script = ExtResource("88_hauko")
 border_color = Color(0.91, 0.329, 0.18, 1)
 header_text = "WINNER"
 
-[node name="Content" type="VBoxContainer" parent="RewardSelectPanel/Content/TopArea/WinnerCard" unique_id=1585752864]
+[node name="Content" type="HBoxContainer" parent="RewardSelectPanel/Content/TopArea/WinnerCard" unique_id=959041879]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -1122,12 +1122,35 @@ offset_right = -10.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="NameLabel" type="Label" parent="RewardSelectPanel/Content/TopArea/WinnerCard/Content" unique_id=59210397]
+[node name="PortraitFrame" type="Control" parent="RewardSelectPanel/Content/TopArea/WinnerCard/Content" unique_id=1463347054]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
-theme_override_font_sizes/font_size = 20
+size_flags_vertical = 4
+
+[node name="Background" type="ColorRect" parent="RewardSelectPanel/Content/TopArea/WinnerCard/Content/PortraitFrame" unique_id=1820532672]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
+[node name="Center" type="CenterContainer" parent="RewardSelectPanel/Content/TopArea/WinnerCard/Content/PortraitFrame" unique_id=5177628]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Portrait" type="TextureRect" parent="RewardSelectPanel/Content/TopArea/WinnerCard/Content/PortraitFrame/Center" unique_id=1744591932]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+stretch_mode = 5
 
 [node name="TitleBlock" type="VBoxContainer" parent="RewardSelectPanel/Content/TopArea" unique_id=849305492]
 layout_mode = 2

@@ -5,6 +5,7 @@
 
 [node name="RewardCard" type="Button" unique_id=1679984179]
 custom_minimum_size = Vector2(180, 160)
+size_flags_vertical = 3
 toggle_mode = true
 script = ExtResource("1_card")
 
@@ -20,6 +21,7 @@ mouse_filter = 2
 [node name="TitleLabel" type="Label" parent="Content" unique_id=1644227123]
 layout_mode = 2
 text = "Reward"
+horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="IconArea" type="ColorRect" parent="Content" unique_id=933603122]
@@ -30,9 +32,11 @@ color = Color(0.3, 0.3, 0.3, 1)
 
 [node name="DescriptionLabel" type="RichTextLabel" parent="Content" unique_id=1980191162]
 layout_mode = 2
+size_flags_vertical = 3
 mouse_filter = 1
 theme_override_fonts/bold_font = ExtResource("2_b5dx5")
 theme_override_font_sizes/bold_font_size = 16
 bbcode_enabled = true
-fit_content = true
 scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
