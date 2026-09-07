@@ -114,12 +114,15 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var restart_button: Button = $GameOverPanel/Content/RestartButton
 
 @onready var begin_combat_panel: Control = $BeginCombatPanel
-@onready var begin_combat_frame: FramedPanel = $BeginCombatPanel/Background
-@onready var begin_combat_message_label: Label = $BeginCombatPanel/Content/MessageLabel
-@onready var begin_combat_portrait: TextureRect = $BeginCombatPanel/Content/PortraitFrame/Center/OpponentPortrait
-@onready var begin_combat_name_label: Label = $BeginCombatPanel/Content/OpponentNameLabel
-@onready var priority_builder_button: Button = $BeginCombatPanel/Content/PriorityBuilderButton
-@onready var begin_combat_button: Button = $BeginCombatPanel/Content/BeginButton
+@onready var begin_combat_round_label: Label = $BeginCombatPanel/Content/TitleBlock/RoundLabel
+@onready var begin_combat_player_name_label: Label = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/NameLabel
+@onready var begin_combat_player_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/PortraitFrame/Center/Portrait
+@onready var begin_combat_player_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/PlayerCard/Scroll/Content/StatList
+@onready var begin_combat_opponent_name_label: Label = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/NameLabel
+@onready var begin_combat_opponent_portrait: TextureRect = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/PortraitFrame/Center/Portrait
+@onready var begin_combat_opponent_stat_list: VBoxContainer = $BeginCombatPanel/Content/CardsRow/OpponentCard/Scroll/Content/StatList
+@onready var priority_builder_button: Button = $BeginCombatPanel/Content/ButtonsRow/PriorityBuilderButton
+@onready var begin_combat_button: Button = $BeginCombatPanel/Content/ButtonsRow/BeginButton
 
 @onready var bracket_screen: BracketScreen = $BracketScreen
 
@@ -643,10 +646,9 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	log_background.visible = false
 	log_outer_frame.visible = false
 
-	begin_combat_message_label.text = "%s — Ready to fight?" % Bracket.round_display_name(current_round)
-	begin_combat_frame.header_text = Bracket.round_display_name(current_round)
-	begin_combat_portrait.texture = opponent.familiar.sprite
-	begin_combat_name_label.text = opponent.familiar.familiar_name
+	begin_combat_round_label.text = Bracket.round_display_name(current_round)
+	_populate_fighter_card(player.familiar, begin_combat_player_name_label, begin_combat_player_portrait, begin_combat_player_stat_list)
+	_populate_fighter_card(opponent.familiar, begin_combat_opponent_name_label, begin_combat_opponent_portrait, begin_combat_opponent_stat_list)
 	priority_builder_button.visible = show_priority_option
 	begin_combat_panel.visible = true
 
@@ -654,6 +656,81 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 
 	begin_combat_panel.visible = false
 	return open_priority_builder
+
+## Mirrors priority_builder.gd's own STAT_ICONS/_add_max_hp_row() approach
+## (icon + label + value rows, Max HP shown as an actual HPBar rather than
+## a plain number) -- duplicated here rather than shared, since this is a
+## read-only pre-fight display, not an editable build, and the only other
+## user of that pattern is a different screen entirely.
+const PREFIGHT_STAT_ICONS: Dictionary = {
+	Familiar.Stat.POWER: preload("res://assets/sprites/icons/power_icon.tres"),
+	Familiar.Stat.DEFENSE: preload("res://assets/sprites/icons/defense_icon.tres"),
+	Familiar.Stat.SPEED: preload("res://assets/sprites/icons/speed_icon.tres"),
+	Familiar.Stat.FOCUS: preload("res://assets/sprites/icons/focus_icon.tres"),
+}
+const PREFIGHT_MAX_HP_ICON: Texture2D = preload("res://assets/sprites/icons/max_hp_icon.tres")
+const PREFIGHT_HP_BAR_SCENE: PackedScene = preload("res://scenes/hp_bar.tscn")
+
+func _populate_fighter_card(familiar: Familiar, name_label: Label, portrait: TextureRect, stat_list: VBoxContainer) -> void:
+	name_label.text = familiar.familiar_name
+	portrait.texture = familiar.sprite
+
+	for child in stat_list.get_children():
+		stat_list.remove_child(child)
+		child.queue_free()
+
+	var hp_row := HBoxContainer.new()
+	hp_row.add_theme_constant_override("separation", 6)
+	stat_list.add_child(hp_row)
+
+	var hp_icon := TextureRect.new()
+	hp_icon.texture = PREFIGHT_MAX_HP_ICON
+	hp_icon.custom_minimum_size = Vector2(16, 16)
+	hp_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	hp_icon.modulate = Palette.HP_ICON
+	hp_row.add_child(hp_icon)
+
+	var hp_name_label := Label.new()
+	hp_name_label.text = Familiar.stat_name(Familiar.Stat.MAX_HP)
+	hp_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hp_row.add_child(hp_name_label)
+
+	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
+	hp_bar.custom_minimum_size = Vector2(90, 14)
+	hp_row.add_child(hp_bar)
+
+	var background_style := StyleBoxFlat.new()
+	background_style.bg_color = Palette.HP_TRACK
+	hp_bar.bar_background_style = background_style
+	var fill_style := StyleBoxFlat.new()
+	fill_style.bg_color = Palette.HP_FULL
+	hp_bar.bar_fill_style = fill_style
+	hp_bar.heart_icon.visible = false
+	hp_bar.set_hp(familiar.max_hp, familiar.max_hp)
+
+	for stat in Familiar.Stat.values():
+		if stat == Familiar.Stat.MAX_HP:
+			continue
+
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		stat_list.add_child(row)
+
+		var icon := TextureRect.new()
+		icon.texture = PREFIGHT_STAT_ICONS[stat]
+		icon.custom_minimum_size = Vector2(16, 16)
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+		icon.modulate = Palette.TEXT_MUTED
+		row.add_child(icon)
+
+		var stat_name_label := Label.new()
+		stat_name_label.text = Familiar.stat_name(stat)
+		stat_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(stat_name_label)
+
+		var value_label := Label.new()
+		value_label.text = str(familiar.get_stat(stat))
+		row.add_child(value_label)
 
 ## Shows the pre-fight screen first (GAME_DESIGN.md §9.2 step 4's entry
 ## point), looping back to it after every priority-editor session rather
