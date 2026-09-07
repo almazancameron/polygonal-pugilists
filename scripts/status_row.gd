@@ -1,5 +1,5 @@
 class_name StatusRow
-extends HBoxContainer
+extends HFlowContainer
 
 ## Maps a status's status_id() to the container currently displaying it, so a
 ## status that's still active keeps the same node (and tooltip hover state)
@@ -46,14 +46,14 @@ func _build_status_container() -> HBoxContainer:
 	stack_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1))
 	stack_label.add_theme_constant_override("shadow_offset_x", 1)
 	stack_label.add_theme_constant_override("shadow_offset_y", 1)
-	stack_label.add_theme_constant_override("font_size", 12)
-	stack_label.add_theme_font_override("font", load("res://assets/fonts/BoldPixels.ttf"))
+	stack_label.add_theme_font_size_override("font_size", 14)
+	stack_label.add_theme_font_override("font", load("res://assets/fonts/yoster.ttf"))
 	container.add_child(stack_label)
 
 	var icon_texture_rect := TextureRect.new()
 	icon_texture_rect.name = "Icon"
 	icon_texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-	icon_texture_rect.custom_minimum_size = Vector2(16, 16)  # Set a minimum size for the icon
+	icon_texture_rect.custom_minimum_size = Vector2(20, 20)  # Set a minimum size for the icon
 	container.add_child(icon_texture_rect)
 
 	container.mouse_entered.connect(func() -> void:

@@ -131,6 +131,14 @@ stat_upgrade_pool = Array[ExtResource("8_2mnj5")]([ExtResource("8_4gblq"), ExtRe
 technique_reward_pool = Array[ExtResource("14_qrayh")]([ExtResource("15_gs12l"), ExtResource("16_i3fbd"), ExtResource("17_rrh2e"), ExtResource("18_cqddr"), ExtResource("19_qnn43"), ExtResource("20_d2g17"), ExtResource("21_uq7we"), ExtResource("22_hauko"), ExtResource("23_gt766"), ExtResource("24_oef1w"), ExtResource("25_soua1"), ExtResource("26_8p3fd"), ExtResource("27_o2llt"), ExtResource("28_mx0ge"), ExtResource("29_dwymc"), ExtResource("30_4rw15"), ExtResource("31_p48d8"), ExtResource("32_tip4j"), ExtResource("33_mpjlb"), ExtResource("34_38w7l"), ExtResource("35_o655g"), ExtResource("36_g1072"), ExtResource("37_pa3g0"), ExtResource("38_n4rad"), ExtResource("39_bpy7r"), ExtResource("40_58yg0"), ExtResource("41_0c1oo"), ExtResource("42_m2s26"), ExtResource("43_cm72k"), ExtResource("44_67q2c"), ExtResource("45_hh0b5"), ExtResource("46_wi1sw"), ExtResource("47_0yd4v")])
 passive_reward_pool = Array[ExtResource("48_aom6h")]([ExtResource("49_t1yxo"), ExtResource("50_rvryj"), ExtResource("51_yuflr"), ExtResource("52_o8s6c"), ExtResource("53_haqqx"), ExtResource("54_f2fag"), ExtResource("55_xxndn"), ExtResource("56_l0nro"), ExtResource("57_gke8i"), ExtResource("58_eeccw"), ExtResource("59_rhpg2"), ExtResource("60_kupap"), ExtResource("61_qkvbb"), ExtResource("62_k7auw"), ExtResource("63_vbgn7"), ExtResource("64_36g0w"), ExtResource("65_yb105")])
 
+[node name="Backdrop" type="ColorRect" parent="." unique_id=507818397]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
 [node name="TooltipLayer" parent="." unique_id=1423614277 instance=ExtResource("18_fpf3k")]
 
 [node name="CombatLog" type="Node" parent="." unique_id=1861618585]
@@ -140,9 +148,9 @@ script = ExtResource("2_log")
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 0.145
+anchor_bottom = 0.2
 offset_left = 16.0
-offset_top = 16.0
+offset_top = 54.0
 offset_right = -16.0
 grow_horizontal = 2
 
@@ -152,8 +160,7 @@ size_flags_horizontal = 3
 
 [node name="Background" type="Control" parent="Panels/PlayerPanel" unique_id=531349878]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchor_right = 0.78
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("88_hauko")
@@ -161,27 +168,20 @@ border_color = Color(0.91, 0.329, 0.18, 1)
 
 [node name="Content" type="VBoxContainer" parent="Panels/PlayerPanel" unique_id=2074211053]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = -1
+anchor_right = 0.78
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 
-[node name="NameLabel" type="Label" parent="Panels/PlayerPanel/Content" unique_id=2079228690]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("82_d2g17")
-theme_override_font_sizes/font_size = 24
-text = "Player"
-
 [node name="HPBar" parent="Panels/PlayerPanel/Content" unique_id=1552056502 instance=ExtResource("3_hpbar")]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme = SubResource("Theme_n6c5v")
 bar_background_style = SubResource("StyleBoxFlat_v7i3o")
 bar_fill_style = SubResource("StyleBoxFlat_66ngm")
 
 [node name="StatusRow" parent="Panels/PlayerPanel/Content" unique_id=42082652 instance=ExtResource("7_yahae")]
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 
 [node name="EnemyPanel" type="Control" parent="Panels" unique_id=1049994733]
@@ -190,7 +190,7 @@ size_flags_horizontal = 3
 
 [node name="Background" type="Control" parent="Panels/EnemyPanel" unique_id=1749191572]
 layout_mode = 1
-anchors_preset = 15
+anchor_left = 0.22
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
@@ -199,32 +199,39 @@ border_color = Color(0.243, 0.812, 0.769, 1)
 
 [node name="Content" type="VBoxContainer" parent="Panels/EnemyPanel" unique_id=1684935374]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
+anchor_left = 0.22
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 
-[node name="NameLabel" type="Label" parent="Panels/EnemyPanel/Content" unique_id=849283833]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.243, 0.812, 0.769, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("82_d2g17")
-theme_override_font_sizes/font_size = 24
-text = "Enemy"
-
 [node name="HPBar" parent="Panels/EnemyPanel/Content" unique_id=715558566 instance=ExtResource("3_hpbar")]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme = SubResource("Theme_orx5a")
 bar_background_style = SubResource("StyleBoxFlat_yahae")
 bar_fill_style = SubResource("StyleBoxFlat_f4pi3")
 
 [node name="StatusRow" parent="Panels/EnemyPanel/Content" unique_id=1299416147 instance=ExtResource("7_yahae")]
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
+
+[node name="LogOuterFrame" type="Control" parent="." unique_id=700371262]
+layout_mode = 1
+anchor_top = 0.601
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 18.0
+offset_right = -6.0
+offset_bottom = -47.0
+mouse_filter = 2
+script = ExtResource("88_hauko")
+border_color = Color(0.34, 0.34, 0.36, 1)
 
 [node name="LogBackground" type="Control" parent="." unique_id=1178550852]
 layout_mode = 1
-anchor_top = 0.546
+anchor_top = 0.601
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 16.0
@@ -239,13 +246,13 @@ header_text = "COMBAT LOG"
 [node name="LogScroll" type="ScrollContainer" parent="." unique_id=2139746670]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.546
+anchor_top = 0.601
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 28.0
-offset_right = -16.0
-offset_bottom = -57.0
+offset_left = 30.0
+offset_top = 36.0
+offset_right = -30.0
+offset_bottom = -71.0
 grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
@@ -515,9 +522,9 @@ horizontal_alignment = 1
 [node name="Arena" type="HBoxContainer" parent="." unique_id=1595600205]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.145
+anchor_top = 0.2
 anchor_right = 1.0
-anchor_bottom = 0.546
+anchor_bottom = 0.601
 offset_left = 16.0
 offset_top = 8.0
 offset_right = -16.0
@@ -527,14 +534,6 @@ theme_override_constants/separation = 8
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-
-[node name="Background" type="ColorRect" parent="Arena/PlayerArena" unique_id=558610917]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-color = Color(0.18, 0.18, 0.18, 1)
 
 [node name="Center" type="CenterContainer" parent="Arena/PlayerArena" unique_id=464101296]
 layout_mode = 1
@@ -557,14 +556,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Background" type="ColorRect" parent="Arena/EnemyArena" unique_id=326946409]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-color = Color(0.18, 0.18, 0.18, 1)
-
 [node name="Center" type="CenterContainer" parent="Arena/EnemyArena" unique_id=589767152]
 layout_mode = 1
 anchors_preset = 15
@@ -581,29 +572,34 @@ texture = SubResource("PlaceholderTexture2D_4k1nj")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Footer" type="HBoxContainer" parent="." unique_id=13915388]
+[node name="Footer" type="MarginContainer" parent="." unique_id=1535574756]
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
+anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -180.0
-offset_top = -49.0
-offset_right = 180.0
-offset_bottom = -8.0
-theme_override_constants/separation = 8
+offset_top = -56.0
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
 
-[node name="AutoToggleButton" type="Button" parent="Footer" unique_id=181225098]
+[node name="ButtonRow" type="HBoxContainer" parent="Footer" unique_id=13915388]
 layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="AutoToggleButton" type="Button" parent="Footer/ButtonRow" unique_id=181225098]
+layout_mode = 2
+size_flags_horizontal = 4
 text = "AUTO: ON"
 
-[node name="SpeedToggleButton" type="Button" parent="Footer" unique_id=1985821346]
+[node name="SpeedToggleButton" type="Button" parent="Footer/ButtonRow" unique_id=1985821346]
 layout_mode = 2
+size_flags_horizontal = 4
 theme = ExtResource("1_uq7we")
 text = "1x"
 
-[node name="AdvanceButton" type="Button" parent="Footer" unique_id=1524887644]
+[node name="AdvanceButton" type="Button" parent="Footer/ButtonRow" unique_id=1524887644]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Advance"

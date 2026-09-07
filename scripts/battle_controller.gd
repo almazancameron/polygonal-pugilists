@@ -84,13 +84,14 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var panels: HBoxContainer = $Panels
 @onready var arena: HBoxContainer = $Arena
-@onready var footer: HBoxContainer = $Footer
+@onready var footer: MarginContainer = $Footer
 @onready var log_scroll: ScrollContainer = $LogScroll
 @onready var log_view: CombatLogView = $LogScroll/LogView
 @onready var log_background: Control = $LogBackground
+@onready var log_outer_frame: Control = $LogOuterFrame
 
-@onready var player_name_label: Label = $Panels/PlayerPanel/Content/NameLabel
-@onready var enemy_name_label: Label = $Panels/EnemyPanel/Content/NameLabel
+@onready var player_frame: FramedPanel = $Panels/PlayerPanel/Background
+@onready var enemy_frame: FramedPanel = $Panels/EnemyPanel/Background
 
 @onready var player_hp_bar: HPBar = $Panels/PlayerPanel/Content/HPBar
 @onready var enemy_hp_bar: HPBar = $Panels/EnemyPanel/Content/HPBar
@@ -102,9 +103,9 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
-@onready var speed_toggle_button: Button = $Footer/SpeedToggleButton
-@onready var auto_toggle_button: Button = $Footer/AutoToggleButton
-@onready var advance_button: Button = $Footer/AdvanceButton
+@onready var speed_toggle_button: Button = $Footer/ButtonRow/SpeedToggleButton
+@onready var auto_toggle_button: Button = $Footer/ButtonRow/AutoToggleButton
+@onready var advance_button: Button = $Footer/ButtonRow/AdvanceButton
 
 @onready var priority_builder: PriorityBuilder = $PriorityBuilder
 
@@ -277,8 +278,8 @@ func _start_new_run() -> void:
 	enemy.opponent = player
 	engine = BattleEngine.new(player, enemy)
 
-	player_name_label.text = player.familiar.familiar_name
-	enemy_name_label.text = enemy.familiar.familiar_name
+	player_frame.header_text = player.familiar.familiar_name
+	enemy_frame.header_text = enemy.familiar.familiar_name
 
 	update_hp_display(player)
 	update_hp_display(enemy)
@@ -344,6 +345,7 @@ func _show_scouting() -> void:
 	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
+	log_outer_frame.visible = false
 
 	bracket_screen.setup(bracket, current_round, false)
 	bracket_screen.visible = true
@@ -365,6 +367,7 @@ func _select_entrant() -> void:
 	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
+	log_outer_frame.visible = false
 
 	bracket_screen.setup(bracket, 0, true)
 	bracket_screen.visible = true
@@ -437,6 +440,7 @@ func begin_reward_sequence() -> void:
 	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
+	log_outer_frame.visible = false
 
 	begin_phase_b()
 
@@ -634,6 +638,7 @@ func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool)
 	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
+	log_outer_frame.visible = false
 
 	begin_combat_message_label.text = "Ready to fight?"
 	begin_combat_portrait.texture = opponent.familiar.sprite
@@ -694,6 +699,7 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 	speed_toggle_button.visible = auto_enabled
 	log_scroll.visible = true
 	log_background.visible = true
+	log_outer_frame.visible = true
 	auto_toggle_button.visible = true
 	advance_button.visible = not auto_enabled
 
@@ -890,6 +896,7 @@ func show_game_over(message: String) -> void:
 	advance_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
+	log_outer_frame.visible = false
 
 	game_over_message_label.text = message
 	game_over_panel.visible = true
@@ -923,7 +930,7 @@ func start_boss_fight() -> void:
 	update_hp_display(player)
 
 	enemy = Combatant.new(enemy_familiar_data)
-	enemy_name_label.text = enemy.familiar.familiar_name
+	enemy_frame.header_text = enemy.familiar.familiar_name
 	enemy_portrait.texture = enemy.familiar.sprite
 	update_hp_display(enemy)
 
@@ -967,7 +974,7 @@ func start_next_round() -> void:
 	update_hp_display(player)
 
 	enemy = Combatant.new(enemy_familiar_data)
-	enemy_name_label.text = enemy.familiar.familiar_name
+	enemy_frame.header_text = enemy.familiar.familiar_name
 	enemy_portrait.texture = enemy.familiar.sprite
 	update_hp_display(enemy)
 
