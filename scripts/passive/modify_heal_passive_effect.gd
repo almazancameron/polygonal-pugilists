@@ -25,4 +25,5 @@ extends PassiveEffect
 func _effect_phrase() -> String:
 	if heal_bonus == 0:
 		return ""
-	return "+%d heal power" % heal_bonus
+	# "✚" not "+" -- yoster.ttf draws plain ASCII "+" as an icon-like glyph.
+	return "✚%d heal power" % heal_bonus

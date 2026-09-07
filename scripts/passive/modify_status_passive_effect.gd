@@ -95,11 +95,12 @@ func _effect_phrase() -> String:
 
 	var parts: Array[String] = []
 
+	# "✚" not "+" -- yoster.ttf draws plain ASCII "+" as an icon-like glyph.
 	if stack_bonus != 0:
-		parts.append("+%d stack%s" % [stack_bonus, "s" if stack_bonus != 1 else ""])
+		parts.append("✚%d stack%s" % [stack_bonus, "s" if stack_bonus != 1 else ""])
 
 	if field_name != &"":
-		parts.append("+%s %s" % [field_bonus, field_name])
+		parts.append("✚%s %s" % [field_bonus, field_name])
 
 	if parts.is_empty():
 		return ""

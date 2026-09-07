@@ -66,11 +66,14 @@ func compute(user: Combatant, target: Combatant) -> int:
 ## combatants describe() doesn't have. "" if this bonus wouldn't show up in
 ## a description at all (both flat_bonus and percent_bonus are zero).
 func describe_lead() -> String:
+	# yoster.ttf draws plain ASCII "+" as an icon-like glyph rather than a
+	# plain plus -- "✚" is the character it draws plainly instead (see
+	# CLAUDE.md's pitfalls list).
 	var fragments: Array[String] = []
 	if flat_bonus != 0:
-		fragments.append("+%d" % flat_bonus)
+		fragments.append("✚%d" % flat_bonus)
 	if not is_zero_approx(percent_bonus):
-		fragments.append("+%d%% of %s" % [int(percent_bonus * 100), _percent_source_phrase()])
+		fragments.append("✚%d%% of %s" % [int(percent_bonus * 100), _percent_source_phrase()])
 	return " ".join(fragments)
 
 ## The part of describe_bonus() explaining *how* describe_lead()'s amount

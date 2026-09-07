@@ -20,7 +20,8 @@ extends PassiveEffect
 func _effect_phrase() -> String:
 	if flat_bonus == 0:
 		return ""
-	return "%s%d %s" % ["+" if flat_bonus > 0 else "", flat_bonus, Familiar.stat_name(stat)]
+	# "✚" not "+" -- yoster.ttf draws plain ASCII "+" as an icon-like glyph.
+	return "%s%d %s" % ["✚" if flat_bonus > 0 else "", flat_bonus, Familiar.stat_name(stat)]
 
 ## Bypasses PassiveEffect.describe()'s trigger/condition phrasing entirely --
 ## trigger/conditions are unused for this subclass (see the class's own
