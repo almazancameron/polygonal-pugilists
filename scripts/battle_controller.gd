@@ -175,16 +175,18 @@ var reward_flow: RewardFlowController = RewardFlowController.new()
 const SPEED_MULTIPLIERS: Array[int] = [1, 2, 4]
 var speed_index: int = 0
 
-## True = existing always-on pacing (paused only by the speed multiplier).
-## False = each turn pauses after resolving, awaiting a manual advance
-## (see take_turn()'s turn_gate_opened gate).
+## True = existing always-on pacing (every paced entry/tick waits on a fixed
+## timer, scaled by the speed multiplier). False = every one of those same
+## paced points instead waits for a single manual advance (see run_upkeep()
+## and take_turn()'s turn_gate_opened waits) -- one click reveals exactly
+## one entry, not a whole turn.
 var auto_enabled: bool = true
 
-## Wakes up take_turn()'s turn-boundary gate -- fired by AdvanceButton, and
-## also by switching Auto back on, since a gate already suspended on
-## advance_button.pressed would otherwise never notice auto_enabled flipped
-## back to true and stay frozen forever (the button that could unstick it
-## is itself hidden the moment Auto turns on).
+## Wakes up run_upkeep()/take_turn()'s per-entry gates when auto is off --
+## fired by AdvanceButton, and also by switching Auto back on, since a gate
+## already suspended on advance_button.pressed would otherwise never notice
+## auto_enabled flipped back to true and stay frozen forever (the button
+## that could unstick it is itself hidden the moment Auto turns on).
 signal turn_gate_opened
 
 var player: Combatant
@@ -766,9 +768,10 @@ func advance_turn(actor: Combatant) -> void:
 ## also when paused for a mid-run upgrade choice.
 func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -> bool:
 	# Engine returns one entry per status ticked, not per message -- a "" entry
-	# still gets its own display update and pause below, matching how live play
-	# paced every tick before this refactor regardless of whether it had
-	# anything to log.
+	# still gets its own display update and pause below in auto mode, matching
+	# how live play paced every tick before this refactor regardless of
+	# whether it had anything to log. Manual mode skips that pause instead of
+	# spending a click on a tick with nothing to show.
 	for message in engine.run_upkeep(combatant):
 		if message != "":
 			combat_log.add_entry(message, source)
@@ -780,6 +783,8 @@ func run_upkeep(combatant: Combatant, hp_bar: HPBar, source: CombatLog.Source) -
 
 		if auto_enabled:
 			await get_tree().create_timer(0.6).timeout
+		elif message != "":
+			await turn_gate_opened
 
 	return await check_victory()
 
@@ -796,15 +801,15 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 		update_hp_display(actor)
 		update_hp_display(target)
 
-		if entry.paced and auto_enabled:
-			await get_tree().create_timer(0.6).timeout
+		if entry.paced:
+			if auto_enabled:
+				await get_tree().create_timer(0.6).timeout
+			else:
+				await turn_gate_opened
 
 	if show_priority_skip_log:
 		for reason in engine.last_skip_reasons:
 			combat_log.add_entry(reason, source)
-
-	if not auto_enabled:
-		await turn_gate_opened
 
 	await advance_turn(actor)
 
