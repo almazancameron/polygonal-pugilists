@@ -167,6 +167,8 @@ The validated shape:
 
 Still open: whether nesting genuinely reads as AND to someone who didn't build it, versus a flat ANDed list with an explicit separator. Cheap to switch — it changes one scene and the tree walk, nothing else.
 
+Still open: nothing currently stops a player from deleting every rule, or deleting the unconditioned fallback specifically, leaving a familiar that does nothing on any turn where no conditioned rule fires. Two candidate fixes: (a) a check-and-warn on leaving the editor ("you have no fallback technique! if none of your conditions are met your familiar will not act!"), or (b) simply not letting the fallback rule (or the last remaining rule) be deleted in the first place. (b) is the likely answer — it also structurally prevents the more general "0 rules total" case that (a) would otherwise need a second check for.
+
 # 7. Techniques, tags, and statuses
 
 CURRENT DIRECTION
