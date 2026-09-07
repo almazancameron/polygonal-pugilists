@@ -1020,7 +1020,7 @@ func _on_restart_pressed() -> void:
 ## in the scene tree, so it fully covers the reward screen underneath
 ## without needing to hide it first.
 func _on_next_opponent_panel_pressed() -> void:
-	bracket_screen.setup(bracket, current_round, false)
+	bracket_screen.setup(bracket, current_round, false, true)
 	bracket_screen.visible = true
 	await bracket_screen.dismissed
 	bracket_screen.visible = false

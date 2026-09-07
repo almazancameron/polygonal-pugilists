@@ -6,6 +6,15 @@ extends VBoxContainer
 ##                         Fighter button that commits the player's draft
 ##   selectable = false -- every later round's scouting view, read-only
 ##
+## selectable = false also covers a second, visually distinct case: a
+## read-only popup opened from elsewhere (currently the reward screen's
+## "next opponent" preview, battle_controller.gd's
+## _on_next_opponent_panel_pressed()). That case passes is_popup = true,
+## which swaps the bottom Continue button for a modal-style close "×" in
+## the top-right corner instead -- a full-screen round transition reads
+## right with a bottom Continue button, but a popup layered over another
+## already-visible screen reads as something to close, not advance past.
+##
 ## Hovering an entrant shows its odds and species tags through the shared
 ## TooltipLayer; clicking one pins the full detail panel.
 ##
@@ -26,6 +35,7 @@ signal dismissed
 @onready var detail_odds: Label = $Body/Content/DetailPanel/Content/DetailOdds
 @onready var select_button: Button = $Body/Content/DetailPanel/Content/SelectButton
 @onready var continue_button: Button = $ContinueButton
+@onready var close_button: Button = $Body/CloseButton
 
 var tooltip_layer: TooltipLayer
 
@@ -35,17 +45,19 @@ var _odds_by_name: Dictionary = {}   # familiar_name -> String
 func _ready() -> void:
 	select_button.pressed.connect(_on_select_pressed)
 	continue_button.pressed.connect(func() -> void: dismissed.emit())
+	close_button.pressed.connect(func() -> void: dismissed.emit())
 
 ## Rebuilds the whole screen for one round. Everything is torn down and
 ## rebuilt rather than diffed, since each row closes over a specific
 ## Familiar instance -- the same reasoning PriorityBuilder.setup() uses.
-func setup(bracket: Bracket, round_index: int, selectable: bool) -> void:
+func setup(bracket: Bracket, round_index: int, selectable: bool, is_popup: bool = false) -> void:
 	_selected = null
 	_odds_by_name.clear()
 
 	title_label.text = "Choose your familiar" if selectable else "Round %d" % (round_index + 1)
 	select_button.visible = selectable
-	continue_button.visible = not selectable
+	continue_button.visible = not selectable and not is_popup
+	close_button.visible = not selectable and is_popup
 
 	for child in entrant_list.get_children():
 		entrant_list.remove_child(child)
