@@ -83,6 +83,8 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var tooltip_layer: TooltipLayer = $TooltipLayer/TooltipContainer
 
 @onready var panels: HBoxContainer = $Panels
+@onready var arena: HBoxContainer = $Arena
+@onready var footer: HBoxContainer = $Footer
 @onready var log_scroll: ScrollContainer = $LogScroll
 @onready var log_view: CombatLogView = $LogScroll/LogView
 @onready var log_background: Control = $LogBackground
@@ -95,14 +97,14 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var player_status_row: StatusRow = $Panels/PlayerPanel/Content/StatusRow
 @onready var enemy_status_row: StatusRow = $Panels/EnemyPanel/Content/StatusRow
 
-@onready var player_portrait: TextureRect = $Panels/PlayerPanel/Content/Portrait
-@onready var enemy_portrait: TextureRect = $Panels/EnemyPanel/Content/Portrait
+@onready var player_portrait: TextureRect = $Arena/PlayerArena/Center/Portrait
+@onready var enemy_portrait: TextureRect = $Arena/EnemyArena/Center/Portrait
 
 @onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
-@onready var speed_toggle_button: Button = $SpeedToggleButton
-@onready var auto_toggle_button: Button = $AutoToggleButton
-@onready var advance_button: Button = $AdvanceButton
+@onready var speed_toggle_button: Button = $Footer/SpeedToggleButton
+@onready var auto_toggle_button: Button = $Footer/AutoToggleButton
+@onready var advance_button: Button = $Footer/AdvanceButton
 
 @onready var priority_builder: PriorityBuilder = $PriorityBuilder
 
@@ -335,6 +337,8 @@ func _build_bracket() -> void:
 ## finished results, free and always available (GAME_DESIGN.md §9.3).
 func _show_scouting() -> void:
 	panels.visible = false
+	arena.visible = false
+	footer.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
 	advance_button.visible = false
@@ -354,6 +358,8 @@ func _show_scouting() -> void:
 ## becomes a real fight.
 func _select_entrant() -> void:
 	panels.visible = false
+	arena.visible = false
+	footer.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
 	advance_button.visible = false
@@ -424,6 +430,8 @@ func begin_reward_sequence() -> void:
 	# speed toggle and combat log only mean anything while a fight is
 	# actually playing out.
 	panels.visible = false
+	arena.visible = false
+	footer.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
 	advance_button.visible = false
@@ -619,6 +627,8 @@ func _on_next_round_pressed() -> void:
 ## they chose to begin the fight as-is.
 func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool) -> bool:
 	panels.visible = false
+	arena.visible = false
+	footer.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
 	advance_button.visible = false
@@ -679,6 +689,8 @@ func _other(combatant: Combatant) -> Combatant:
 ## as before Speed-based ordering existed.
 func begin_fight(message: String, source: CombatLog.Source) -> void:
 	panels.visible = true
+	arena.visible = true
+	footer.visible = true
 	speed_toggle_button.visible = auto_enabled
 	log_scroll.visible = true
 	log_background.visible = true
@@ -871,6 +883,8 @@ func check_victory() -> bool:
 ## _on_restart_pressed() is the only way out of it.
 func show_game_over(message: String) -> void:
 	panels.visible = false
+	arena.visible = false
+	footer.visible = false
 	speed_toggle_button.visible = false
 	auto_toggle_button.visible = false
 	advance_button.visible = false
