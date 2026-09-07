@@ -33,20 +33,20 @@ const DEFINITION_ORDER: Array[String] = [
 
 @onready var tooltip_layer: TooltipLayer = $TooltipLayer/TooltipContainer
 
-@onready var familiar_name_label: Label = $Columns/LeftColumn/FamiliarPanel/Rows/NameLabel
-@onready var portrait: TextureRect = $Columns/LeftColumn/FamiliarPanel/Rows/Portrait
-@onready var stat_grid: GridContainer = $Columns/LeftColumn/FamiliarPanel/Rows/StatGrid
-@onready var technique_palette: BlockPalette = $Columns/LeftColumn/TechniqueScroll/TechniquePalette
-@onready var passive_palette: BlockPalette = $Columns/LeftColumn/PassiveScroll/PassivePalette
+@onready var familiar_name_label: Label = $Columns/LeftColumn/Content/FamiliarPanel/Rows/NameLabel
+@onready var portrait: TextureRect = $Columns/LeftColumn/Content/FamiliarPanel/Rows/Portrait
+@onready var stat_grid: GridContainer = $Columns/LeftColumn/Content/FamiliarPanel/Rows/StatGrid
+@onready var technique_palette: BlockPalette = $Columns/LeftColumn/Content/TechniqueScroll/TechniquePalette
+@onready var passive_palette: BlockPalette = $Columns/LeftColumn/Content/PassiveScroll/PassivePalette
 
-@onready var add_slot_button: Button = $Columns/BuildColumn/Header/AddSlotButton
-@onready var confirm_button: Button = $Columns/BuildColumn/Header/ConfirmButton
-@onready var segment_list: SegmentList = $Columns/BuildColumn/BuildScroll/SegmentList
+@onready var add_slot_button: Button = $Columns/BuildColumn/Content/Header/AddSlotButton
+@onready var confirm_button: Button = $Columns/BuildColumn/Content/Header/ConfirmButton
+@onready var segment_list: SegmentList = $Columns/BuildColumn/Content/BuildScroll/SegmentList
 
-@onready var condition_palette: BlockPalette = $Columns/RightColumn/ConditionScroll/ConditionPalette
-@onready var state_probe: StateProbe = $Columns/RightColumn/StateProbe
-@onready var probe_controls: VBoxContainer = $Columns/RightColumn/StateProbe/Rows/Controls
-@onready var probe_message: Label = $Columns/RightColumn/StateProbe/Rows/Message
+@onready var condition_palette: BlockPalette = $Columns/RightColumn/Content/ConditionScroll/ConditionPalette
+@onready var state_probe: StateProbe = $Columns/RightColumn/Content/StateProbe
+@onready var probe_controls: VBoxContainer = $Columns/RightColumn/Content/StateProbe/Rows/Controls
+@onready var probe_message: Label = $Columns/RightColumn/Content/StateProbe/Rows/Message
 
 ## True once anything has structurally changed since the last setup() call
 ## -- i.e. the player actually touched the build area this session (not
