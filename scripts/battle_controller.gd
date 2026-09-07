@@ -103,9 +103,9 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 @onready var priority_builder: PriorityBuilder = $PriorityBuilder
 
-@onready var game_over_panel: VBoxContainer = $GameOverPanel
-@onready var game_over_message_label: Label = $GameOverPanel/MessageLabel
-@onready var restart_button: Button = $GameOverPanel/RestartButton
+@onready var game_over_panel: Control = $GameOverPanel
+@onready var game_over_message_label: Label = $GameOverPanel/Content/MessageLabel
+@onready var restart_button: Button = $GameOverPanel/Content/RestartButton
 
 @onready var begin_combat_panel: VBoxContainer = $BeginCombatPanel
 @onready var begin_combat_message_label: Label = $BeginCombatPanel/MessageLabel
@@ -364,7 +364,6 @@ func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") 
 	var button := Button.new()
 	button.text = label
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.theme = preload("res://assets/themes/button_font.tres")
 	if tooltip != "":
 		button.mouse_entered.connect(func() -> void: tooltip_layer.hover_started(button, tooltip))
 		button.mouse_exited.connect(func() -> void: tooltip_layer.hover_ended(button))

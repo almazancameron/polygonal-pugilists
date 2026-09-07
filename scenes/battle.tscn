@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dgnd4w5q8qf4g"]
 
 [ext_resource type="Script" uid="uid://bm15uleb46vhy" path="res://scripts/battle_controller.gd" id="1_battle"]
+[ext_resource type="Theme" uid="uid://bjpkk4s7s64ve" path="res://assets/themes/pixel_pugilists.tres" id="1_uq7we"]
 [ext_resource type="Resource" uid="uid://bygb7mye4bqe8" path="res://resources/familiars/twerpent.tres" id="2_6vh42"]
 [ext_resource type="Resource" uid="uid://gwt6fu5ghk3n" path="res://resources/familiars/pyrewisp.tres" id="2_i3fbd"]
 [ext_resource type="Script" uid="uid://cy44cok5wjn5a" path="res://scripts/combat_log.gd" id="2_log"]
@@ -35,7 +36,6 @@
 [ext_resource type="Resource" uid="uid://qnv81ygkrnlg" path="res://resources/techniques/body_press.tres" id="18_cqddr"]
 [ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="18_fpf3k"]
 [ext_resource type="Resource" uid="uid://c6hthsb3h2731" path="res://resources/bosses/final_boss_stub.tres" id="19_d2g17"]
-[ext_resource type="Theme" uid="uid://hkf2bxrjlau4" path="res://assets/themes/button_font.tres" id="19_p0caf"]
 [ext_resource type="Resource" uid="uid://yg7leamrvquj" path="res://resources/techniques/chronoparry.tres" id="19_qnn43"]
 [ext_resource type="Resource" uid="uid://c4thhx5mgbves" path="res://resources/techniques/concussive_blow.tres" id="20_d2g17"]
 [ext_resource type="Resource" uid="uid://sxfm5dp2hyac" path="res://resources/techniques/corrosive_ooze.tres" id="21_uq7we"]
@@ -86,6 +86,7 @@
 [ext_resource type="Resource" uid="uid://d1w06igu0adrp" path="res://resources/passives/venomous_rhythm.tres" id="65_yb105"]
 [ext_resource type="PackedScene" uid="uid://vjdrxuhv1ynl" path="res://scenes/priority_builder/priority_builder.tscn" id="76_1w6ws"]
 [ext_resource type="Script" uid="uid://reqqbounkxb5" path="res://scripts/bracket/bracket_screen.gd" id="85_cqddr"]
+[ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="88_hauko"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_6vh42"]
 
@@ -122,6 +123,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_uq7we")
 script = ExtResource("1_battle")
 full_roster = Array[ExtResource("2_rrh2e")]([ExtResource("2_i3fbd"), ExtResource("3_rrh2e"), ExtResource("4_cqddr"), ExtResource("5_qnn43"), ExtResource("6_d2g17"), ExtResource("7_uq7we"), ExtResource("8_hauko"), ExtResource("9_gt766"), ExtResource("10_oef1w"), ExtResource("11_soua1"), ExtResource("2_6vh42"), ExtResource("2_nha6o"), ExtResource("2_p0caf"), ExtResource("3_4k1nj"), ExtResource("7_6ni85"), ExtResource("63_b446w")])
 final_boss = ExtResource("19_d2g17")
@@ -240,7 +242,7 @@ offset_top = 16.0
 offset_right = -16.0
 offset_bottom = 48.0
 grow_horizontal = 0
-theme = ExtResource("19_p0caf")
+theme = ExtResource("1_uq7we")
 text = "1x"
 
 [node name="StatUpgradePanel" type="VBoxContainer" parent="." unique_id=1661631153]
@@ -341,28 +343,6 @@ text = "Next Round"
 [node name="PriorityBuilder" parent="." unique_id=1870533042 instance=ExtResource("76_1w6ws")]
 visible = false
 layout_mode = 1
-
-[node name="GameOverPanel" type="VBoxContainer" parent="." unique_id=424323279]
-visible = false
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 150.0
-offset_right = -16.0
-offset_bottom = 590.0
-grow_horizontal = 2
-alignment = 1
-
-[node name="MessageLabel" type="Label" parent="GameOverPanel" unique_id=1387639829]
-layout_mode = 2
-text = "Game Over"
-horizontal_alignment = 1
-
-[node name="RestartButton" type="Button" parent="GameOverPanel" unique_id=545872067]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Restart"
 
 [node name="BeginCombatPanel" type="VBoxContainer" parent="." unique_id=1121647803]
 visible = false
@@ -465,3 +445,48 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Continue"
+
+[node name="GameOverPanel" type="Control" parent="." unique_id=1048520037]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 150.0
+offset_right = -16.0
+offset_bottom = 590.0
+
+[node name="Background" type="Control" parent="GameOverPanel" unique_id=829935797]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("88_hauko")
+
+[node name="Content" type="VBoxContainer" parent="GameOverPanel" unique_id=424323279]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="MessageLabel" type="Label" parent="GameOverPanel/Content" unique_id=1387639829]
+layout_mode = 2
+text = "Game Over"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="GameOverPanel/Content" unique_id=545872067]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Restart"
+
+[node name="TitleBanner" type="Label" parent="." unique_id=773084411]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 8.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
+text = "★ FAMILIAR FIGHT ★"
+horizontal_alignment = 1
