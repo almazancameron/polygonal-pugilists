@@ -280,6 +280,8 @@ func _start_new_run() -> void:
 
 	player_frame.header_text = player.familiar.familiar_name
 	enemy_frame.header_text = enemy.familiar.familiar_name
+	log_view.player_name = player.familiar.familiar_name
+	log_view.enemy_name = enemy.familiar.familiar_name
 
 	update_hp_display(player)
 	update_hp_display(enemy)
@@ -931,6 +933,7 @@ func start_boss_fight() -> void:
 
 	enemy = Combatant.new(enemy_familiar_data)
 	enemy_frame.header_text = enemy.familiar.familiar_name
+	log_view.enemy_name = enemy.familiar.familiar_name
 	enemy_portrait.texture = enemy.familiar.sprite
 	update_hp_display(enemy)
 
@@ -975,6 +978,7 @@ func start_next_round() -> void:
 
 	enemy = Combatant.new(enemy_familiar_data)
 	enemy_frame.header_text = enemy.familiar.familiar_name
+	log_view.enemy_name = enemy.familiar.familiar_name
 	enemy_portrait.texture = enemy.familiar.sprite
 	update_hp_display(enemy)
 

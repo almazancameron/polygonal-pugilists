@@ -136,6 +136,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 color = Color(0.18, 0.18, 0.18, 1)
 
@@ -158,6 +160,15 @@ grow_horizontal = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="OuterFrame" type="Control" parent="Panels/PlayerPanel" unique_id=286458916]
+layout_mode = 1
+anchor_left = -0.015
+anchor_right = 0.8
+anchor_bottom = 1.0
+offset_bottom = 6.0
+mouse_filter = 2
+script = ExtResource("88_hauko")
+
 [node name="Background" type="Control" parent="Panels/PlayerPanel" unique_id=531349878]
 layout_mode = 1
 anchor_right = 0.78
@@ -171,10 +182,14 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.78
 anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = -6.0
 size_flags_horizontal = 3
 
 [node name="HPBar" parent="Panels/PlayerPanel/Content" unique_id=1552056502 instance=ExtResource("3_hpbar")]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 theme = SubResource("Theme_n6c5v")
 bar_background_style = SubResource("StyleBoxFlat_v7i3o")
@@ -187,6 +202,15 @@ layout_mode = 2
 [node name="EnemyPanel" type="Control" parent="Panels" unique_id=1049994733]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="OuterFrame" type="Control" parent="Panels/EnemyPanel" unique_id=334865249]
+layout_mode = 1
+anchor_left = 0.2
+anchor_right = 1.015
+anchor_bottom = 1.0
+offset_bottom = 6.0
+mouse_filter = 2
+script = ExtResource("88_hauko")
 
 [node name="Background" type="Control" parent="Panels/EnemyPanel" unique_id=1749191572]
 layout_mode = 1
@@ -203,10 +227,14 @@ anchors_preset = -1
 anchor_left = 0.22
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = -6.0
 size_flags_horizontal = 3
 
 [node name="HPBar" parent="Panels/EnemyPanel/Content" unique_id=715558566 instance=ExtResource("3_hpbar")]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 theme = SubResource("Theme_orx5a")
 bar_background_style = SubResource("StyleBoxFlat_yahae")
@@ -482,12 +510,15 @@ offset_left = 16.0
 offset_top = 150.0
 offset_right = -16.0
 offset_bottom = 590.0
+grow_horizontal = 2
 
 [node name="Background" type="Control" parent="GameOverPanel" unique_id=829935797]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("88_hauko")
 
@@ -497,6 +528,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
 
 [node name="MessageLabel" type="Label" parent="GameOverPanel/Content" unique_id=1387639829]
@@ -515,6 +547,7 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_top = 8.0
 offset_bottom = 28.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
 text = "★ FAMILIAR FIGHT ★"
 horizontal_alignment = 1
@@ -540,6 +573,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="Portrait" type="TextureRect" parent="Arena/PlayerArena/Center" unique_id=1830652992]
@@ -561,6 +596,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="Portrait" type="TextureRect" parent="Arena/EnemyArena/Center" unique_id=382211985]
@@ -578,9 +615,9 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -56.0
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_bottom = 6
+offset_top = -41.0
+grow_horizontal = 2
+grow_vertical = 0
 
 [node name="ButtonRow" type="HBoxContainer" parent="Footer" unique_id=13915388]
 layout_mode = 2
