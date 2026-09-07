@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cahe4vcmvjswf"]
 
-[ext_resource type="Script" path="res://scripts/battle_panels/build_view_panel.gd" id="1_bvpanel"]
+[ext_resource type="Script" uid="uid://bq60w5e648t7s" path="res://scripts/battle_panels/build_view_panel.gd" id="1_bvpanel"]
 [ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_framed"]
 
 [node name="BuildViewPanel" type="Control" unique_id=1310433948]

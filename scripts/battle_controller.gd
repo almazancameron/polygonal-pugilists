@@ -101,8 +101,6 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var player_portrait: TextureRect = $Arena/PlayerArena/Center/Portrait
 @onready var enemy_portrait: TextureRect = $Arena/EnemyArena/Center/Portrait
 
-@onready var build_select_panel: HBoxContainer = $BuildSelectPanel
-
 @onready var speed_toggle_button: Button = $Footer/ButtonRow/SpeedToggleButton
 @onready var auto_toggle_button: Button = $Footer/ButtonRow/AutoToggleButton
 @onready var advance_button: Button = $Footer/ButtonRow/AdvanceButton
@@ -178,9 +176,12 @@ const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/
 @onready var bracket_summary_button: Button = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard
 @onready var bracket_summary_round_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard/Rows/RoundLabel
 @onready var bracket_summary_remaining_label: Label = $RewardSelectPanel/Content/TopArea/RightColumn/BracketSummaryCard/Rows/RemainingLabel
+@onready var choose_reward_label: Label = $RewardSelectPanel/Content/ChooseRewardLabel
+@onready var card_row: HBoxContainer = $RewardSelectPanel/Content/CardRow
 @onready var species_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/SpeciesColumn/Content
 @onready var run_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/RunColumn/Content
 @onready var pivot_column: VBoxContainer = $RewardSelectPanel/Content/CardRow/PivotColumn/Content
+@onready var sacrifice_card_row: HBoxContainer = $RewardSelectPanel/Content/SacrificeCardRow
 @onready var rerolls_remaining_label: Label = $RewardSelectPanel/Content/ActionRow/RerollsRemainingLabel
 @onready var skip_button: Button = $RewardSelectPanel/Content/ActionRow/SkipButton
 @onready var next_round_button: Button = $RewardSelectPanel/Content/ActionRow/NextRoundButton
@@ -196,6 +197,15 @@ var _reward_card_group: ButtonGroup = ButtonGroup.new()
 var _reward_cards: Dictionary = {}  # RewardSelector.RewardSlot -> RewardCard
 var _slot_columns: Dictionary = {}  # RewardSelector.RewardSlot -> VBoxContainer
 var selected_reward_option: UpgradeOption = null
+
+## -- Sacrifice screen (round 4's PASSIVE_TRADE cadence, step 1 of 2) --
+## Its own ButtonGroup/selection state rather than reusing the reward-card
+## ones above: a genuinely separate screen and step, never shown at the
+## same time, so there's no reason for one's stale selection to have any
+## chance of bleeding into the other's.
+var _sacrifice_card_group: ButtonGroup = ButtonGroup.new()
+var _in_sacrifice_pick_step: bool = false
+var selected_sacrifice_passive: PassiveEffect = null
 
 var reward_flow: RewardFlowController = RewardFlowController.new()
 
@@ -432,20 +442,6 @@ func _on_auto_toggle_pressed() -> void:
 	if auto_enabled:
 		turn_gate_opened.emit()
 
-## Spawns a button on the shared choice panel (used for the round-4
-## sacrifice screen) that calls on_pressed when clicked.
-func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") -> void:
-	var button := Button.new()
-	button.text = label
-	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if tooltip != "":
-		button.mouse_entered.connect(func() -> void: tooltip_layer.hover_started(button, tooltip))
-		button.mouse_exited.connect(func() -> void: tooltip_layer.hover_ended(button))
-
-	button.pressed.connect(on_pressed)
-
-	build_select_panel.add_child(button)
-
 ## ---- Reward sequence: Phase B (tailored reward cards) comes first, ----
 ## ---- then Phase A (mandatory stat allocation) ----
 
@@ -601,9 +597,20 @@ func _on_stat_confirm_pressed(on_confirmed: Callable) -> void:
 ## round shows the sacrifice screen first. Nothing past the authored
 ## cadence has a reward to offer at all, so it goes straight to the
 ## (1-point) stat allocation instead.
+##
+## current_round is 0-indexed and only ever advances via start_next_round()
+## -- start_boss_fight() deliberately leaves it alone (round_display_name()
+## still needs to read "Final" throughout the champion fight), so by the
+## time this runs for the boss's own reward sequence, current_round is
+## still one behind "how many rounds have actually been completed", which
+## is what RewardProgression.kind_for_round() expects. Off by one here
+## silently pulled a TECHNIQUE/PASSIVE round's cadence entry instead of
+## round 4's PASSIVE_TRADE, showing a normal reward screen instead of the
+## sacrifice screen right before the champion.
 func begin_phase_b() -> void:
+	var rounds_completed: int = current_round + 1 if facing_boss else current_round
 	var kind: RewardProgression.RewardKind = reward_flow.begin_reward_screen(
-		current_round, player_familiar_data, technique_reward_pool, passive_reward_pool
+		rounds_completed, player_familiar_data, technique_reward_pool, passive_reward_pool
 	)
 
 	match kind:
@@ -614,27 +621,69 @@ func begin_phase_b() -> void:
 		_:
 			_show_reward_cards(true)
 
-## Reuses the build-select panel's plain button-list convention -- one
-## button per currently-held passive, plus a Skip that leads straight to
-## the stat-allocation pass with 2 points (skipping the trade entirely).
-## Skip lives ONLY here, not on the reward-cards screen that follows.
+## Sacrifice screen, step 1 of 2 (round 4's PASSIVE_TRADE cadence): pick
+## which currently-held passive to give up. Styled like the normal
+## reward-cards screen it shares a panel with (same TopArea/title-row
+## shell, RewardCard-shaped options) but without the SPECIES/RUN/WILDCARD
+## named-slot framing -- there's no fixed-slot concept here, just
+## "however many passives are currently held". A selection is toggled,
+## not immediate-fire -- the same misclick protection RewardCard's own
+## toggle-then-confirm interaction already gives every other one-way
+## reward pick applies here too, arguably more so: unlike a normal pick,
+## there's no way to reconsider which passive got chosen once step 2
+## (the replacement-passive cards) is showing. Confirming moves to that
+## step 2 via reward_flow.resolve_sacrifice() + _show_reward_cards().
 func begin_sacrifice_screen() -> void:
-	for child in build_select_panel.get_children():
+	_in_sacrifice_pick_step = true
+	selected_sacrifice_passive = null
+	next_round_button.disabled = true
+
+	choose_reward_label.text = "SACRIFICE A PASSIVE"
+	rerolls_remaining_label.visible = false
+	card_row.visible = false
+	sacrifice_card_row.visible = true
+
+	_populate_sacrifice_cards()
+
+	skip_button.visible = true
+	reward_select_panel.visible = true
+
+## One RewardCard per currently-held passive, sharing their own
+## ButtonGroup (kept separate from the reward-cards screen's -- see
+## selected_sacrifice_passive's own declaration for why). See
+## GiveUpPassiveOption's docstring for why these carry no real apply().
+func _populate_sacrifice_cards() -> void:
+	for child in sacrifice_card_row.get_children():
 		child.queue_free()
 
 	for passive in reward_flow.sacrifice_options(player_familiar_data):
-		add_choice_button("Give up: %s" % passive.passive_name, _on_sacrifice_selected.bind(passive), passive.describe())
+		var option := GiveUpPassiveOption.new()
+		option.passive = passive
+		option.label = "Give up %s" % passive.passive_name
 
-	add_choice_button("Skip", _on_skip_pressed)
+		var card: RewardCard = REWARD_CARD_SCENE.instantiate()
+		sacrifice_card_row.add_child(card)
+		card.button_group = _sacrifice_card_group
+		card.setup(option, tooltip_layer)
+		card.toggled.connect(_on_sacrifice_card_toggled.bind(passive))
 
-func _on_sacrifice_selected(passive: PassiveEffect) -> void:
-	for child in build_select_panel.get_children():
-		child.queue_free()
+func _on_sacrifice_card_toggled(pressed: bool, passive: PassiveEffect) -> void:
+	if not pressed:
+		return
+	selected_sacrifice_passive = passive
+	next_round_button.disabled = false
 
-	reward_flow.resolve_sacrifice(passive, player_familiar_data)
-	_show_reward_cards(false)
-
+## Shared by both the sacrifice screen's step 2 (replacement passives) and
+## every normal TECHNIQUE/PASSIVE round -- resets every bit of UI state
+## the sacrifice screen's step 1 touches, so a fresh reward screen never
+## silently inherits sacrifice-mode leftovers from a previous round.
 func _show_reward_cards(show_skip: bool) -> void:
+	_in_sacrifice_pick_step = false
+	choose_reward_label.text = "CHOOSE YOUR REWARD"
+	rerolls_remaining_label.visible = true
+	sacrifice_card_row.visible = false
+	card_row.visible = true
+
 	_populate_reward_cards()
 	skip_button.visible = show_skip
 	reward_select_panel.visible = true
@@ -705,14 +754,22 @@ func _on_reroll_pressed(slot: RewardSelector.RewardSlot) -> void:
 	_refresh_reroll_buttons()
 
 ## Declining the reward grants 2 stat points on the single allocation
-## pass that follows, instead of running that screen a second time.
+## pass that follows, instead of running that screen a second time. Also
+## the sacrifice screen's own "skip the trade entirely" action -- reached
+## from either step, so it doesn't need to know or care which one.
 func _on_skip_pressed() -> void:
 	reward_select_panel.visible = false
-	for child in build_select_panel.get_children():
-		child.queue_free()
 	populate_stat_upgrade_rows(2, advance_to_priority_editor)
 
+## Confirm button shared by the sacrifice screen's step 1 (which passive
+## to give up) and every other reward pick (step 2 included) -- dispatches
+## on _in_sacrifice_pick_step rather than needing two separately-wired
+## buttons for what the player experiences as one "confirm" action.
 func _on_next_round_pressed() -> void:
+	if _in_sacrifice_pick_step:
+		_confirm_sacrifice_pick()
+		return
+
 	if selected_reward_option == null:
 		return
 	selected_reward_option.apply(player_familiar_data)
@@ -720,6 +777,13 @@ func _on_next_round_pressed() -> void:
 	update_hp_display(player)
 	reward_select_panel.visible = false
 	populate_stat_upgrade_rows(1, advance_to_priority_editor)
+
+func _confirm_sacrifice_pick() -> void:
+	if selected_sacrifice_passive == null:
+		return
+	_in_sacrifice_pick_step = false
+	reward_flow.resolve_sacrifice(selected_sacrifice_passive, player_familiar_data)
+	_show_reward_cards(false)
 
 ## Shows a "get ready" screen with the upcoming opponent's portrait/name and
 ## waits for the player to choose a path, before begin_fight() actually
@@ -877,9 +941,6 @@ func begin_fight(message: String, source: CombatLog.Source) -> void:
 	log_outer_frame.visible = true
 	auto_toggle_button.visible = true
 	advance_button.visible = not auto_enabled
-
-	for child in build_select_panel.get_children():
-		child.queue_free()
 
 	combat_log.add_entry(message, source)
 

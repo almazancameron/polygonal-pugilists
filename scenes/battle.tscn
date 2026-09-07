@@ -87,7 +87,7 @@
 [ext_resource type="FontFile" uid="uid://dx5mcc8hoc7sk" path="res://assets/fonts/yoster.ttf" id="82_d2g17"]
 [ext_resource type="Script" uid="uid://reqqbounkxb5" path="res://scripts/bracket/bracket_screen.gd" id="85_cqddr"]
 [ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="88_hauko"]
-[ext_resource type="PackedScene" path="res://scenes/battle_panels/build_view_panel.tscn" id="89_bvpanel"]
+[ext_resource type="PackedScene" uid="uid://cahe4vcmvjswf" path="res://scenes/battle_panels/build_view_panel.tscn" id="89_bvpanel"]
 
 [sub_resource type="Theme" id="Theme_n6c5v"]
 default_font = ExtResource("82_d2g17")
@@ -297,16 +297,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme = SubResource("Theme_lf7me")
 script = ExtResource("4_logview")
-
-[node name="BuildSelectPanel" type="HBoxContainer" parent="." unique_id=1655570240]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 600.0
-offset_right = -16.0
-offset_bottom = 640.0
-grow_horizontal = 2
 
 [node name="PriorityBuilder" parent="." unique_id=1870533042 instance=ExtResource("76_1w6ws")]
 visible = false
@@ -1215,6 +1205,13 @@ size_flags_horizontal = 3
 [node name="RerollButton" type="Button" parent="RewardSelectPanel/Content/CardRow/PivotColumn/Content" unique_id=755980464]
 layout_mode = 2
 text = "Reroll"
+
+[node name="SacrificeCardRow" type="HBoxContainer" parent="RewardSelectPanel/Content" unique_id=1409694737]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+alignment = 1
 
 [node name="ActionRow" type="HBoxContainer" parent="RewardSelectPanel/Content" unique_id=1515370735]
 layout_mode = 2
