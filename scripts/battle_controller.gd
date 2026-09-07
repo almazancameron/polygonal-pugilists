@@ -101,6 +101,8 @@ var _bracket_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var build_select_panel: HBoxContainer = $BuildSelectPanel
 
 @onready var speed_toggle_button: Button = $SpeedToggleButton
+@onready var auto_toggle_button: Button = $AutoToggleButton
+@onready var step_button: Button = $StepButton
 
 @onready var priority_builder: PriorityBuilder = $PriorityBuilder
 
@@ -173,6 +175,11 @@ var reward_flow: RewardFlowController = RewardFlowController.new()
 const SPEED_MULTIPLIERS: Array[int] = [1, 2, 4]
 var speed_index: int = 0
 
+## True = existing always-on pacing (paused only by the speed multiplier).
+## False = each turn pauses after resolving, awaiting a manual step
+## (gated on step_button.pressed directly -- see take_turn()).
+var auto_enabled: bool = true
+
 var player: Combatant
 var enemy: Combatant
 
@@ -188,6 +195,8 @@ func _ready() -> void:
 	enemy_status_row.tooltip_layer = tooltip_layer
 
 	speed_toggle_button.pressed.connect(_on_speed_toggle_pressed)
+	auto_toggle_button.pressed.connect(_on_auto_toggle_pressed)
+	step_button.visible = false
 
 	_slot_columns = {
 		RewardSelector.RewardSlot.SPECIES: species_column,
@@ -317,6 +326,8 @@ func _build_bracket() -> void:
 func _show_scouting() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
+	auto_toggle_button.visible = false
+	step_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -334,6 +345,8 @@ func _show_scouting() -> void:
 func _select_entrant() -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
+	auto_toggle_button.visible = false
+	step_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -360,6 +373,12 @@ func _on_speed_toggle_pressed() -> void:
 	speed_index = (speed_index + 1) % SPEED_MULTIPLIERS.size()
 	Engine.time_scale = SPEED_MULTIPLIERS[speed_index]
 	speed_toggle_button.text = "%dx" % SPEED_MULTIPLIERS[speed_index]
+
+func _on_auto_toggle_pressed() -> void:
+	auto_enabled = not auto_enabled
+	auto_toggle_button.text = "AUTO: %s" % ("ON" if auto_enabled else "OFF")
+	speed_toggle_button.visible = auto_enabled
+	step_button.visible = not auto_enabled
 
 ## Spawns a button on the shared choice panel (used for the round-4
 ## sacrifice screen) that calls on_pressed when clicked.
@@ -394,6 +413,8 @@ func begin_reward_sequence() -> void:
 	# actually playing out.
 	panels.visible = false
 	speed_toggle_button.visible = false
+	auto_toggle_button.visible = false
+	step_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -587,6 +608,8 @@ func _on_next_round_pressed() -> void:
 func _wait_for_pre_fight_screen(opponent: Combatant, show_priority_option: bool) -> bool:
 	panels.visible = false
 	speed_toggle_button.visible = false
+	auto_toggle_button.visible = false
+	step_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 
@@ -644,9 +667,11 @@ func _other(combatant: Combatant) -> Combatant:
 ## as before Speed-based ordering existed.
 func begin_fight(message: String, source: CombatLog.Source) -> void:
 	panels.visible = true
-	speed_toggle_button.visible = true
+	speed_toggle_button.visible = auto_enabled
 	log_scroll.visible = true
 	log_background.visible = true
+	auto_toggle_button.visible = true
+	step_button.visible = not auto_enabled
 
 	for child in build_select_panel.get_children():
 		child.queue_free()
@@ -767,6 +792,9 @@ func take_turn(actor: Combatant, target: Combatant, source: CombatLog.Source) ->
 		for reason in engine.last_skip_reasons:
 			combat_log.add_entry(reason, source)
 
+	if not auto_enabled:
+		await step_button.pressed
+
 	await advance_turn(actor)
 
 ## Each branch must `return true` explicitly, or the caller's "battle's over,
@@ -828,6 +856,8 @@ func check_victory() -> bool:
 func show_game_over(message: String) -> void:
 	panels.visible = false
 	speed_toggle_button.visible = false
+	auto_toggle_button.visible = false
+	step_button.visible = false
 	log_scroll.visible = false
 	log_background.visible = false
 

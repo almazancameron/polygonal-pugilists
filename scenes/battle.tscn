@@ -537,3 +537,28 @@ offset_bottom = 28.0
 theme_override_colors/font_color = Color(0.541, 0.561, 0.596, 1)
 text = "★ FAMILIAR FIGHT ★"
 horizontal_alignment = 1
+
+[node name="AutoToggleButton" type="Button" parent="." unique_id=181225098]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -206.0
+offset_top = 16.0
+offset_right = -106.0
+offset_bottom = 48.0
+grow_horizontal = 0
+text = "AUTO: ON"
+
+[node name="StepButton" type="Button" parent="." unique_id=1524887644]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -96.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 48.0
+grow_horizontal = 0
+text = "Step"
