@@ -2,7 +2,15 @@
 class_name HPBar
 extends Control
 
-@onready var label: Label = $Bar/Label
+## Label is a plain top-level sibling, last in child order, so it paints
+## over Bar/StatusPreview through normal tree order alone -- it used to be
+## nested under Bar with z_index=15 to achieve the same thing, but
+## CanvasItem.z_index sorts globally across the whole canvas (not just
+## local siblings), so that "15" also painted this text on top of
+## unrelated full-screen overlays elsewhere in battle.tscn (confirmed:
+## BracketScreen, opened from the reward screen, with the HP number
+## floating on top of it despite BracketScreen being later in the tree).
+@onready var label: Label = $Label
 @onready var bar: ProgressBar = $Bar
 @onready var status_preview: Control = $StatusPreview
 @onready var heart_icon: TextureRect = $HeartIcon
