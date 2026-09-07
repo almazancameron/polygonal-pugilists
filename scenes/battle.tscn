@@ -318,6 +318,30 @@ offset_right = -16.0
 offset_bottom = 590.0
 grow_horizontal = 2
 
+[node name="NextOpponentPanel" type="Button" parent="RewardSelectPanel" unique_id=266292823]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+
+[node name="Row" type="HBoxContainer" parent="RewardSelectPanel/NextOpponentPanel" unique_id=1772325158]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Portrait" type="TextureRect" parent="RewardSelectPanel/NextOpponentPanel/Row" unique_id=1809651432]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_filter = 2
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="RewardSelectPanel/NextOpponentPanel/Row" unique_id=1548441878]
+layout_mode = 2
+text = "Next: ???"
+
 [node name="CardRow" type="HBoxContainer" parent="RewardSelectPanel" unique_id=663900416]
 layout_mode = 2
 size_flags_vertical = 3

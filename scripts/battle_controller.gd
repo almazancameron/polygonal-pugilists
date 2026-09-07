@@ -168,6 +168,9 @@ const PALETTE_BLOCK_SCENE: PackedScene = preload("res://scenes/priority_builder/
 @onready var stat_passive_list: VBoxContainer = $StatUpgradePanel/Content/RightColumn/PassivesCard/PassiveList
 
 @onready var reward_select_panel: VBoxContainer = $RewardSelectPanel
+@onready var next_opponent_panel: Button = $RewardSelectPanel/NextOpponentPanel
+@onready var next_opponent_portrait: TextureRect = $RewardSelectPanel/NextOpponentPanel/Row/Portrait
+@onready var next_opponent_name_label: Label = $RewardSelectPanel/NextOpponentPanel/Row/NameLabel
 @onready var species_column: VBoxContainer = $RewardSelectPanel/CardRow/SpeciesColumn
 @onready var run_column: VBoxContainer = $RewardSelectPanel/CardRow/RunColumn
 @onready var pivot_column: VBoxContainer = $RewardSelectPanel/CardRow/PivotColumn
@@ -238,6 +241,7 @@ func _ready() -> void:
 	skip_button.pressed.connect(_on_skip_pressed)
 	next_round_button.pressed.connect(_on_next_round_pressed)
 	restart_button.pressed.connect(_on_restart_pressed)
+	next_opponent_panel.pressed.connect(_on_next_opponent_panel_pressed)
 
 	priority_builder_button.pressed.connect(func() -> void: pre_fight_choice_made.emit(true))
 	begin_combat_button.pressed.connect(_on_begin_fight_pressed)
@@ -441,6 +445,9 @@ func add_choice_button(label: String, on_pressed: Callable, tooltip: String="") 
 ## points on that single pass instead of 1, rather than showing the stat
 ## screen a second, separate time.
 func begin_reward_sequence() -> void:
+	next_opponent_portrait.texture = enemy_familiar_data.sprite
+	next_opponent_name_label.text = "Next: %s" % enemy_familiar_data.familiar_name
+
 	# Hidden for the whole reward sequence (Phase B and whichever Phase A
 	# pass follows it) -- shown again once begin_fight() resumes the next
 	# fight. Nothing re-shows them in between, so hiding all three once
@@ -1006,6 +1013,17 @@ func show_game_over(message: String) -> void:
 
 func _on_restart_pressed() -> void:
 	await _start_new_run()
+
+## Read-only look at the bracket from the reward screen, reusing
+## BracketScreen exactly as the between-round scouting screen already
+## does (selectable = false) -- BracketScreen draws after RewardSelectPanel
+## in the scene tree, so it fully covers the reward screen underneath
+## without needing to hide it first.
+func _on_next_opponent_panel_pressed() -> void:
+	bracket_screen.setup(bracket, current_round, false)
+	bracket_screen.visible = true
+	await bracket_screen.dismissed
+	bracket_screen.visible = false
 
 ## Advances to the next opponent, resets both Combatants (full heal, no
 ## statuses -- see DECISIONS.md), and starts the reward sequence (Phase A
