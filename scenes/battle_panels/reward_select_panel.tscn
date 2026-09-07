@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://bbal7cj524poc"]
 
-[ext_resource type="Script" path="res://scripts/battle_panels/reward_select_panel.gd" id="1_rspanel"]
+[ext_resource type="Script" uid="uid://dqgfiqhsdku4b" path="res://scripts/battle_panels/reward_select_panel.gd" id="1_rspanel"]
 [ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_framed"]
 
 [node name="RewardSelectPanel" type="Control" unique_id=1322811496]
@@ -227,7 +227,7 @@ horizontal_alignment = 1
 
 [node name="ChooseRewardLabel" type="Label" parent="Content" unique_id=1256237482]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
+theme_override_colors/font_color = Color(0.9098039, 0.32941177, 0.18039216, 1)
 theme_override_font_sizes/font_size = 20
 text = "CHOOSE YOUR REWARD"
 horizontal_alignment = 1

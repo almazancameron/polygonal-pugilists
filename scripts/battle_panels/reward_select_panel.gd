@@ -267,7 +267,10 @@ func begin_sacrifice_screen(familiar: Familiar, reward_flow: RewardFlowControlle
 
 	_populate_sacrifice_cards()
 
-	skip_button.visible = true
+	# The big Skip card in the row above now carries this same action,
+	# more prominently -- keeping the small footer button too would just
+	# be a confusing second way to do the identical thing.
+	skip_button.visible = false
 	visible = true
 
 
@@ -275,6 +278,10 @@ func begin_sacrifice_screen(familiar: Familiar, reward_flow: RewardFlowControlle
 ## ButtonGroup (kept separate from the reward-cards screen's -- see
 ## _selected_sacrifice_passive's own declaration for why). See
 ## GiveUpPassiveOption's docstring for why these carry no real apply().
+## A third card, Skip, always sits at the end of the row -- not part of
+## that ButtonGroup (it fires immediately on click, like the reward-cards
+## screen's own Skip button, not a toggle-then-confirm choice), so
+## sacrifice is visibly just as valid an option as either passive.
 func _populate_sacrifice_cards() -> void:
 	for child in sacrifice_card_row.get_children():
 		child.queue_free()
@@ -289,6 +296,11 @@ func _populate_sacrifice_cards() -> void:
 		card.button_group = _sacrifice_card_group
 		card.setup(option, _tooltip_layer)
 		card.toggled.connect(_on_sacrifice_card_toggled.bind(passive))
+
+	var skip_card: RewardCard = REWARD_CARD_SCENE.instantiate()
+	sacrifice_card_row.add_child(skip_card)
+	skip_card.setup(SkipSacrificeOption.new(), _tooltip_layer)
+	skip_card.pressed.connect(func() -> void: skip_requested.emit())
 
 
 func _on_sacrifice_card_toggled(pressed: bool, passive: PassiveEffect) -> void:
