@@ -18,3 +18,13 @@ const HP_FULL := Color(0.298, 0.686, 0.314)
 const HP_LOW := Color(0.898, 0.224, 0.208)
 const HP_TRACK := Color(0.11, 0.13, 0.16)
 const HP_ICON := Color(0.55, 0.08, 0.08)
+
+## Bracket matchup-odds tiers (BracketOdds' five labels) -- a gradient from
+## saturated dark red (doomed) through mid-gray (coin flip) to saturated
+## dark green (near-lock), used wherever an entrant's odds are shown
+## directly (BracketTree's leaf cards) rather than only in a tooltip.
+const ODDS_HEAVY_UNDERDOG := Color(0.62, 0.10, 0.10)
+const ODDS_UNDERDOG := Color(0.68, 0.42, 0.42)
+const ODDS_TOSS_UP := Color(0.60, 0.60, 0.62)
+const ODDS_FAVORITE := Color(0.42, 0.62, 0.45)
+const ODDS_HEAVY_FAVORITE := Color(0.13, 0.55, 0.20)

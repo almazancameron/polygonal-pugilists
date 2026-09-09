@@ -47,6 +47,10 @@ This is the current authoritative design baseline for Familiar Fight Club. It su
 
 - Defeating that organization opens a postgame league-management fiction and a Hades II-style configurable challenge system whose thresholds unlock new content.
 
+## 0.2A What changed in the 2026-09 delta reconciliation
+
+Reconciled against a separate design-delta document (`FFC_Recent_Design_Canon_and_Delta_v2_Audited.md`, 2026-09) covering ground this document previously left thin. New or substantially expanded: world/setting/visual identity (§1A), high-speed-playback presentation requirements (§2.4), two new design pillars on state/event-driven combat and reusable compositional primitives (§3.8, §3.9), a new Combat Signals/Events/Ledger system (§4A), an expanded priority-rule comparison grammar (§6.2), a new Technique Fusion/Linking system (§6.5, deliberately left with unresolved legality/cost/Recharge-interaction details), a clarification that species/types are primarily non-combat classification (§9.1), a new cosmetic dress-up subsection (§9.5), an expanded status-baseline list (§10.5), a bracket-as-living-system subsection covering real NPC simulation and scouting-reveals-strategy (§12.6), a boss-progression-as-mechanical-preview subsection validated directly by Pixel Pugilists' own final boss (§12.7), and a four-stage recruitment/acquisition progression ending in Perfect Essence (§14.4). One direct, unresolved contradiction was surfaced rather than silently merged: §14.5's prior "no exact clones" language conflicts with Perfect Essence's exact-recreation capability — flagged in place, needs an explicit developer decision.
+
 ## 0.3 Production hierarchy
 
 Familiar Fight Club contains three nested games: the combat engine, the familiar career, and the campaign/metagame. Development should prove them in that order.
@@ -68,6 +72,8 @@ Familiar Fight Club contains three nested games: the combat engine, the familiar
 - 3\. Design pillars
 
 - 4\. Combat foundation
+
+- 4A\. Combat signals, events, and ledger
 
 - 5\. Combat timing and universal stats
 
@@ -123,6 +129,36 @@ Central fantasy: Raise a unique creature, construct a coherent combat engine, an
 
 - Not a permanent-party progression game where one familiar is expected to grow forever.
 
+## 1A. World, setting, and visual identity
+
+LOCKED / STRONG DIRECTION (added from the 2026-09 design-delta reconciliation — see revision note at the end of this section)
+
+FFC should not read as generic medieval fantasy plus Pokémon. The premise is:
+
+> **The industrialized/modern-ish world already existed, and then magic arrived or became newly accessible.** Society did not grow around magic from antiquity — already-existing institutions had to react to a new impossible phenomenon.
+
+This means magic gets absorbed into universities, laboratories, corporations, factories, transit systems, regulators, organized sport, broadcast media, organized crime, medicine, research, markets, consumer culture, and public infrastructure — not into castles and guilds. The aesthetic is **post-industrial occult noir**: old brick, concrete, steel, industrial districts, elevated rail, wet streets, neon/signage, modern clothing, arenas, laboratories, strange containment rigs, arcane instrumentation, improvised magical retrofits, aging infrastructure modified *after* magic arrived. The target feeling is *ordinary infrastructure with strange arcane systems bolted onto it later*, not *generic fantasy buildings with gears and glowing crystals pasted on*.
+
+**Magic and familiars should feel like phenomena** society is still classifying, not a conventional spell list. Familiars can be strange enough to challenge simple biological categories — an arcane ferret-like creature, a golem composed of a collector's treasured pebbles, an heirloom pen that gradually began behaving like a living creature, industrially adapted magical wildlife, object-like manifestations, occult organisms, creatures that appear to be environmental or emotional phenomena. Not every familiar needs an industrial origin story; some should simply be mystical creatures now inhabiting an industrialized magical world. Scientists, corporations, trainers, researchers, and ordinary people may genuinely disagree about what familiars fundamentally are — that ambiguity is a feature, not a gap to close.
+
+**Visual/magical language is CMYK-derived**, a recurring symbolic system across the world (spell/technique VFX, UI accents, research classifications, signage, occult diagrams, corporate/academic iconography, magical machinery, familiar traits, environments, ritual equipment, narrative symbolism):
+
+| Color | Category |
+|---|---|
+| Cyan / Teal | Arcane |
+| Magenta / Purple | Occult |
+| Yellow / Gold | Divine |
+| Black | Void |
+| White | Aether |
+
+The exact metaphysical relationship between these five categories is **open** — treat the color-language mapping itself as current direction, not the underlying cosmology.
+
+**Riverton** is the current leading candidate for FFC's main anchor city — major arena/tournament district, industrial zones, a research institute, markets, transit infrastructure, contaminated/abandoned industrial sites, Ranch/training facilities, corporate presence, broadcast/sports media, organized crime, regulatory presence. It should support both the competitive sport and the broader mystery of how society is adapting to magic.
+
+**Sebastian** is a strong candidate for connective tissue across eras: *competitor/champion-era figure → retired researcher/familiar authority → potentially an older professor-like elder authority later in the timeline*. The strongest characterization is that people assume he left competition because he could no longer keep up, when the real reason is that understanding what familiars and magic actually *are* became more compelling to him than continuing to compete. A retroactive tie to the Pixel Pugilists protagonist/player figure, and later mentor/Ranch-presence/commentator/public-figure roles, are possibilities worth keeping open, not separately locked requirements.
+
+*(This subsection was added wholesale from a 2026-09 design-delta document that reconciled recent worldbuilding/visual-design discussion against this vision doc — the prior version of this document had no dedicated world/setting/visual-identity content at all. Treat the mechanical sections below as the more load-bearing/established part of this document; this section is comparatively newer and less battle-tested.)*
+
 # 2. Core player experience
 
 LOCKED
@@ -142,6 +178,12 @@ Ideal reaction: “It did exactly what I taught it to do — and all the pieces 
 ## 2.3 Attachment through finite careers
 
 A familiar should feel individual because its career is finite. Opportunities are constrained, builds cannot acquire everything, victories and mistakes become part of a record, and retirement closes one competitive story while feeding future careers.
+
+## 2.4 Presentation must survive high-speed playback
+
+STRONG DIRECTION (added from the 2026-09 design-delta reconciliation)
+
+Because both PP and FFC are autobattlers, "execution as payoff" (§2.2) depends heavily on VFX/SFX quality — and players may watch combat at accelerated speeds such as 4×. Effects need to remain readable, satisfying, and non-chaotic when many automated actions resolve quickly, not only at normal speed. Treat high-speed readability as a real presentation constraint to test against directly, not an afterthought discovered late. Exact audio/VFX implementation remains open.
 
 # 3. Design pillars
 
@@ -175,6 +217,20 @@ A familiar eventually leaves active competition. Retirement converts one finishe
 
 Later challenge should not only inflate enemy numbers. Harder competition should introduce new opponents, new build pressures, new species or candidate pools, and other content that expands the game’s possibility space.
 
+## 3.8 Combat is state/status/event/history driven, not type-chart driven
+
+LOCKED (added from the 2026-09 design-delta reconciliation)
+
+FFC combat should **not** revolve around Pokémon-like elemental weakness charts or direct type-matchup multipliers. The main combat language is instead statuses, current state, recent turn state, historical battle state, event signals, technique properties/tags, positioning, conditional behavior, action economy, and resource/cooldown state (see the new §4A, Combat Signals, Events, and Ledger). The strategic question is not "what element beats this enemy?" but "what state is the fight currently in, what state am I trying to create, and how does my familiar respond to that?"
+
+This directly informs §9.1 (Species): familiars keep flavorful **types**, but those types are primarily non-combat classification (acquisition, raising, meta progression, research/identity, thematic technique access) rather than a damage-multiplier chart. A fire-aligned familiar naturally has access to many Burn-oriented techniques and related build pieces — that's the type's combat *influence*, not a type-vs-type resistance table.
+
+## 3.9 Prefer reusable compositional primitives over combinatorial content multiplication
+
+LOCKED (added from the 2026-09 design-delta reconciliation)
+
+FFC's biggest production risk is combinatorial content multiplication — familiars, techniques, passives, statuses, priorities, the combat ledger, events, grid movement, terrain, tournaments, brackets, NPC simulation, circuits, the Ranch, acquisition, story, maps, modifiers, and career progression can each demand bespoke content if treated in isolation. Prefer reusable primitives that recombine into content over authoring bespoke systems for every circuit, familiar, or tournament — the game should become deep because shared systems combine in surprising ways, not because each new piece of content requires its own mechanical ecosystem. This governs circuits specifically (§12.2: circuits should remix existing systems more often than they demand bespoke new ones) and cosmetics specifically (§9.5), but is stated here as the general production rule those sections apply.
+
 # 4. Combat foundation
 
 LOCKED
@@ -202,6 +258,43 @@ The underlying rules should be dependable. Randomness should be explicit or cons
 - Later spatial arenas may vary between authored layouts, but the loaded arena state should be visible and stable.
 
 - Status resistance should preferably modify outcomes predictably rather than causing invisible percentage failures.
+
+# 4A. Combat signals, events, and ledger
+
+CORE / STRONG DIRECTION (new section, added from the 2026-09 design-delta reconciliation — this system did not previously exist anywhere in this document)
+
+## 4A.1 The problem: plain damage has too few hooks
+
+A recent PP realization worth carrying into FFC's foundational design: **plain damage attacks currently interact with much less of the combat system than status-oriented attacks do.** Applying a status immediately creates interaction points (is target afflicted, is it above a threshold, can it be consumed/protected/scaled-with, does applying or decaying it fire a trigger, can it be compared between targets) — a plain "deal 8 damage" often happens and leaves nothing behind, which makes status techniques feel like real build pieces while plain attacks feel like filler. **Do not solve this by putting statuses on every attack.** Build a broader interaction language instead — the rest of this section.
+
+## 4A.2 Four kinds of readable combat information
+
+- **Current state** — persistent information currently true: HP, statuses, recharge, buffs/debuffs, position, active defenses, current target state.
+- **Event signals** — things that just happened: `hit`, `damage_dealt`, `damage_taken`, `status_applied`, `status_removed`, `status_consumed`, `healed`, `technique_used`, `turn_started`, `turn_ended`, `multi_hit_turn`.
+- **Technique properties / tags** — structural facts about the technique itself: attack, multi-hit, heavy, defensive, healing, status, direct damage, movement, ranged, etc.
+- **Historical / ledger state** — accumulated memory of the fight (§4A.4): total Poison applied, total direct damage dealt, largest hit this combat, damage the enemy took last turn, hits landed this turn, total Bleed consumed, total healing received, number of heavy techniques used.
+
+Statuses remain the richest form of persistent state (§10.5/§10.6 still apply), but they are not the only interaction surface.
+
+## 4A.3 Multi-hit needs a real runtime signal, distinct from a technique tag
+
+FFC needs a signal equivalent to *"this familiar hit multiple times this turn,"* kept distinct from a static `multi_hit` technique tag. A technique can be inherently multi-hit, but a familiar may also hit multiple times because of technique fusion (§6.5), a passive's extra attack, a follow-up, a chained action, or several separate single-hit effects landing in the same turn. So: `multi_hit` (technique property, structural) is a different thing from `hits_this_turn >= 2` / `multiple_hits_this_turn` (runtime event/state, actual). This lets a passive like *"after you hit multiple times in a turn, gain Hone"* trigger correctly regardless of *why* the extra hit happened — a real example of the interaction density this system is meant to enable.
+
+## 4A.4 Combat Ledger / Combat History
+
+FFC should maintain a **Combat Ledger** separate from visible statuses. Statuses answer "what is true now?"; the ledger answers "what has happened?" Useful categories, starting with a curated subset rather than tracking every imaginable statistic:
+
+- **Per-turn state**: hits dealt this turn, direct damage dealt this turn, status damage dealt this turn, damage taken this turn, healing performed/received this turn, status stacks applied/consumed this turn, techniques used this turn.
+- **Previous-turn snapshot**: the same fields, one turn back (e.g. damage the target took last turn, hits the target landed last turn).
+- **Combat totals**: total hits, total direct damage, total status damage, total damage taken, total healing, total status stacks applied/consumed, per-status totals, total techniques used by tag, largest hit, largest healing instance, turns survived, etc.
+
+This creates a real ledger-based technique design space — e.g. *Toxic Reckoning* (damage equal to total Poison stacks applied to the target this combat), *Echo Strike* (damage based on total damage the target took last turn), *Blood Memory* (bonus damage based on total Bleed consumed this combat), *Vindication* (heal based on damage taken last turn), *Combo Engine* (gain Hone if you hit at least 3 times this turn), *Pressure* (consecutive direct-damage actions strengthen until interrupted), *Record Breaker* (a benefit for exceeding your own previous largest hit). The broader principle: **the battle itself becomes an accumulating object techniques can query**, letting late-fight techniques become more powerful because history has accumulated — not just because a status happens to be stacked high.
+
+## 4A.5 Statuses + events + history + tags = the core mechanical substrate
+
+Together, these four categories are the main interaction substrate for combat, and should be read as one system rather than "statuses, plus some other stuff." This creates room for raw-damage archetypes, multi-hit archetypes, defensive archetypes, healing archetypes, combo/momentum archetypes, genuinely statusless archetypes, retaliation, history-scaling attacks, and fused-technique engines — all without needing a bespoke status invented for each one. Non-status build ecosystems are an explicit, intended archetype: plain damage should be able to form real builds via consecutive direct-damage turns, heavy hits, multi-hit turns, retaliation after taking damage, missing-HP scaling, damage dealt last turn, largest hit, total hits, attacking *without* applying statuses, repeated use of the same attack class, attack streaks, and damage thresholds — e.g. bonus damage for consecutive turns without applying a status, which turns "statusless" into a readable property of recent behavior rather than an absence of build identity.
+
+**Even with this broader signal language, combat should remain more status/state-centric than type-matchup-centric** (§3.8) — statuses stay especially useful because they persist, are visible, provide readable thresholds, create strong conditional hooks, allow setup/payoff loops, create tactical identities, and work naturally with priority rules.
 
 # 5. Combat timing and universal stats
 
@@ -253,6 +346,8 @@ CURRENT DIRECTION
 
 The original structure combined a condition, movement instruction, action, and target into one rule. This remains a strong candidate for the spatial game, but the prototype should begin with the smallest vocabulary necessary to test prioritization and build expression.
 
+**Priority comparison language (strong direction, added from the 2026-09 design-delta reconciliation):** conditions should not be authored as a giant list of bespoke permutations. They should compare **arbitrary left/right value expressions** — conceptually `[left value] [operator] [right value]`, where either side can be drawn from useful value sources such as Me/Target, HP or HP%, stats, status stacks/values, flat numeric values, or percentages (e.g. *target Burn stacks > my Burn stacks*, *target HP > 12*, *target Defense > 12*, *target Power > my Defense*). The UI should expose this through configurable/scrollable condition building rather than authoring every possible comparison as its own hard-coded rule — this is the grammar §6.2 is deliberately keeping open room for, not a separate system.
+
 ## 6.3 Specialized logic
 
 Advanced behavioral components may eventually be learned or unlocked. They should feel like useful tactical cards rather than syntax fragments in a complicated programming language. A specialized option should generally have a useful floor even outside its ideal matchup.
@@ -260,6 +355,24 @@ Advanced behavioral components may eventually be learned or unlocked. They shoul
 ## 6.4 Explanation tooling
 
 Readable AI is a feature, not only a debugging convenience. Useful surfaces may include the selected rule, skipped-rule reasons, triggered passives, status changes, and a compact event timeline. The first prototype should prioritize this visibility early.
+
+## 6.5 Technique Fusion / Linking
+
+CORE / STRONG DIRECTION (new section, added from the 2026-09 design-delta reconciliation — carried forward from an earlier four-character tactics-RPG concept that ports well into FFC)
+
+**Technique Fusion / Linking** lets two techniques execute together in a single turn under one shared priority rule/behavioral instruction. The essential tradeoff:
+
+> **You get both techniques in one turn, but you normally have to do both every time the fused instruction fires.**
+
+Without fusion, two techniques can have fully separate priority conditions. With fusion, they're coupled under one priority rule — improving action economy while reducing behavioral granularity. Example: *Guard if HP < 50%* and *Renewal if HP < 30%*, authored separately, can be converted into a fused Guard+Renewal action — but now the two effects are tied together whenever that fused action is chosen, not "Technique A, plus Technique B only when B's own private condition happens to be convenient." At base Fusion, losing a separate conditional barrier for the second technique is part of the cost, which is exactly what makes Fusion an appropriately powerful metaprogression unlock (§16).
+
+**Fusion progression can become more sophisticated** over the course of metaprogression: basic Fusion (two techniques coupled, executing together under the same priority logic) can later be joined by a **composite-conditioning** unlock that restores some control by letting the fused/composite technique be gated behind an *additional* condition on top of the fusion itself — powerful precisely because base Fusion sacrifices that granularity. The exact rule syntax for composite conditioning is open; do not assume a specific implementation (e.g. "global condition then internal condition") until a technical design document locks one. Multiple fused pairs, triple-technique composites, or deeper nesting are exploratory, not current requirements.
+
+**Fusion legality, costs, Recharge-interaction, and pair-compatibility are explicitly unresolved** — whether all component costs are always paid, how Recharge/cooldowns combine, how once-per-fight restrictions combine, whether the whole composite must be legal before it can fire, what happens when one component has an invalid target/state, and which technique pairs are considered compatible are all open design questions, not assistant-invented rules to treat as canon. The one locked conceptual constraint is: **at base Fusion, linked techniques execute together rather than retaining fully independent conditional behavior.** Everything past that needs its own explicit design pass.
+
+**Metaprogression should more broadly let players build more sophisticated machines, not simply bigger stats** — this is the philosophy Fusion is one instance of. Early player logic: *if X → use Y*. More advanced: *if X AND Y → use Z*. Later: *if X OR Y → use Z*. Later still: combine two techniques into one action, then eventually gain more control over when that composite action is allowed to fire. Strong metaprogression axes beyond Fusion itself: additional priority/rule capacity, additional conditions, AND/OR logic, richer comparison/value sources (§6.2), more readable battle-history variables (§4A.4), additional fused pairs, extra conditional control over fused techniques.
+
+Progression should also let earlier resource gates loosen as later ones become the frontier: advanced mechanics can have meaningful costs when first unlocked so they feel special, but as the player pushes into harder routes, older resources should become increasingly plentiful relative to what the player can realistically spend — shifting the active question from "can I afford the old mechanic?" to "the old mechanic is now part of my normal toolbox; the newer resource/mechanic is the real constraint." Legacy Points (§14.3) already point at "unlock breadth, not stat superiority" — this is the same philosophy applied specifically to combat-logic sophistication rather than to Ranch/acquisition breadth.
 
 # 7. Coaching and intervention
 
@@ -319,6 +432,8 @@ LOCKED
 
 Species defines the familiar’s broad chassis and visual identity, not its entire build. It may influence baseline stats, movement traits, technique affinities, or a species-specific passive, but species should provide useful primitives rather than prescribing one narrow element or status theme.
 
+Species/familiar **types** are primarily a *non-combat* classification — acquisition, raising/development, meta progression, research/classification, familiar identity, and thematic technique access/affinity — not a Pokémon-style combat weakness/resistance chart (see §3.8). A fire-aligned familiar naturally has access to many Burn-oriented techniques and related build pieces; that's the type's combat influence, expressed through the same status/state/event language every other familiar uses, not a type-vs-type multiplier applied on top of it. The exact type taxonomy, and every non-combat system that reads type, remain open — do not infer a breeding system, tournament-eligibility system, or other type-dependent subsystem unless another design document explicitly establishes one.
+
 ## 9.2 Individual identity
 
 Two members of the same species should be capable of developing differently. Small stat differences, innate traits, affinities, and career opportunities can nudge the player toward different builds without creating obviously worthless candidates.
@@ -336,6 +451,12 @@ Innate traits may influence combat, development opportunities, or both. Effects 
 OPEN / PLAYTEST
 
 The final loadout will likely limit techniques, combat passives, behavioral rules, and innate traits through separate or partially separate capacities. Exact slot counts and whether unusually versatile components consume additional capacity should be determined after the component systems are playable.
+
+## 9.5 Cosmetic familiar dress-up
+
+EXPLORATORY / STRONG RECENT IDEA (added from the 2026-09 design-delta reconciliation)
+
+A recent cosmetic direction is accessory/clothing packs that let players decorate familiar sprites — closer to Pokémon Contest-style dress-up than a conventional equipment paper-doll system. Per §3.9's scope discipline, the implementation should stay deliberately lightweight: don't author bespoke equipment slots for every familiar/accessory combination; expose general attachment/anchor points, let the player place and rotate cosmetic pieces, then effectively "glue" the cosmetic to the sprite at the chosen transform. The goal is expressive cosmetic packs without multiplying sprite-authoring work across the entire familiar roster.
 
 # 10. Techniques, passives, tags, and statuses
 
@@ -363,7 +484,7 @@ Complexity should be expressed through a readable tag vocabulary rather than unn
 
 ## 10.5 Status baseline
 
-The established status vocabulary is Poison, Burn, Acid, Vines, Chill, Shock, and Bleed. Exact numbers, stack caps, durations, and final clauses remain balance variables, but the statuses should have distinct baseline jobs.
+The originally established status vocabulary was Poison, Burn, Acid, Vines, Chill, Shock, and Bleed. Exact numbers, stack caps, durations, and final clauses remain balance variables, but the statuses should have distinct baseline jobs.
 
 | **Status** | **Baseline identity**                                                                 |
 |------------|---------------------------------------------------------------------------------------|
@@ -374,6 +495,16 @@ The established status vocabulary is Poison, Burn, Acid, Vines, Chill, Shock, an
 | Chill      | Movement reduction or other mobility pressure over a duration.                        |
 | Shock      | Punishes movement, historically by dealing damage as the afflicted familiar moves.    |
 | Bleed      | Stacking delayed-payoff damage whose eventual burst scales with accumulated stacks.   |
+
+**The vocabulary has since grown substantially in Pixel Pugilists** (as of this writing: Poison, Burn, Acid, Bleed, Stagger, Foretell, Stun, Defending, Infestation, Hone, Fortify, Enlarge, Recharge, Thorns, Ward, Hex, Absorption, Ruin, Retaliation, Stasis, Renewal, Lifesteal, Regeneration, Cleanse — plus a further-explored "Persistence"-style status-preservation concept). **Treat the exact current implementation list as something to pull from PP's own current status/content data when needed, not from this vision document** — the important design point was never any single frozen list, it's that statuses act as reusable interaction primitives rather than generic RPG ailments. Several of PP's newer statuses demonstrate especially useful interaction patterns worth preserving as *patterns*, independent of their exact PP numbers:
+
+- **Recharge** — shared cooldown-like state that other mechanics can read, reduce, or manipulate (see §16 on why bypassing/reducing it deserves the same scrutiny as an extra action).
+- **Ward** — a readable defense specifically against enemy status/debuff application, distinct from HP-damage mitigation.
+- **Hex** — turns the *event* of a status being applied into something that itself generates value, not just the status's own direct effect.
+- **Foretell** — a delayed/countdown payoff, rewarding a setup investment that pays off later rather than immediately.
+- **Stasis** and similar preservation mechanics — intercepting or altering status *loss* (rather than status gain) as its own distinct archetype.
+
+The general rule carried forward: **statuses should create readable state that other techniques, passives, priorities, and events can inspect, preserve, consume, transform, or react to** — this is the same substrate described in §4A, just with statuses as the richest (not the only) layer of it.
 
 ## 10.6 Deterministic resistance
 
@@ -437,9 +568,23 @@ LOCKED
 
 Tournaments are short multi-fight sequences that provide the payoff for development. Before entering, the familiar commits to its current learned toolkit. Between rounds, coaching may allow reordering behavior, swapping already learned components, reviewing scouting, and allocating limited recovery or interventions, but not learning entirely new capabilities.
 
+**Priority rules should encourage matchup adaptation, not accumulation** (strong direction, added from the 2026-09 design-delta reconciliation): players should not necessarily leave every known technique active in the priority list at all times. The game should actively encourage swapping techniques, changing priority rules, adjusting condition thresholds, adapting to specific opponents, and pivoting builds — tutorialization should explicitly push back on the likely beginner pitfall of "I learned six techniques, therefore I should always have all six active," teaching instead that a narrower, matchup-specific behavior set can be stronger. This connects directly to §7 (Coaching): coaching exists partly to make this narrowing/adaptation practical between rounds. Tutorialization more broadly needs to be unusually explicit given the player is programming behavior indirectly — covering how priority rules resolve, why a familiar chose a move, when to remove a technique from the active routine, how to change thresholds, how status state affects decisions, how to scout opponents, how to identify bad loops, how to avoid wasting techniques, and how to interpret a loss. The goal isn't explaining controls; it's teaching the player how to think about building an automated fighter.
+
+## 12.1A Tournament routing: many available, only some required
+
+CORE / LOCKED (new subsection, added from the 2026-09 design-delta reconciliation)
+
+One of the most important recent structural decisions: a career/run should have **more tournaments available than the player is required to complete.** The player may need only a limited number of qualifying tournament completions before proceeding to a circuit/career finale — e.g. several Easy tournaments, several Medium, several Hard, perhaps Very Hard/special events, but only 3–4 successful completions required before the finale. This turns career progression into **routing**: the question becomes "which tournaments should I risk entering with this familiar and this build?" rather than "can I clear the exact next level?" A tutorial/first career may subtly introduce a safe route (Easy → Medium → Hard → Finale) before the player realizes they can enter Hard first, and eventually that Easy can be skipped entirely in favor of Medium → Hard → Very Hard.
+
+This directly resolves a metaprogression tension noted in §3.7/§14.3 (difficulty should unlock possibility, not just bigger numbers): with many available tournaments, **progression lets the player voluntarily attempt more dangerous and rewarding content**, rather than either (a) permanent stat progression trivializing old content, or (b) enemies always scaling with the player so progression feels fake. Harder tournaments can offer stronger rewards, rarer acquisition opportunities, new techniques/passives, rare resources, prestige, unusual opponents, special-event access, or meta unlocks — the metaprogression goal is the player thinking "I can probably get away with entering this harder tournament now," not "my permanent +25% damage makes this trivial."
+
+**Note for Pixel Pugilists:** PP's own single-run bracket structure is a compressed stand-in for this system (§0.3) and doesn't currently implement optional/skippable tournament routing — this section describes the full FFC career layer, not a requirement to retrofit into PP.
+
 ## 12.2 Circuits
 
 The game contains several authored competitive circuits. Each circuit should have a thematic identity, characteristic opponents, development-event tendencies, and eventually spatial arena tendencies. Exact routing, transfers, and branching remain provisional.
+
+**Circuits vs. tournaments, and what circuits can vary** (added from the 2026-09 design-delta reconciliation): a *tournament* is one discrete competition; a *circuit* is the broader competitive environment containing multiple tournaments, opponent pools, rules, themes, events, and reward/resource profiles. Circuits can vary entrant pool, difficulty distribution, tournament availability, arena/map rules, event pool, reward profile, which resources are emphasized, hazards, and thematic/regional identity — a key purpose being that **different circuits and harder routes can pay out different resources**, giving the player reasons to choose among them rather than merely climbing one linear difficulty ladder. This is the same "how much can I win, and how ambitious can I afford to be?" question §12.1A introduces at the tournament level, one layer up. Per §3.9's production-scope rule: **circuits should remix existing systems more often than they demand bespoke new ones** — avoid making every circuit require a unique mechanical ecosystem, a bespoke roster, and a large set of one-off maps; prefer recombination of shared primitives.
 
 ## 12.3 Narrative tone
 
@@ -464,6 +609,28 @@ The campaign uses a loose anime-style plot to connect the competitive climb. The
 ## 12.5 Narrative restraint
 
 The conspiracy should remain readable and energetic rather than becoming a dense political thriller. The competitive scene, characters, and familiar careers remain the emotional center of the game.
+
+## 12.6 Brackets as living systems: real NPC simulation, scouting, and sports stories
+
+CORE / STRONG DIRECTION (new subsection, added from the 2026-09 design-delta reconciliation)
+
+**The tournament bracket should be more than a fight-selection menu.** It can simultaneously function as opponent preview, scouting interface, route visualization, story generator, tournament-simulation display, character-selection context, and anticipation builder — PP already validates the character-selection use (the starting familiar is effectively chosen by taking over one entrant's bracket slot) and the scouting/route-visualization use (its own bracket screen). The overall bracket should feel alive, not static.
+
+**Background tournament matches should actually simulate**, not resolve to arbitrary winners: NPC competitors fight one another, gain upgrades, change build direction, and create upsets over the course of a tournament — meaning the eventual final opponent can be the survivor of *their own* miniature roguelike run rather than a pre-scripted final boss. This is one of the strongest systemic narrative ideas in the design and should be preserved deliberately. **AI systems built to draft/evaluate builds for balance-simulation testing can double as actual NPC trainer logic** — different NPCs preferring status engines, defense, raw damage, specific technique tags, risky combos, counter-building, or specific familiar archetypes, so opponents develop systemically rather than receiving arbitrary scripted upgrades. (PP's own AI-drafting/priority-optimizer system, `docs/superpowers/specs/2026-09-06-ai-drafting-design.md`, is exactly this pattern already — see `GAME_DESIGN.md` §11.)
+
+**Scouting should reveal strategy, not an opponent's exact build.** Rather than exposing a full exact loadout, scouting should expose archetype tags, recent performance, a rough stat profile, behavioral tendencies, build themes, and broad strengths/weaknesses — "Attrition / Poison / Defensive," not an exact technique list plus exact priority rules. This preserves uncertainty while still allowing informed preparation; the player should feel like a coach/scout, not an omniscient one.
+
+**Real simulation naturally produces sports stories** — "that weird Guubal upset the tournament favorite and somehow made finals" — via concepts like favorite, underdog, heavy favorite, lock, upset, rivalry, dominant run, collapse, comeback, Cinderella run, tournament history, and familiar record. The system should produce narrative through competition rather than requiring every rivalry to be hand-authored. Following the sport this way also becomes a natural lens into the broader world (§1A): familiar fighting is simultaneously sport, entertainment, research opportunity, business, prestige system, social mobility, exploitation, regulation, advertising, celebrity culture, gambling/crime pressure, and corporate influence — which strengthens the corrupt-league storyline (§12.4) by grounding it in a competitive world the player has actually watched develop.
+
+## 12.7 Boss progression can preview and unlock new mechanical layers
+
+STRONG DIRECTION (new subsection, added from the 2026-09 design-delta reconciliation)
+
+Bosses can do more than test raw build strength — tournament bosses can teach the player what the next layer of the game looks like. A recurring pattern worth building toward: an early "hard" tournament boss can use essentially every mechanic already in the player's starting arsenal (the fight asks "have you actually learned how the tools you already possess fit together?"), while a later "harder" boss can use a mechanic the player does **not** yet have access to — intentionally shocking on first encounter ("wait, it can do that?") — with beating that boss unlocking the mechanic for the player. **Technique Fusion (§6.5) is a strong candidate for a mechanic introduced this way.** This creates a progression rhythm: master current toolbox → see an enemy break the apparent rules → overcome it → gain that expressive tool yourself → discover a new frontier — which fits the broader metaprogression philosophy (§16) closely, and later/very-hard tournaments can keep revealing further layers beyond what previously looked like the endpoint.
+
+At the far end, **an intentionally absurd final boss** can use abilities that look blatantly unfair, provided a sufficiently strong run can still beat them — e.g. applying every negative status to the player and every positive status to itself, then dealing damage scaling with the combined stack count across both combatants, potentially paired with an automated defensive passive. The design question is deliberately "how ridiculous can the final encounter appear while remaining beatable by a genuinely excellent build?" rather than forcing perfect symmetry, which fits roguelike final-boss philosophy better than a fair, symmetric fight would.
+
+**Direct validation from Pixel Pugilists:** PP's own final boss (The Champion, `GAME_DESIGN.md` §9, `DEVLOG.md` session 12) already implements almost exactly this "absurd final boss" example — Calamity Manipulation applies the full negative-status kit to the target, Taste of Immortality sets the full positive-status kit on itself, and Reap scales damage off total unique statuses across both combatants — and the developer has confirmed via direct playtesting that the fight is difficult but genuinely beatable. This is real evidence the pattern works as intended, not just a promising idea on paper.
 
 # 13. Performance objectives and medals
 
@@ -531,11 +698,20 @@ Legacy Points are permanent progression earned when familiar careers end. Legacy
 
 New familiars are acquired rather than captured during battle. The baseline recruitment structure remains rotating Ranch candidates plus special candidates or eggs earned through career rewards, events, circuits, or unlock milestones. A fallback candidate should always be available so the player cannot become unable to start another career.
 
+**Expanded, staged acquisition progression** (added from the 2026-09 design-delta reconciliation; STRONG DIRECTION, detail OPEN-PLAYTEST). Recruitment should read as a four-stage arc of increasing player control, mirroring the broader metaprogression philosophy of gaining expressive power rather than only bigger numbers (§6.5, §16):
+
+- **Stage 1 — researcher-provided candidates (low control).** Early on, a researcher/handler presents a small selection of familiar candidates; the player chooses among what is offered rather than requesting an exact species or build. This is deliberately about working creatively with imperfect, partly-random opportunities, not optimizing a known target.
+- **Stage 2 — Essence Echoes and controlled randomness.** Retired familiars (§15.2) can produce **Essence Echoes** — not a generic currency, but components used directly in the acquisition process. The player combines Echoes in a formula/ritual that shapes a *weighted table* of possible outcomes, then rolls from that table: influence over probability, not yet a guarantee.
+- **Stage 3 — better formulas, increasing control.** Progression grants stronger ingredients, improved formulas, and narrower/more favorable outcome tables — the player is moving along a spectrum from "accept possibilities" toward "strongly constrain possibilities."
+- **Stage 4 — Perfect Essence: guaranteed species, not a stat/build clone.** At the far end, a **Perfect Essence** guarantees the exact same *species* as the essence's source rather than another weighted roll across the species table — turning acquisition from probabilistic engineering into true precision. It does not carry over the source familiar's stats or build; the resulting familiar is freshly generated within that species like any other candidate. How Perfect Essence is actually earned is left open until specified elsewhere.
+
 ## 14.5 Lineage
 
 CURRENT DIRECTION
 
-Later progression may allow retired familiars to influence future candidates through a simple breeding or mentorship system. The goal is meaningful influence over traits, affinities, stat tendencies, or cosmetic features without turning the game into a breeding-management simulator or producing exact clones.
+Later progression may allow retired familiars to influence future candidates through a simple breeding or mentorship system. The goal is meaningful influence over traits, affinities, stat tendencies, or cosmetic features without turning the game into a breeding-management simulator or producing exact clones — a familiar's specific stats and build are never directly reproducible in a new candidate.
+
+**Resolved tension with Perfect Essence (§14.4 Stage 4):** the delta reconciliation flagged an apparent conflict between this "no exact clones" rule and Perfect Essence's "exact recreation" language. Resolved: Perfect Essence guarantees only the source's *species*, not its stats or build — the produced familiar is a freshly generated individual of that species, same as any other candidate. "No exact clones" and Perfect Essence are therefore compatible as written; no further reconciliation needed.
 
 # 15. Retirement and the Ranch
 

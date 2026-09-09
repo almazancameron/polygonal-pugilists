@@ -1,10 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://c7a6jfq72cfpj"]
 
 [ext_resource type="Script" uid="uid://reqqbounkxb5" path="res://scripts/bracket/bracket_screen.gd" id="1_bracket"]
 [ext_resource type="Script" uid="uid://cvo873bi5qd0q" path="res://scripts/ui/framed_panel.gd" id="2_framed"]
+[ext_resource type="Script" uid="uid://drwrpr8n3jj1n" path="res://scripts/bracket/bracket_tree.gd" id="3_tree"]
 
 [node name="BracketScreen" type="VBoxContainer" unique_id=511430675]
-layout_mode = 3
+anchors_preset = 10
 anchor_right = 1.0
 offset_left = 16.0
 offset_top = 40.0
@@ -61,9 +62,9 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("2_framed")
 border_color = Color(1, 0.714, 0.282, 1)
-header_text = "ENTRANTS"
+header_text = "BRACKET"
 
-[node name="Content" type="ScrollContainer" parent="Body/Content/EntrantScroll" unique_id=1751780073]
+[node name="Content" type="Control" parent="Body/Content/EntrantScroll" unique_id=1751780073]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -77,9 +78,14 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="EntrantList" type="VBoxContainer" parent="Body/Content/EntrantScroll/Content" unique_id=157412023]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="BracketTree" type="Control" parent="Body/Content/EntrantScroll/Content" unique_id=157412023]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_tree")
 
 [node name="DetailPanel" type="Control" parent="Body/Content" unique_id=2042057886]
 visible = false
@@ -157,6 +163,7 @@ text = "×"
 
 [node name="ContinueButton" type="Button" parent="." unique_id=771854374]
 visible = false
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Continue"

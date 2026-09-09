@@ -44,3 +44,19 @@ static func loser_label(probability: float) -> String:
 	if probability >= FAVORITE_THRESHOLD:
 		return LABEL_UNDERDOG
 	return LABEL_TOSS_UP
+
+## The color an odds label reads in wherever it's shown directly (not just
+## in a tooltip) -- e.g. BracketTree's leaf cards. Defaults to the
+## toss-up gray for an empty/unrecognized label (a match with no odds
+## scouted yet), rather than something alarming like red.
+static func label_color(label: String) -> Color:
+	match label:
+		LABEL_HEAVY_FAVORITE:
+			return Palette.ODDS_HEAVY_FAVORITE
+		LABEL_FAVORITE:
+			return Palette.ODDS_FAVORITE
+		LABEL_UNDERDOG:
+			return Palette.ODDS_UNDERDOG
+		LABEL_HEAVY_UNDERDOG:
+			return Palette.ODDS_HEAVY_UNDERDOG
+	return Palette.ODDS_TOSS_UP

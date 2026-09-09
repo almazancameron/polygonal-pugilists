@@ -330,3 +330,11 @@ ability to write rules.
   across a few different evaluation opponents or use the same fixed
   handful every time is left to implementation — either is a reversible
   choice at this stage.
+- §4.3's table generation currently gives every owned technique a slot
+  somewhere in the compiled table (only individual hint variants get
+  omitted, not whole techniques). Personalities should probably differ
+  here too: some builds may only perform optimally with a genuinely
+  no-synergy technique left out of the table entirely, and "always
+  include everything I own" vs. "evaluate and cull dead weight" feels
+  like its own personality axis, not a universal behavior — worth adding
+  once the base three personalities are validated.

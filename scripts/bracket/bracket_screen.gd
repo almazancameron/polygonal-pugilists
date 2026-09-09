@@ -18,14 +18,16 @@ extends VBoxContainer
 ## Hovering an entrant shows its odds and species tags through the shared
 ## TooltipLayer; clicking one pins the full detail panel.
 ##
-## Later rounds also list the previous round's finished matches, so the
-## player can just see who won rather than being told in a log line.
+## The whole bracket tree (all 4 rounds) is always shown at once --
+## BracketTree draws undecided matches as "?" regardless of how far off
+## they are, so there's no need to filter down to "this round" the way
+## the old plain-list view did.
 
 signal entrant_selected(familiar: Familiar)
 signal dismissed
 
 @onready var title_label: Label = $TitleLabel
-@onready var entrant_list: VBoxContainer = $Body/Content/EntrantScroll/Content/EntrantList
+@onready var bracket_tree: BracketTree = $Body/Content/EntrantScroll/Content/BracketTree
 @onready var detail_panel: Control = $Body/Content/DetailPanel
 @onready var detail_name: Label = $Body/Content/DetailPanel/Content/DetailName
 @onready var detail_portrait: TextureRect = $Body/Content/DetailPanel/Content/DetailPortrait
@@ -40,6 +42,7 @@ signal dismissed
 var tooltip_layer: TooltipLayer
 
 var _selected: Familiar
+var _selectable: bool = false
 var _odds_by_name: Dictionary = {}   # familiar_name -> String
 
 func _ready() -> void:
@@ -47,39 +50,29 @@ func _ready() -> void:
 	continue_button.pressed.connect(func() -> void: dismissed.emit())
 	close_button.pressed.connect(func() -> void: dismissed.emit())
 
-## Rebuilds the whole screen for one round. Everything is torn down and
-## rebuilt rather than diffed, since each row closes over a specific
-## Familiar instance -- the same reasoning PriorityBuilder.setup() uses.
+	bracket_tree.entrant_hovered.connect(_on_entrant_hovered)
+	bracket_tree.entrant_unhovered.connect(_on_entrant_unhovered)
+	bracket_tree.entrant_clicked.connect(_on_entrant_clicked)
+
+## Rebuilds the whole screen for one round. bracket_tree itself tears down
+## and rebuilds its leaf cards on every call (see BracketTree.setup()),
+## since each one closes over a specific Familiar instance -- the same
+## reasoning PriorityBuilder.setup() uses.
 func setup(bracket: Bracket, round_index: int, selectable: bool, is_popup: bool = false) -> void:
 	_selected = null
+	_selectable = selectable
 	_odds_by_name.clear()
 
-	title_label.text = "Choose your familiar" if selectable else "Round %d" % (round_index + 1)
+	title_label.text = "Choose your familiar" if selectable else Bracket.round_display_name(round_index)
 	select_button.visible = selectable
 	continue_button.visible = not selectable and not is_popup
 	close_button.visible = not selectable and is_popup
 
-	for child in entrant_list.get_children():
-		entrant_list.remove_child(child)
-		child.queue_free()
+	for bracket_round in bracket.rounds:
+		for bracket_match in bracket_round.matches:
+			_record_odds(bracket_match)
 
-	# Last round's finished matches first -- this is the reveal. No log
-	# line needed for something the player can simply read here.
-	if round_index > 0:
-		_add_heading("Round %d results" % round_index)
-		for bracket_match in bracket.rounds[round_index - 1].matches:
-			if bracket_match.revealed:
-				_add_result_row(bracket_match)
-		_add_spacer(16)
-		_add_heading("Round %d" % (round_index + 1))
-
-	for bracket_match in bracket.rounds[round_index].matches:
-		if not bracket_match.is_ready():
-			continue
-		_record_odds(bracket_match)
-		_add_row(bracket_match.entrant_a, bracket_match)
-		_add_row(bracket_match.entrant_b, bracket_match)
-		_add_spacer(8)
+	bracket_tree.setup(bracket, null, _odds_by_name)
 
 	_clear_detail()
 
@@ -103,43 +96,18 @@ func _mirror_label(label: String) -> String:
 			return BracketOdds.LABEL_HEAVY_FAVORITE
 	return BracketOdds.LABEL_TOSS_UP
 
-func _add_heading(text: String) -> void:
-	var heading := Label.new()
-	heading.text = text
-	entrant_list.add_child(heading)
-
-func _add_spacer(height: int) -> void:
-	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, height)
-	entrant_list.add_child(spacer)
-
-## A finished match, winner first, so scanning the column reads as a
-## list of who advanced.
-func _add_result_row(bracket_match: BracketMatch) -> void:
-	if bracket_match.winner == null:
-		return
-	var beaten: Familiar = bracket_match.other_entrant(bracket_match.winner)
-	var row := Label.new()
-	row.text = "    %s def. %s" % [
-		bracket_match.winner.familiar_name,
-		beaten.familiar_name if beaten != null else "?",
-	]
-	entrant_list.add_child(row)
-
-func _add_row(familiar: Familiar, bracket_match: BracketMatch) -> void:
-	var row := Button.new()
-	row.text = "%s   %s" % [familiar.familiar_name, _odds_for(familiar)]
-	row.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if bracket_match.is_player_match:
-		row.text += "   (your match)"
-
-	row.pressed.connect(_on_row_pressed.bind(familiar))
+func _on_entrant_hovered(familiar: Familiar, control: Control) -> void:
 	if tooltip_layer != null:
-		row.mouse_entered.connect(func() -> void: tooltip_layer.hover_started(row, _tooltip_text(familiar)))
-		row.mouse_exited.connect(func() -> void: tooltip_layer.hover_ended(row))
+		tooltip_layer.hover_started(control, _tooltip_text(familiar))
 
-	entrant_list.add_child(row)
+func _on_entrant_unhovered(control: Control) -> void:
+	if tooltip_layer != null:
+		tooltip_layer.hover_ended(control)
+
+func _on_entrant_clicked(familiar: Familiar) -> void:
+	if _selectable:
+		bracket_tree.set_selected(familiar)
+	_show_detail(familiar)
 
 func _odds_for(familiar: Familiar) -> String:
 	return _odds_by_name.get(familiar.familiar_name, "")
@@ -160,7 +128,7 @@ func _tag_text(familiar: Familiar) -> String:
 		names.append(String(RewardTag.Tag.keys()[affinity.tag]).capitalize())
 	return ", ".join(names)
 
-func _on_row_pressed(familiar: Familiar) -> void:
+func _show_detail(familiar: Familiar) -> void:
 	_selected = familiar
 	detail_name.text = familiar.familiar_name
 	detail_portrait.texture = familiar.sprite

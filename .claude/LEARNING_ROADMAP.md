@@ -320,11 +320,16 @@ model for how future systems get covered.
 
 **Worth naming as its own lesson, not just implementation history:** two screens in a row needed multiple rounds of post-implementation correction before the developer said outright that they'd lost confidence the remaining screens would go well without much more hand-holding. What actually fixed it wasn't more caution in general, it was a specific process change — read the mockup fully and compare it against a plan task's literal stated scope *before* writing any code, and flag real gaps as a short question rather than shipping the minimal literal reading and waiting to be corrected live. The very next screen (stat-upgrade) went through in one round instead of several once that was applied. Whether this holds for the remaining screens is still an open question, not a solved one — worth checking whether it actually keeps working, not assuming session 10's one success generalizes on its own.
 
-### Step 8 — Final showdown + build-comparison pass (higher-level)
+### Step 8 — Final showdown — ✅ Done (session 12)
 The bracket's final match, opponents having accumulated a comparable amount of power to
-the player over the run, plus a deliberate comparison of two different drafted builds
-against it — directly testing the core thesis (`GAME_DESIGN.md` §1/§12) as a whole.
-Developer-led by this point, Claude reviewing.
+the player over the run — directly testing the core thesis (`GAME_DESIGN.md` §1/§12) as a
+whole. Landed differently than originally envisioned here: Claude-implemented from a
+design brief (the Burn-gated three-technique kit, specified in full by the developer)
+under the new producer-mode arrangement above, not developer-led. Playtested end-to-end by
+the developer and confirmed fun, with the boss specifically called out as difficult but
+beatable — a real, playtested answer to the thesis question, not just a feature-complete
+build. The build-comparison half of this step's original scope was never done and isn't
+currently planned; drop it from future re-reads of this step unless it comes back up.
 
 ### Step 9 — AI drafting personalities & priority optimizer (not yet started; has a concrete integration point now)
 Swaps in at exactly one place: `AIDrafter.apply_round_reward()`
@@ -416,11 +421,40 @@ UI work from the start. The two concerns shouldn't be conflated, but the broader
 is still worth having deliberately at some point, not folded into "well, the mockup process
 got fixed."
 
-**Immediate next step**: finish the visual-overhaul plan — the reward screen and two small
-popups (next-opponent preview, "view my build") are what's left of
-`docs/superpowers/plans/2026-09-06-visual-overhaul.md`. After that: Pebbloq's rebalance
-(still unaddressed since session 8 — Ancient Sentinel actually working made it a real
-76.7% outlier), the final boss's real kit, and the AI-drafting/priority-optimizer system
-(§11), which has a concrete swap-in point already spec'd and waiting
-(`AIDrafter.apply_round_reward()`). Also re-export `build/FamiliarRPG0.exe` before any
-external playtest — the file on disk predates several sessions' worth of fixes now.
+**The developer-ownership check-in flagged above finally happened, session 12** — not as its
+own explicit conversation, but as a direct, durable statement of intent: "I feel confident
+with my knowledge of GDScript syntax at this point and want to take the reins more as
+system design and production while you implement things and help me with general
+architecture to keep content easy to build in large batches." This formally supersedes the
+old **Claude implements → developer extends → Claude reviews** progression in `CLAUDE.md`
+for the areas it covers — the developer now leads system design/production, Claude
+implements by default, and the collaboration should favor architecture that scales to large
+content batches over further hand-holding on ordinary GDScript syntax. It does *not* mean
+the developer has stopped learning the engine (priority #1 in this file's own stated
+order) — it's an explicit choice about where their remaining time goes, made with full
+context on the tradeoff, not a silent drift. Worth treating as the real answer to the
+concern this section has been carrying since session 7, rather than reopening it again.
+
+**Session 12, entirely under that new arrangement**: the final boss's real kit (Step 8,
+now done — see below) and the bracket screen rebuilt as a literal tournament tree (a
+design gap `GAME_DESIGN.md` had flagged since the visual-overhaul pass, not part of any
+prior plan). Both were Claude-implemented from a design brief with no permission
+round-trip, but the bracket-tree work in particular went through several real rounds of
+screenshot-driven correction — the developer's own live playtesting caught a backwards
+design (a decided match combining both entrants into one box, rather than the winner's
+card moving forward) and three further layout-math bugs across follow-up screenshots
+before it was right. This is a good concrete example of what "developer leads design,
+Claude implements" looks like in practice: the design judgment (what should this look
+like when X happens) came from the developer reacting to real output, not from Claude
+guessing correctly on the first attempt.
+
+**Immediate next step**: the developer's own 9-step post-Milestone-1 roadmap (see
+`GAME_DESIGN.md` §10 for the full list) — shore up the AI drafters and upgrade tags,
+build a full-run simulation harness around them, then engine scaffolding (turn/battle-scoped
+state, a consistent hit-vs-status-damage rule, more events, always-first/always-last turn
+order — the last of which answers §12.1's open Speed question rather than sitting beside
+it), a larger content pass, using the sims to catch broken content as it's added, then art/
+VFX/SFX/music, final polish, and a v0.1 release. Pebbloq's rebalance (still unaddressed
+since session 8) and re-exporting `build/FamiliarRPG0.exe` (predates several sessions of
+fixes) are still open, smaller items worth folding into whichever of the above touches
+balance or ships a build first.

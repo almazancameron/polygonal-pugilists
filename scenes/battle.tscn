@@ -34,7 +34,7 @@
 [ext_resource type="Resource" uid="uid://bn2pvhgr22f7p" path="res://resources/techniques/blooming_strike.tres" id="17_rrh2e"]
 [ext_resource type="Resource" uid="uid://qnv81ygkrnlg" path="res://resources/techniques/body_press.tres" id="18_cqddr"]
 [ext_resource type="PackedScene" uid="uid://dpyyw5wn1lcwg" path="res://scenes/tooltip_layer.tscn" id="18_fpf3k"]
-[ext_resource type="Resource" uid="uid://c6hthsb3h2731" path="res://resources/bosses/final_boss_stub.tres" id="19_d2g17"]
+[ext_resource type="Resource" uid="uid://c6hthsb3h2731" path="res://resources/bosses/entropy.tres" id="19_d2g17"]
 [ext_resource type="Resource" uid="uid://yg7leamrvquj" path="res://resources/techniques/chronoparry.tres" id="19_qnn43"]
 [ext_resource type="Resource" uid="uid://c4thhx5mgbves" path="res://resources/techniques/concussive_blow.tres" id="20_d2g17"]
 [ext_resource type="Resource" uid="uid://sxfm5dp2hyac" path="res://resources/techniques/corrosive_ooze.tres" id="21_uq7we"]
@@ -90,8 +90,8 @@
 [ext_resource type="PackedScene" path="res://scenes/battle_panels/game_over_panel.tscn" id="90_gopanel"]
 [ext_resource type="PackedScene" path="res://scenes/battle_panels/begin_combat_panel.tscn" id="91_bcpanel"]
 [ext_resource type="PackedScene" path="res://scenes/battle_panels/stat_upgrade_panel.tscn" id="92_supanel"]
-[ext_resource type="PackedScene" path="res://scenes/battle_panels/bracket_screen.tscn" id="93_bracket"]
-[ext_resource type="PackedScene" path="res://scenes/battle_panels/reward_select_panel.tscn" id="94_rspanel"]
+[ext_resource type="PackedScene" uid="uid://c7a6jfq72cfpj" path="res://scenes/battle_panels/bracket_screen.tscn" id="93_bracket"]
+[ext_resource type="PackedScene" uid="uid://bbal7cj524poc" path="res://scenes/battle_panels/reward_select_panel.tscn" id="94_rspanel"]
 
 [sub_resource type="Theme" id="Theme_n6c5v"]
 default_font = ExtResource("82_d2g17")
