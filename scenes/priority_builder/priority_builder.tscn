@@ -27,10 +27,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 44.0
-offset_right = -8.0
-offset_bottom = -48.0
+offset_left = 10
+offset_top = 55
+offset_right = -10
+offset_bottom = -60
 mouse_filter = 2
 script = ExtResource("4_ir8ym")
 
@@ -39,14 +39,14 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 54.0
-offset_bottom = -56.0
+offset_top = 68
+offset_bottom = -70
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="LeftColumn" type="Control" parent="Columns" unique_id=2072791816]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(375, 0)
 layout_mode = 2
 
 [node name="FamiliarCard" type="Control" parent="Columns/LeftColumn" unique_id=224433296]
@@ -68,10 +68,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 13
+offset_top = 13
+offset_right = -13
+offset_bottom = -13
 
 [node name="Scroll" type="ScrollContainer" parent="Columns/LeftColumn/FamiliarCard/Content" unique_id=1296341558]
 layout_mode = 1
@@ -91,11 +91,11 @@ layout_mode = 2
 [node name="NameLabel" type="Label" parent="Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows" unique_id=365889528]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 25
 text = "Familiar"
 
 [node name="PortraitFrame" type="Control" parent="Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows" unique_id=1981453499]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 113)
 layout_mode = 2
 
 [node name="Background" type="ColorRect" parent="Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows/PortraitFrame" unique_id=1969339385]
@@ -114,14 +114,14 @@ anchor_bottom = 1.0
 mouse_filter = 2
 
 [node name="Portrait" type="TextureRect" parent="Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows/PortraitFrame/Center" unique_id=2094062844]
-custom_minimum_size = Vector2(76, 76)
+custom_minimum_size = Vector2(95, 95)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="StatList" type="VBoxContainer" parent="Columns/LeftColumn/FamiliarCard/Content/Scroll/FamiliarPanel/Rows" unique_id=871519487]
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 3
 
 [node name="TechniquesCard" type="Control" parent="Columns/LeftColumn" unique_id=886571577]
 layout_mode = 1
@@ -140,15 +140,15 @@ border_color = Color(1, 0.714, 0.282, 1)
 header_text = "TECHNIQUES"
 
 [node name="Content" type="VBoxContainer" parent="Columns/LeftColumn/TechniquesCard" unique_id=807309529]
-custom_minimum_size = Vector2(260, 0)
+custom_minimum_size = Vector2(325, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 13
+offset_top = 13
+offset_right = -13
+offset_bottom = -13
 
 [node name="TechniqueScroll" type="ScrollContainer" parent="Columns/LeftColumn/TechniquesCard/Content" unique_id=1115238117]
 layout_mode = 2
@@ -180,10 +180,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 13
+offset_top = 13
+offset_right = -13
+offset_bottom = -13
 
 [node name="PassiveScroll" type="ScrollContainer" parent="Columns/LeftColumn/PassivesCard/Content" unique_id=202427317]
 layout_mode = 1
@@ -216,10 +216,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 13
+offset_top = 13
+offset_right = -13
+offset_bottom = -13
 size_flags_horizontal = 3
 
 [node name="BuildScroll" type="ScrollContainer" parent="Columns/BuildColumn/Content" unique_id=281569208]
@@ -231,18 +231,18 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 script = ExtResource("3_seglist")
 
 [node name="RightColumn" type="Control" parent="Columns" unique_id=1704060519]
-custom_minimum_size = Vector2(362, 0)
+custom_minimum_size = Vector2(453, 0)
 layout_mode = 2
 
 [node name="ConditionsCard" type="Control" parent="Columns/RightColumn" unique_id=876491888]
 layout_mode = 1
 anchor_right = 1.0
 anchor_bottom = 0.46
-offset_bottom = 89.51999
+offset_bottom = 112
 
 [node name="Background" type="Control" parent="Columns/RightColumn/ConditionsCard" unique_id=466686414]
 layout_mode = 1
@@ -255,15 +255,15 @@ border_color = Color(1, 0.714, 0.282, 1)
 header_text = "CONDITIONS PALETTE"
 
 [node name="Content" type="VBoxContainer" parent="Columns/RightColumn/ConditionsCard" unique_id=1892121245]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 13
+offset_top = 13
+offset_right = -13
+offset_bottom = -13
 
 [node name="ConditionScroll" type="ScrollContainer" parent="Columns/RightColumn/ConditionsCard/Content" unique_id=1983763367]
 layout_mode = 2
@@ -280,7 +280,7 @@ layout_mode = 1
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 83.0
+offset_top = 104
 
 [node name="Background" type="Control" parent="Columns/RightColumn/MockStateCard" unique_id=1322835130]
 layout_mode = 1
@@ -297,10 +297,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 13
+offset_top = 13
+offset_right = -13
+offset_bottom = -13
 
 [node name="Scroll" type="ScrollContainer" parent="Columns/RightColumn/MockStateCard/Content" unique_id=1273925044]
 layout_mode = 1
@@ -331,11 +331,11 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -43.0
-offset_bottom = -5.0
+offset_top = -54
+offset_bottom = -6
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 12
+theme_override_constants/separation = 15
 alignment = 1
 
 [node name="AddSlotButton" type="Button" parent="Footer" unique_id=751606923]
@@ -343,6 +343,6 @@ layout_mode = 2
 text = "✚ Add slot"
 
 [node name="ConfirmButton" type="Button" parent="Footer" unique_id=966138334]
-custom_minimum_size = Vector2(220, 0)
+custom_minimum_size = Vector2(275, 0)
 layout_mode = 2
 text = "Confirm Priorities"

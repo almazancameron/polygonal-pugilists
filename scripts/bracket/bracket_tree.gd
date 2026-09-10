@@ -37,19 +37,19 @@ const ROUND_COUNT: int = 4
 ## is hidden, shrinks it back when DetailPanel reappears), so the tree
 ## always fills its space exactly rather than sitting at a fixed pixel
 ## size inside a scroll view.
-const LEAF_WIDTH: float = 150.0
-const LEAF_HEIGHT: float = 38.0
-const LEAF_GAP: float = 12.0
-const CONNECTOR_SIZE: float = 44.0
+const LEAF_WIDTH: float = 180.0
+const LEAF_HEIGHT: float = 72.0
+const LEAF_GAP: float = 4.0
+const CONNECTOR_SIZE: float = 72.0
 const FINAL_SIZE: float = 64.0
-const COLUMN_GAP: float = 26.0
-const SPRITE_SIZE: float = 22.0
+const COLUMN_GAP: float = 16.0
+const SPRITE_SIZE: float = 64.0
 const LINE_WIDTH: float = 2.0
 
 ## Fixed (not scaled) -- a small, constant breathing room above the
 ## topmost and below the bottommost leaf row, so they don't sit flush
 ## against the panel's own edge or get clipped by it.
-const VERTICAL_PADDING: float = 32.0
+const VERTICAL_PADDING: float = 8.0
 
 ## How far the Final box sits above true vertical center, as a fraction of
 ## the distance from center to the very top of the padded content area --
@@ -355,6 +355,7 @@ func _maybe_build_entrant_card(familiar: Familiar, global_leaf: int) -> void:
 	var panel := Panel.new()
 	panel.position = rect.position
 	panel.size = rect.size
+	panel.clip_contents = true
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	panel.mouse_entered.connect(func() -> void: entrant_hovered.emit(familiar, panel))
 	panel.mouse_exited.connect(func() -> void: entrant_unhovered.emit(panel))
@@ -366,12 +367,13 @@ func _maybe_build_entrant_card(familiar: Familiar, global_leaf: int) -> void:
 	_entrant_panels[familiar] = panel
 	_style_leaf_panel(panel, familiar)
 
-	var card_sprite_size: float = min(rect.size.y * (SPRITE_SIZE / LEAF_HEIGHT), rect.size.y - 4.0)
+	var card_sprite_size: float = minf(SPRITE_SIZE, minf(rect.size.y * (SPRITE_SIZE / LEAF_HEIGHT), rect.size.y - 8.0))
 
 	var sprite := TextureRect.new()
 	sprite.texture = familiar.sprite
+	sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	sprite.position = Vector2(6, (rect.size.y - card_sprite_size) / 2.0)
+	sprite.position = Vector2(8, (rect.size.y - card_sprite_size) / 2.0)
 	sprite.size = Vector2(card_sprite_size, card_sprite_size)
 	sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(sprite)
@@ -379,17 +381,17 @@ func _maybe_build_entrant_card(familiar: Familiar, global_leaf: int) -> void:
 	var seed_label := Label.new()
 	seed_label.text = str(global_leaf + 1)
 	seed_label.add_theme_color_override("font_color", Palette.ENEMY_ACCENT)
-	seed_label.add_theme_font_size_override("font_size", 12)
-	seed_label.position = Vector2(4, 2)
+	seed_label.add_theme_font_size_override("font_size", 15)
+	seed_label.position = Vector2(5, 3)
 	seed_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(seed_label)
 
-	var text_x: float = card_sprite_size + 12
-	var text_width: float = rect.size.x - card_sprite_size - 16
+	var text_x: float = card_sprite_size + 15
+	var text_width: float = rect.size.x - card_sprite_size - 20
 
 	var name_label := Label.new()
 	name_label.text = familiar.familiar_name
-	name_label.add_theme_font_size_override("font_size", 14)
+	name_label.add_theme_font_size_override("font_size", 18)
 	name_label.position = Vector2(text_x, 0)
 	name_label.size = Vector2(text_width, rect.size.y * 0.55)
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -401,7 +403,7 @@ func _maybe_build_entrant_card(familiar: Familiar, global_leaf: int) -> void:
 	if odds_text != "":
 		var odds_label := Label.new()
 		odds_label.text = odds_text
-		odds_label.add_theme_font_size_override("font_size", 10)
+		odds_label.add_theme_font_size_override("font_size", 13)
 		odds_label.add_theme_color_override("font_color", BracketOdds.label_color(odds_text))
 		odds_label.position = Vector2(text_x, rect.size.y * 0.5)
 		odds_label.size = Vector2(text_width, rect.size.y * 0.5)
@@ -560,7 +562,7 @@ func _draw_small_sprite_box(familiar: Familiar, box_rect: Rect2, show_x: bool) -
 	if familiar == null:
 		return
 
-	var bounds_size: float = min(box_rect.size.x, box_rect.size.y) - 8.0
+	var bounds_size: float = minf(SPRITE_SIZE, maxf(minf(box_rect.size.x, box_rect.size.y) - 8.0, 0.0))
 	var bounds_rect := Rect2(box_rect.get_center() - Vector2.ONE * bounds_size / 2.0, Vector2.ONE * bounds_size)
 
 	var sprite_rect: Rect2 = bounds_rect

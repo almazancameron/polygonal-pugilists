@@ -4,20 +4,20 @@
 [ext_resource type="Script" path="res://scripts/priority_builder/drop_zone.gd" id="2_dzone"]
 
 [node name="RuleSegment" type="PanelContainer"]
-offset_right = 420.0
-offset_bottom = 120.0
+offset_right = 525
+offset_bottom = 150
 mouse_filter = 0
 script = ExtResource("1_rseg")
 
 [node name="Rows" type="VBoxContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="Header" type="HBoxContainer" parent="Rows"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="Handle" type="Label" parent="Rows/Header"]
 layout_mode = 2
@@ -28,7 +28,7 @@ text = "  ≡  "
 [node name="IndexLabel" type="Label" parent="Rows/Header"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 28
 text = "1"
 
 [node name="VerdictLabel" type="Label" parent="Rows/Header"]
@@ -39,7 +39,7 @@ clip_text = true
 mouse_filter = 2
 
 [node name="DeleteButton" type="Button" parent="Rows/Header"]
-custom_minimum_size = Vector2(28, 28)
+custom_minimum_size = Vector2(35, 35)
 layout_mode = 2
 size_flags_vertical = 4
 text = "×"
@@ -47,7 +47,7 @@ text = "×"
 [node name="ConditionBody" type="VBoxContainer" parent="Rows"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 5
 script = ExtResource("2_dzone")
 empty_text = "drop conditions here"
 empty_height = 30.0

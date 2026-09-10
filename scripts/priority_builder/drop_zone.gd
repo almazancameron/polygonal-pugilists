@@ -18,14 +18,14 @@ extends VBoxContainer
 		if _placeholder != null:
 			_placeholder.text = value
 
-@export var empty_height: float = 30.0:
+@export var empty_height: float = 38.0:
 	set(value):
 		empty_height = value
 		custom_minimum_size.y = value
 
 @export var fill_color: Color = Color(1, 1, 1, 0.04)
 @export var border_color: Color = Color(1, 1, 1, 0.28)
-@export var dash_length: float = 5.0
+@export var dash_length: float = 6.0
 
 var _placeholder: Label
 

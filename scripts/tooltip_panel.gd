@@ -16,7 +16,7 @@ signal close_requested
 ## border, which PanelContainer's own panel-style margin can't provide
 ## since it insets every direct child (Background included) by the same
 ## amount rather than padding Content relative to Background.
-const TEXT_INSET: float = 6.0
+const TEXT_INSET: float = 8.0
 
 var pinned: bool = false
 

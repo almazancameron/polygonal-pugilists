@@ -23,7 +23,7 @@ extends Control
 
 const TOOLTIP_PANEL_SCENE: PackedScene = preload("res://scenes/tooltip_panel.tscn")
 const HOVER_DELAY: float = 0.2
-const CURSOR_OFFSET: Vector2 = Vector2(16, 16)
+const CURSOR_OFFSET: Vector2 = Vector2(20, 20)
 
 ## How far the cursor can drift from where a RichTextLabel link's hover
 ## began before _catch_exited_active_tooltips() treats it as "left the
@@ -33,7 +33,7 @@ const CURSOR_OFFSET: Vector2 = Vector2(16, 16)
 ## Regeneration/Retaliation/Infestation) after live feedback that 90 felt
 ## too loose -- the cursor doesn't need to physically leave the link's
 ## rendered word before the tooltip should give up.
-const LINK_DRIFT_TOLERANCE: float = 40.0
+const LINK_DRIFT_TOLERANCE: float = 50.0
 
 var _hover_timer: Timer
 

@@ -206,12 +206,12 @@ func _refresh_stats() -> void:
 			continue
 
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 6)
+		row.add_theme_constant_override("separation", 8)
 		stat_list.add_child(row)
 
 		var icon := TextureRect.new()
 		icon.texture = Familiar.stat_icon(stat)
-		icon.custom_minimum_size = Vector2(16, 16)
+		icon.custom_minimum_size = Vector2(20, 20)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 		icon.modulate = Palette.TEXT_MUTED
 		row.add_child(icon)
@@ -233,12 +233,12 @@ func _refresh_stats() -> void:
 ## avoid displaying it twice.
 func _add_max_hp_row() -> void:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
+	row.add_theme_constant_override("separation", 8)
 	stat_list.add_child(row)
 
 	var icon := TextureRect.new()
 	icon.texture = Familiar.stat_icon(Familiar.Stat.MAX_HP)
-	icon.custom_minimum_size = Vector2(16, 16)
+	icon.custom_minimum_size = Vector2(20, 20)
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	icon.modulate = Palette.HP_ICON
 	row.add_child(icon)
@@ -249,7 +249,7 @@ func _add_max_hp_row() -> void:
 	row.add_child(name_label)
 
 	var hp_bar: HPBar = HP_BAR_SCENE.instantiate()
-	hp_bar.custom_minimum_size = Vector2(90, 14)
+	hp_bar.custom_minimum_size = Vector2(113, 18)
 	row.add_child(hp_bar)
 
 	var background_style := StyleBoxFlat.new()

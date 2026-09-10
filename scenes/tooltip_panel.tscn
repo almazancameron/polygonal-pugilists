@@ -11,7 +11,7 @@ content_margin_right = 8.0
 content_margin_bottom = 8.0
 
 [node name="TooltipPanel" type="PanelContainer" unique_id=733801476]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 40)
 theme_override_styles/panel = SubResource("StyleBoxEmpty_u6ryj")
 script = ExtResource("1_5atpf")
 
@@ -25,20 +25,20 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="RichTextLabel" type="RichTextLabel" parent="Content" unique_id=2094315661]
-custom_minimum_size = Vector2(350, 0)
+custom_minimum_size = Vector2(438, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = 6.0
-offset_right = -6.0
-offset_bottom = -6.0
+offset_left = 8
+offset_top = 8
+offset_right = -8
+offset_bottom = -8
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 theme_override_fonts/bold_font = ExtResource("3_mkpxh")
-theme_override_font_sizes/bold_font_size = 16
+theme_override_font_sizes/bold_font_size = 20
 bbcode_enabled = true
 text = "EXAMPLE"
 fit_content = true
@@ -50,9 +50,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -20.0
-offset_top = 2.0
-offset_right = -2.0
-offset_bottom = 18.0
+offset_left = -25
+offset_top = 3
+offset_right = -3
+offset_bottom = 23
 grow_horizontal = 0
 text = "×"

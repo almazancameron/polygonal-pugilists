@@ -97,12 +97,12 @@ func _populate_fighter_card(familiar: Familiar, name_label_ref: Label, portrait_
 		child.queue_free()
 
 	var hp_row := HBoxContainer.new()
-	hp_row.add_theme_constant_override("separation", 8)
+	hp_row.add_theme_constant_override("separation", 10)
 	stat_list_ref.add_child(hp_row)
 
 	var hp_icon := TextureRect.new()
 	hp_icon.texture = Familiar.stat_icon(Familiar.Stat.MAX_HP)
-	hp_icon.custom_minimum_size = Vector2(24, 24)
+	hp_icon.custom_minimum_size = Vector2(30, 30)
 	hp_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	hp_icon.modulate = Palette.HP_ICON
 	hp_row.add_child(hp_icon)
@@ -110,11 +110,11 @@ func _populate_fighter_card(familiar: Familiar, name_label_ref: Label, portrait_
 	var hp_name_label := Label.new()
 	hp_name_label.text = Familiar.stat_name(Familiar.Stat.MAX_HP)
 	hp_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hp_name_label.add_theme_font_size_override("font_size", 22)
+	hp_name_label.add_theme_font_size_override("font_size", 28)
 	hp_row.add_child(hp_name_label)
 
 	var hp_bar: HPBar = PREFIGHT_HP_BAR_SCENE.instantiate()
-	hp_bar.custom_minimum_size = Vector2(110, 24)
+	hp_bar.custom_minimum_size = Vector2(138, 30)
 	hp_row.add_child(hp_bar)
 
 	var background_style := StyleBoxFlat.new()
@@ -131,12 +131,12 @@ func _populate_fighter_card(familiar: Familiar, name_label_ref: Label, portrait_
 			continue
 
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
+		row.add_theme_constant_override("separation", 10)
 		stat_list_ref.add_child(row)
 
 		var icon := TextureRect.new()
 		icon.texture = Familiar.stat_icon(stat)
-		icon.custom_minimum_size = Vector2(24, 24)
+		icon.custom_minimum_size = Vector2(30, 30)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 		icon.modulate = Palette.TEXT_MUTED
 		row.add_child(icon)
@@ -144,10 +144,10 @@ func _populate_fighter_card(familiar: Familiar, name_label_ref: Label, portrait_
 		var row_name_label := Label.new()
 		row_name_label.text = Familiar.stat_name(stat)
 		row_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row_name_label.add_theme_font_size_override("font_size", 22)
+		row_name_label.add_theme_font_size_override("font_size", 28)
 		row.add_child(row_name_label)
 
 		var value_label := Label.new()
 		value_label.text = str(familiar.get_stat(stat))
-		value_label.add_theme_font_size_override("font_size", 22)
+		value_label.add_theme_font_size_override("font_size", 28)
 		row.add_child(value_label)

@@ -7,10 +7,10 @@ script = ExtResource("1_row")
 
 [node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 13
 
 [node name="Icon" type="TextureRect" parent="Row"]
-custom_minimum_size = Vector2(28, 28)
+custom_minimum_size = Vector2(35, 35)
 layout_mode = 2
 stretch_mode = 5
 

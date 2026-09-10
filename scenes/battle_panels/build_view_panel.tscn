@@ -7,10 +7,10 @@
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 16.0
-offset_top = 40.0
-offset_right = -16.0
-offset_bottom = 620.0
+offset_left = 20
+offset_top = 50
+offset_right = -20
+offset_bottom = 775
 grow_horizontal = 2
 script = ExtResource("1_bvpanel")
 
@@ -30,16 +30,16 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 44.0
-offset_right = -16.0
-offset_bottom = -12.0
+offset_left = 20
+offset_top = 55
+offset_right = -20
+offset_bottom = -15
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
 [node name="FamiliarCard" type="Control" parent="Content" unique_id=787209747]
-custom_minimum_size = Vector2(340, 0)
+custom_minimum_size = Vector2(425, 0)
 layout_mode = 2
 
 [node name="Background" type="Control" parent="Content/FamiliarCard" unique_id=1687572517]
@@ -58,23 +58,23 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 8.0
-offset_right = -10.0
-offset_bottom = -8.0
+offset_left = 13
+offset_top = 10
+offset_right = -13
+offset_bottom = -10
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="NameLabel" type="Label" parent="Content/FamiliarCard/Content" unique_id=531170224]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
 [node name="PortraitFrame" type="Control" parent="Content/FamiliarCard/Content" unique_id=1361664261]
-custom_minimum_size = Vector2(150, 150)
+custom_minimum_size = Vector2(188, 188)
 layout_mode = 2
 size_flags_horizontal = 4
 
@@ -96,13 +96,13 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Portrait" type="TextureRect" parent="Content/FamiliarCard/Content/PortraitFrame/Center" unique_id=1917414197]
-custom_minimum_size = Vector2(124, 124)
+custom_minimum_size = Vector2(155, 155)
 layout_mode = 2
 stretch_mode = 5
 
 [node name="StatList" type="VBoxContainer" parent="Content/FamiliarCard/Content" unique_id=1569517974]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="RightColumn" type="Control" parent="Content" unique_id=54562755]
 layout_mode = 2
@@ -129,13 +129,13 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 8.0
-offset_right = -10.0
-offset_bottom = -8.0
+offset_left = 13
+offset_top = 10
+offset_right = -13
+offset_bottom = -10
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="PassivesCard" type="Control" parent="Content/RightColumn" unique_id=587593194]
 layout_mode = 1
@@ -159,23 +159,23 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 8.0
-offset_right = -10.0
-offset_bottom = -8.0
+offset_left = 13
+offset_top = 10
+offset_right = -13
+offset_bottom = -10
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="CloseButton" type="Button" parent="." unique_id=1019846162]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -40.0
-offset_top = 6.0
-offset_right = -8.0
-offset_bottom = 38.0
+offset_left = -50
+offset_top = 8
+offset_right = -10
+offset_bottom = 48
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 28
 text = "×"

@@ -191,7 +191,7 @@ func _add_number(part: SentencePart) -> void:
 	spin.select_all_on_focus = true
 	# Wide enough that the value plus its suffix is not scrolled out of view
 	# when the field loses focus.
-	spin.custom_minimum_size.x = 96.0
+	spin.custom_minimum_size.x = 120.0
 
 	# The condition stores a scaled value; the widget shows the unscaled one
 	# (0.25 stored reads as 25 for a percentage).

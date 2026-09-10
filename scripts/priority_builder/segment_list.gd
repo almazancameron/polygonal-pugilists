@@ -17,7 +17,7 @@ const RULE_SEGMENT_SCENE: PackedScene = preload("res://scenes/priority_builder/r
 ## scrolling, the last rule sits flush against the bottom of the scrollable
 ## content with nothing past it, same tiny-target problem as before, just
 ## inside the scrolled area instead of the empty space beneath it.
-const EDGE_PADDING: float = 12.0
+const EDGE_PADDING: float = 15.0
 
 var _indicator: ColorRect
 var _bottom_spacer: Control

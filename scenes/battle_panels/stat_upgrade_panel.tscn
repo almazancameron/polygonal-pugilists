@@ -7,10 +7,10 @@
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 16.0
-offset_top = 40.0
-offset_right = -16.0
-offset_bottom = 620.0
+offset_left = 20
+offset_top = 50
+offset_right = -20
+offset_bottom = 775
 grow_horizontal = 2
 script = ExtResource("1_supanel")
 
@@ -30,16 +30,16 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 12.0
-offset_right = -16.0
-offset_bottom = -12.0
+offset_left = 20
+offset_top = 15
+offset_right = -20
+offset_bottom = -15
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
 [node name="LeftColumn" type="Control" parent="Content" unique_id=739744560]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(375, 0)
 layout_mode = 2
 
 [node name="Background" type="Control" parent="Content/LeftColumn" unique_id=1009029535]
@@ -58,23 +58,23 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 8.0
-offset_right = -10.0
-offset_bottom = -8.0
+offset_left = 13
+offset_top = 10
+offset_right = -13
+offset_bottom = -10
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="NameLabel" type="Label" parent="Content/LeftColumn/Content" unique_id=1697003142]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.91, 0.329, 0.18, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
 [node name="PortraitFrame" type="Control" parent="Content/LeftColumn/Content" unique_id=1071814277]
-custom_minimum_size = Vector2(150, 150)
+custom_minimum_size = Vector2(188, 188)
 layout_mode = 2
 size_flags_horizontal = 4
 
@@ -96,30 +96,30 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Portrait" type="TextureRect" parent="Content/LeftColumn/Content/PortraitFrame/Center" unique_id=1600571055]
-custom_minimum_size = Vector2(124, 124)
+custom_minimum_size = Vector2(155, 155)
 layout_mode = 2
 stretch_mode = 5
 
 [node name="StatList" type="VBoxContainer" parent="Content/LeftColumn/Content" unique_id=1933562268]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="CenterColumn" type="VBoxContainer" parent="Content" unique_id=516832897]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 13
 
 [node name="HeaderLabel" type="Label" parent="Content/CenterColumn" unique_id=855118998]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.714, 0.282, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 28
 text = "1 stat upgrade to apply"
 horizontal_alignment = 1
 
 [node name="RowsContainer" type="VBoxContainer" parent="Content/CenterColumn" unique_id=813407388]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="ConfirmButton" type="Button" parent="Content/CenterColumn" unique_id=439118741]
 layout_mode = 2
@@ -128,7 +128,7 @@ disabled = true
 text = "Confirm Upgrades"
 
 [node name="RightColumn" type="Control" parent="Content" unique_id=1280376589]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(375, 0)
 layout_mode = 2
 
 [node name="TechniquesCard" type="Control" parent="Content/RightColumn" unique_id=146841310]
@@ -152,13 +152,13 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 8.0
-offset_right = -10.0
-offset_bottom = -8.0
+offset_left = 13
+offset_top = 10
+offset_right = -13
+offset_bottom = -10
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="PassivesCard" type="Control" parent="Content/RightColumn" unique_id=1395503589]
 layout_mode = 1
@@ -182,10 +182,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 8.0
-offset_right = -10.0
-offset_bottom = -8.0
+offset_left = 13
+offset_top = 10
+offset_right = -13
+offset_bottom = -10
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8

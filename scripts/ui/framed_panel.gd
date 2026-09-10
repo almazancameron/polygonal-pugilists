@@ -14,13 +14,13 @@ extends Control
 ## nodes, not a rewrite of the screens that use it.
 
 const BORDER_WIDTH: float = 2.0
-const CORNER_CUT: float = 10.0
-const RIVET_SIZE: float = 7.0
+const CORNER_CUT: float = 13.0
+const RIVET_SIZE: float = 9.0
 const RIVET_CORNER_RADIUS: int = 2
 const RIVET_OFFSET: float = CORNER_CUT / 2.0
-const HEADER_HEIGHT: float = 22.0
-const HEADER_TAB_PADDING: float = 12.0
-const HEADER_TEXT_INSET: float = 8.0
+const HEADER_HEIGHT: float = 28.0
+const HEADER_TAB_PADDING: float = 15.0
+const HEADER_TEXT_INSET: float = 10.0
 
 @export var border_color: Color = Palette.PANEL_BORDER:
 	set(value):

@@ -126,7 +126,7 @@ func _populate_winner_card(player: Combatant) -> void:
 		child.queue_free()
 
 	var hp_bar: HPBar = WINNER_HP_BAR_SCENE.instantiate()
-	hp_bar.custom_minimum_size = Vector2(0, 24)
+	hp_bar.custom_minimum_size = Vector2(0, 30)
 	hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	# Appended after the scene's static PortraitFrame -- sprite on the

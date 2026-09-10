@@ -163,6 +163,7 @@ var phase: Phase = Phase.PLAYER_TURN
 var engine: BattleEngine
 
 func _ready() -> void:
+	get_window().min_size = Vector2i(1440, 810)
 	player_status_row.tooltip_layer = tooltip_layer
 	enemy_status_row.tooltip_layer = tooltip_layer
 

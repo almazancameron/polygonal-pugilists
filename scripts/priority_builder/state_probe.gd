@@ -326,7 +326,7 @@ func _build_side_display(into: VBoxContainer, label_text: String, editable_max_h
 		var max_hp_spin := SpinBox.new()
 		max_hp_spin.min_value = 1
 		max_hp_spin.max_value = 999
-		max_hp_spin.custom_minimum_size = Vector2(72, 0)
+		max_hp_spin.custom_minimum_size = Vector2(90, 0)
 		max_hp_spin.value = _dummy_familiar.max_hp
 		max_hp_spin.value_changed.connect(_on_dummy_max_hp_changed)
 		name_row.add_child(max_hp_spin)

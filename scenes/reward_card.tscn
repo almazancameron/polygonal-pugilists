@@ -4,7 +4,7 @@
 [ext_resource type="FontVariation" path="res://assets/fonts/yoster_bold.tres" id="2_b5dx5"]
 
 [node name="RewardCard" type="Button" unique_id=1679984179]
-custom_minimum_size = Vector2(180, 160)
+custom_minimum_size = Vector2(225, 200)
 size_flags_vertical = 3
 toggle_mode = true
 script = ExtResource("1_card")
@@ -25,7 +25,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="IconArea" type="ColorRect" parent="Content" unique_id=933603122]
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 mouse_filter = 2
 color = Color(0.3, 0.3, 0.3, 1)
@@ -35,7 +35,7 @@ layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
 theme_override_fonts/bold_font = ExtResource("2_b5dx5")
-theme_override_font_sizes/bold_font_size = 16
+theme_override_font_sizes/bold_font_size = 20
 bbcode_enabled = true
 scroll_active = false
 horizontal_alignment = 1
