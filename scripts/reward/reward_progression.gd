@@ -13,12 +13,10 @@ const CADENCE: Array[RewardKind] = [
 	RewardKind.TECHNIQUE, RewardKind.PASSIVE, RewardKind.TECHNIQUE, RewardKind.PASSIVE_TRADE,
 ]
 
-## round_completed is 1-indexed (battle_controller.gd's current_round,
-## read right after it increments in start_next_round() -- "how many
-## rounds have been completed so far"). Past the authored cadence,
-## returns NONE explicitly -- prize-fight/extra-round rewards are a
-## separate, not-yet-decided future task, not something this silently
-## improvises by repeating or wrapping the cadence.
+## round_completed counts completed rounds from 1, not the zero-based
+## bracket position. The controller passes current_round after advancing to
+## the next bracket round, or 4 at the pre-boss reward transition while
+## current_round remains 3. Values outside CADENCE return NONE.
 static func kind_for_round(round_completed: int) -> RewardKind:
 	if round_completed >= 1 and round_completed <= CADENCE.size():
 		return CADENCE[round_completed - 1]

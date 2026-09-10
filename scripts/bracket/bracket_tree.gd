@@ -66,15 +66,15 @@ var _bracket: Bracket
 var _selected: Familiar
 
 ## familiar_name -> BracketOdds label String, as computed by
-## BracketScreen._record_odds() -- read here only to color/label each leaf
+## BracketScreen._record_odds() -- read here only to color/label each live
 ## card's own odds line, never mutated.
 var _odds_by_name: Dictionary = {}
 
-## Familiar -> Panel, only for currently-drawn (still-alive) leaf cards.
+## Familiar -> Panel for each currently drawn live entrant card, at any tier.
 var _entrant_panels: Dictionary = {}
 
 ## "leaf_<i>" / "match_<round>_<index>" -> Rect2, populated by
-## _compute_layout(), read by both _build_leaf_cards() (round 0's leaves)
+## _compute_layout(), read by both _build_leaf_cards() (live entrant cards)
 ## and _draw() (connector lines/boxes, every round).
 var _box_rects: Dictionary = {}
 
@@ -99,7 +99,7 @@ func setup(bracket: Bracket, selected: Familiar = null, odds_by_name: Dictionary
 	_relayout()
 
 ## Recomputes the whole layout against this control's current size and
-## rebuilds every leaf card -- called on setup() and whenever the parent
+## rebuilds every live entrant card -- called on setup() and whenever the parent
 ## Container resizes us (DetailPanel showing/hiding). A no-op if we don't
 ## have a real size yet (e.g. one frame before the parent Container has
 ## laid out): resized will fire again once we do.
@@ -145,31 +145,17 @@ func _local_y(round_index: int, local_index: int) -> float:
 func _leaf_local_y(local_index: int) -> float:
 	return local_index * (_leaf_height + _leaf_gap) + _leaf_height / 2.0
 
-## Reference half-width used only to calibrate the horizontal scale
-## factor (size.x / (this * 2)) -- exactly one column per half is ever
-## "big" (leaf-width) at a time, the rest are "small" (connector-width,
-## or final-width for an undecided Final): see _compute_layout()'s column
-## widths. This reference assumes the Leaf column is the big one (round 0
-## not yet decided), but the total is the same regardless of WHICH single
-## column is big, since a small column is always replaced one-for-one by
-## another small column elsewhere -- the only exception is once the
-## champion is crowned (Final becomes big and every other column is
-## small, including Leaf, whose usual "small" alternative -- connector
-## width -- happens to be narrower than Final's own "small" alternative,
-## undecided-"?" final-width, so the total very slightly undershoots at
-## that final stage; harmless, and never the overflow direction).
-##
-## The Final's own width is counted once, not per half -- it's the one
-## shared column sitting at the center, not mirrored left and right the
-## way every other column is.
+## Reference total width used by scale_x = size.x / _reference_total_width().
+## Includes both mirrored halves and the shared Final once. This calibrates
+## the initial leaf-card layout; _compute_layout() assigns full card widths
+## to the active tier and small box widths to the others.
 func _reference_total_width() -> float:
 	var half_to_final: float = LEAF_WIDTH + COLUMN_GAP
 	for _r in range(ROUND_COUNT - 1):
 		half_to_final += CONNECTOR_SIZE + COLUMN_GAP
 	return half_to_final * 2.0 + FINAL_SIZE
 
-## Which connector column (0..ROUND_COUNT-1, matching gap_widths'/
-## left_col_x's own indexing where ROUND_COUNT-1 means the Final) is
+## Which connector tier (0..ROUND_COUNT-1, with the last being the Final) is
 ## currently hosting the live, leaf-width cards -- -1 if round 0 isn't
 ## even fully decided yet, meaning every still-alive entrant is still at
 ## leaf level. Every still-alive entrant advances together (a whole round
@@ -309,7 +295,7 @@ func _compute_layout() -> void:
 func _match_key(round_index: int, match_index: int) -> String:
 	return "match_%d_%d" % [round_index, match_index]
 
-## ---- Leaf cards (the only interactive/child-node part of this control;
+## ---- Live entrant cards (the interactive child nodes at the active tier;
 ## everything else is drawn directly in _draw()) ----
 
 func _build_leaf_cards() -> void:
@@ -361,12 +347,9 @@ func _maybe_build_entrant_card(familiar: Familiar, global_leaf: int) -> void:
 	if slot_key == "":
 		return
 
-	# _compute_layout() already sizes whichever slot is currently "live"
-	# (see _live_connector_tier()) at leaf-width/leaf-height, precisely
-	# because this is the one card allowed to be full-sized -- every
-	# still-alive entrant advances in lockstep (a whole round resolves as
-	# one batch), so there's only ever one live slot at a time, and its
-	# box_rect is already exactly right; nothing to recompute here.
+	# _compute_layout() sizes every live card in the active tier at full card
+	# dimensions. There can be many live cards in that tier; this entrant's
+	# box_rect already has the required size and position.
 	var rect: Rect2 = _box_rects[slot_key]
 
 	var panel := Panel.new()
@@ -449,9 +432,7 @@ func _is_player_familiar(familiar: Familiar) -> bool:
 				return true
 	return false
 
-## ---- Connector nodes and connecting lines (purely decorative -- no
-## per-node interactivity, so all drawn directly rather than as children) ----
-
+## ---- Decorative boxes and connecting lines; live cards are child Panels ----
 func _draw() -> void:
 	if _bracket == null:
 		return
@@ -563,7 +544,7 @@ func _draw_question_box(box_rect: Rect2) -> void:
 ## A downgraded slot an entrant has passed through -- their own sprite
 ## alone, crossed out if show_x is true (they lost the match that moved
 ## them past this slot). box_rect is already sized correctly small by
-## _compute_layout() for any slot that isn't the current live one, so
+## _compute_layout() for slots outside the active tier, so
 ## this draws it directly rather than centering an artificially-small box
 ## inside a leftover leaf-sized rect -- which is also why the elbow lines
 ## (drawn separately, from these same box_rects) touch its edges exactly,

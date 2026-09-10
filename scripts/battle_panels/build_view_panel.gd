@@ -47,11 +47,9 @@ func show_for(familiar: Familiar, tooltip_layer: TooltipLayer) -> void:
 	visible = true
 
 
-## Mirrors battle_controller.gd's own _populate_fighter_card() (icon +
-## label + value rows, Max HP shown as an actual HPBar rather than a plain
-## number) -- duplicated here rather than shared, following this
-## codebase's existing convention of duplicating this exact read-only
-## card layout per screen (see that function's own docstring).
+## Panel-local read-only fighter card: icon/label/value rows with an HPBar
+## for max HP. BeginCombatPanel, BuildViewPanel and StatUpgradePanel each
+## retain their own helper to keep their layouts owned by the screen.
 func _populate_fighter_card(familiar: Familiar) -> void:
 	name_label.text = familiar.familiar_name
 	portrait.texture = familiar.sprite

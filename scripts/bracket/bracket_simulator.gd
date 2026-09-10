@@ -4,12 +4,11 @@ extends RefCounted
 ## Plays an off-screen bracket match through the real combat engine, with
 ## no UI and no pacing, and reports how decisively it went.
 ##
-## Using the real engine rather than a stat-comparison approximation is
-## affordable here: a run needs at most 11 off-screen matches total
-## (7 + 3 + 1 + 0 across the four rounds) and balance_test.gd measures a
-## full battle at roughly 7.5ms. The result is deliberately treated as
-## odds rather than a verdict -- see BracketOdds and the design spec.
-
+## Scouting and resolution each call the real engine for eligible off-screen
+## matches. Opening character selection scouts all eight first-round matches
+## before a player is chosen; resolution then simulates the other seven.
+## Later rounds likewise scout and resolve separately. Count these repeated
+## calls when measuring cost, rather than counting each match only once.
 const MAX_TURNS: int = 200
 
 ## Returns {"winner": Familiar, "loser": Familiar, "margin": float,

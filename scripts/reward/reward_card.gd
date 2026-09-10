@@ -1,22 +1,13 @@
 class_name RewardCard
 extends Button
 
-## One of the 3 reward-screen offers. toggle_mode + a shared ButtonGroup
-## (wired in battle_controller.gd) give "select exactly one of three" for
-## free -- the interaction Phase B needs (select, don't apply, confirm
-## separately), which nothing else in this codebase needed before.
+## Reusable offer card for rewards and passive-sacrifice choices.
+## RewardSelectPanel owns selection groups and confirmation; its Skip card
+## uses immediate activation rather than toggle selection.
 ##
-## Wider than palette_block.tscn's single-Label card on purpose: title +
-## icon placeholder + description are all shown on-card (per
-## assets/ui_mockup/reward_mockup.png). No card-level tooltip -- the full
-## description is already visible on the card itself. description_label
-## is a RichTextLabel (not a plain Label) specifically so the
-## [url=...]-wrapped status names describe() produces (see
-## Status.status_link()) render as real links and resolve into nested
-## status tooltips on hover, the same way TooltipPanel's own content
-## already does -- see _on_description_meta_hover_started() below,
-## mirroring tooltip_panel.gd's _on_meta_hover_started() exactly.
-
+## Title and description are visible on the card; setup() hides the unused
+## icon placeholder. RichTextLabel renders describe()'s [url=...] status
+## links for nested tooltips via _on_description_meta_hover_started().
 @onready var content: Control = $Content
 @onready var title_label: Label = $Content/TitleLabel
 @onready var icon_area: ColorRect = $Content/IconArea

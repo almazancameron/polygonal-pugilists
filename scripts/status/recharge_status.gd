@@ -1,11 +1,9 @@
 class_name RechargeStatus
 extends Status
 
-## Status that does nothing except lose a stack every turn on its own.
-## Many techniques apply recharge to the user. Any technique that applies recharge
-## to the user has extremely diminshed effect (if any) if the user is already recharging.
-## Some techniques might also apply recharge to the target as a debuff, but this is less common.
-
+## Countdown marker reduced by stacks_lost_per_tick on upkeep. Authored
+## conditions use its presence or stack count to gate technique effects;
+## the executor does not impose a universal Recharge restriction.
 var stacks_lost_per_tick: int = 1
 
 func status_id() -> StringName:

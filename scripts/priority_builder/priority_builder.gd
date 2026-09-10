@@ -3,10 +3,9 @@ extends Control
 
 ## The priority-rule editor. Playable standalone (builder_familiar/
 ## opponent_familiar assigned via the Inspector, as originally built) and
-## embedded live in battle.tscn, shown once per round from
-## battle_controller.gd's advance_to_priority_editor() -- setup() is what
-## makes the second case possible, since the opponent (and the player's own
-## techniques/priority_rules) change every round, not just once at startup.
+## embedded live in battle.tscn. After the opening fight, the controller's
+## advance_to_priority_editor() loop allows repeated visits before combat.
+## setup() refreshes the editor on each opening with the current builds.
 ##
 ## Produces an Array[PriorityRule] via SegmentList.compile()/compiled_rules();
 ## confirm_requested signals a caller that the player is done.
@@ -28,7 +27,7 @@ const DEFINITION_ORDER: Array[String] = [
 @export var opponent_familiar: Familiar
 
 ## Exported rather than directory-scanned so the palette's order is
-## authored, the same way battle_controller.gd exports available_builds.
+## authored, like the controller's exported roster and reward pools.
 @export var block_definitions: Array[ConditionBlockDefinition] = []
 
 @onready var tooltip_layer: TooltipLayer = $TooltipLayer/TooltipContainer
@@ -89,8 +88,8 @@ func _on_confirm_pressed() -> void:
 ## RuleSegment.load_rule()) so reopening the editor shows what the player
 ## already has, not a blank canvas -- required by GAME_DESIGN.md §9.2 step 4.
 ## Called once from _ready() for the standalone scene, and again by
-## battle_controller.gd every round, since the opponent (and the player's
-## own techniques/priority_rules) both change round to round.
+## battle_controller.gd on each editor opening, including repeat visits in
+## the same round.
 func setup(familiar: Familiar, opponent: Familiar) -> void:
 	builder_familiar = familiar
 	opponent_familiar = opponent
@@ -229,12 +228,9 @@ func _refresh_stats() -> void:
 		value_label.text = str(base) if base == effective else "%d → %d" % [base, effective]
 		row.add_child(value_label)
 
-## No status in this game scales MAX_HP (unlike Power/Defense/Speed/Focus,
-## which Hone/Fortify/Enlarge/Ruin can), so there's no base -> effective
-## case to show here -- just the familiar's own max HP, always full. Same
-## icon+label prefix as the other stat rows, with an actual (small) HPBar
-## standing in for the plain value label -- the heart there is this row's
-## own icon, so the bar's built-in one is hidden to avoid showing two.
+## Shows familiar.max_hp as a full HPBar instead of a plain stat value.
+## The row supplies its own heart icon, so the bar's icon is hidden to
+## avoid displaying it twice.
 func _add_max_hp_row() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)

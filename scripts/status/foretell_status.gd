@@ -1,20 +1,17 @@
 class_name ForetellStatus
 extends Status
 
-## Duration-based status that does nothing per tick. Once its duration
-## reaches 0 -- whether from a normal upkeep tick or from an early reapply
-## -- it fires a burst of damage instead of expiring quietly. Reapplying
-## doesn't refresh or add to the duration; it costs the countdown one extra
-## turn, which can trigger the burst immediately if that was its last turn.
-
-var burst_damage: int = 9  # TODO: tune once there's a real technique using this
+## Countdown that bursts when upkeep or reapplication reduces stacks to zero.
+## Both request a reduction of stacks_lost_per_tick; reapplication accelerates
+## the countdown instead of refreshing or extending it.
+var burst_damage: int = 9
 var stacks_lost_per_tick: int = 1  # also spent by a reapply -- see on_reapply()
 
 func status_id() -> StringName:
 	return &"foretell"
 
-## The newly-applied instance's own stack count is irrelevant -- reapplying
-## always costs exactly one extra turn, handled in on_reapply() instead.
+## Incoming stacks do not extend the countdown. on_reapply() instead requests
+## a reduction of stacks_lost_per_tick through the stack setter.
 func stack_with(_other: Status) -> void:
 	pass
 

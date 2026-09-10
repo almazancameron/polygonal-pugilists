@@ -9,7 +9,8 @@ extends PanelContainer
 ##                    there is never more than one empty slot.
 ##   is_complete() -- runnable. Gates inclusion in the probe.
 ## A slot with conditions but no technique is non-empty AND incomplete: the
-## add button stays disabled, and the probe skips it with a badge.
+## probe skips it with a badge, but it does not itself disable Add Slot.
+## Add stays disabled only while an actually empty slot exists.
 
 signal structure_changed
 signal delete_requested(segment: RuleSegment)

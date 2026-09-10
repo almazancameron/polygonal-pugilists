@@ -22,11 +22,10 @@ extends Resource
 @export var role_sustain: int = 0
 @export var role_control: int = 0
 
-## Deals damage (respecting Defend), heals, and applies each entry in
-## status_effects, all per the hit_count/heal_applications/status_applications
-## counts. Override this entirely for a technique whose control flow doesn't
-## fit that loop shape at all (e.g. one that reaches into priority_rules or
-## turn order).
+## Builds Callables from StepGroups whose ANDed conditions pass, appending
+## each group's ordered actions for each repeat. All gates are checked here,
+## before the caller executes any returned action. Effects and numeric
+## bonuses resolve when the Callables run.
 ## trigger_hooks controls whether this run's hit/status actions cascade into
 ## the action-level ambient triggers (HIT/ATTACK/STATUS_APPLIED, see
 ## apply_hit()/apply_status()) -- true for every real turn (the default an

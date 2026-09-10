@@ -4,12 +4,10 @@ extends RefCounted
 ## Orchestrates one reward-screen "session" for the post-round loop: owns
 ## the RNG instance, the current cadence/pool/snapshot for whichever round
 ## is active, the 3 slots' current candidates, the shared reroll charges,
-## and the stat-allocation state for Phase A. battle_controller.gd stays
-## UI glue only -- it reflects this object's state into visible nodes and
-## calls back into it on every button press; RewardProgression/
-## RewardSelector stay pure and untouched by any of this session state
-## (mirrors how battle_controller.gd already delegates turn/upkeep
-## resolution to BattleEngine rather than owning that logic itself).
+## and the stat-allocation state for Phase A. RewardSelectPanel and
+## StatUpgradePanel own their nodes and button wiring; battle_controller.gd
+## coordinates the screens and commits confirmed upgrades. RewardProgression
+## supplies cadence and RewardSelector handles candidate selection.
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -40,11 +38,7 @@ func begin_stat_phase(points: int) -> void:
 	available_points = points
 	allocated = {}
 
-## +1 only succeeds while points remain; -1 only succeeds while this
-## invocation has actually allocated a point to that stat -- "+ grayed
-## out with no upgrades left, - grayed out until that stat has received
-## one this round." Nothing is written to a Familiar here -- allocation
-## is staged, transient state until confirm_stat_phase().
+## Allocation stays staged here; only confirm_stat_phase() changes a Familiar.
 func try_allocate(stat: Familiar.Stat, delta: int) -> bool:
 	if delta > 0:
 		if available_points <= 0:
@@ -116,7 +110,6 @@ func begin_reward_screen(round_completed: int, familiar: Familiar,
 			_populate_all_slots(familiar, _wrap_passive)
 		RewardProgression.RewardKind.PASSIVE_TRADE:
 			_active_pool = passive_pool
-			# Slots stay empty until resolve_sacrifice() runs.
 		RewardProgression.RewardKind.NONE:
 			pass
 

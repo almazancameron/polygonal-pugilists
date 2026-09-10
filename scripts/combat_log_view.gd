@@ -1,14 +1,13 @@
 class_name CombatLogView
 extends VBoxContainer
 
-## Subscribes to a CombatLog and renders each entry as a colored Label.
-## BattleController never touches this directly -- it only calls
-## CombatLog.add_entry(), which this view happens to be listening for.
-
+## Renders CombatLog.entry_added events as RichTextLabels. The controller
+## configures combatant names between fights and clears the view on restart;
+## new entries arrive through the log signal.
 @onready var combat_log: CombatLog = $"../../CombatLog"
 @onready var scroll_container: ScrollContainer = get_parent() as ScrollContainer
 
-## Set once by battle_controller.gd when each side's familiar is known, so
+## Updated by battle_controller.gd as the matchup changes, so
 ## entries can highlight a combatant's own name in their accent color --
 ## every other word in the line stays plain white regardless of which side
 ## the message is about.
@@ -44,8 +43,8 @@ func _highlight_names(text: String) -> String:
 func _scroll_to_bottom() -> void:
 	scroll_container.scroll_vertical = int(scroll_container.get_v_scroll_bar().max_value)
 
-## Wipes every logged entry -- used when a run restarts, so the new run's
-## log doesn't start out scrolled past the previous run's entries.
+## Queues rendered entry nodes for deletion when the controller restarts the
+## run. CombatLog supplies new entries independently through its signal.
 func clear() -> void:
 	for child in get_children():
 		child.queue_free()

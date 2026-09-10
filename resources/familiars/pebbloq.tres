@@ -7,11 +7,11 @@
 [ext_resource type="Resource" uid="uid://duycjfdo8bcgg" path="res://resources/techniques/timeline_collapse.tres" id="4_collapse"]
 [ext_resource type="Script" uid="uid://ck5xyovqw4lxy" path="res://scripts/priority_rule.gd" id="5_rule"]
 [ext_resource type="Resource" uid="uid://c0evlwj8xdvou" path="res://resources/priority_rules/pebbloq_collapse_rule.tres" id="6_collapse_rule"]
-[ext_resource type="Texture2D" uid="uid://m5py7ninfxc8" path="res://assets/sprites/actors/SpriteSheet2.png" id="7_doeij"]
 [ext_resource type="Resource" uid="uid://c0e863qx0f3bu" path="res://resources/priority_rules/pebbloq_parry_rule.tres" id="7_parry_rule"]
 [ext_resource type="Script" uid="uid://dkagykutrhecb" path="res://scripts/passive/passive_effect.gd" id="8_passive"]
 [ext_resource type="Script" uid="uid://bdxeihwioldya" path="res://scripts/reward/tag_affinity.gd" id="8_v2sdf"]
 [ext_resource type="Resource" uid="uid://dswd16sptfji2" path="res://resources/passives/ancient_sentinel.tres" id="9_sentinel"]
+[ext_resource type="Texture2D" uid="uid://eaphkr5tedxn" path="res://assets/sprites/actors/Sprite-0001.png" id="9_v2sdf"]
 
 [sub_resource type="Resource" id="Resource_v2sdf"]
 script = ExtResource("8_v2sdf")
@@ -32,14 +32,10 @@ weight = 2
 script = ExtResource("8_v2sdf")
 tag = 30
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_jo4ey"]
-atlas = ExtResource("7_doeij")
-region = Rect2(32, 16, 16, 16)
-
 [resource]
 script = ExtResource("1_familiar")
 familiar_name = "Pebbloq"
-sprite = SubResource("AtlasTexture_jo4ey")
+sprite = ExtResource("9_v2sdf")
 max_hp = 55
 defense = 9
 speed = 6

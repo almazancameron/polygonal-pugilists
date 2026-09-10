@@ -1,22 +1,14 @@
 class_name RewardSelector
 extends RefCounted
 
-## Pure weighted candidate selection for the reward screen's three slots
-## (Species/Run/Pivot). Decoupled from Combatant/battle-runtime-state/UI/
-## scene tree -- everything it needs is plain data (a Familiar resource,
-## a BuildSnapshot, a content pool, an RNG), so it's reusable later by an
-## AI-drafting/simulation pass with no scene required. It DOES take a
-## Familiar in directly, which is fine -- Familiar is authored data, not
-## live state, same as everywhere else in this codebase.
+## Weighted selection for Species/Run/Pivot rewards. Reads the current run
+## Familiar, BuildSnapshot, content pool and RNG without mutating the build;
+## no Combatant, UI or scene tree is required.
 ##
-## No filter/fallback ladder: every eligible candidate always gets a
-## weighted-random chance, floored by BASE_WEIGHT so a zero-relevance
-## candidate is never actually unreachable. This is also what makes the
-## system testable/playable before any real tags are authored -- with no
-## tag data, every candidate's weight collapses to roughly the same
-## BASE_WEIGHT, which reads as uniform-random rather than needing an
-## explicit "no tags yet" branch.
-
+## BASE_WEIGHT is the starting weight, not a lower bound. Relevance adjusts
+## it, and MIN_SAFETY_WEIGHT keeps every eligible candidate pickable even
+## when Pivot's overlap penalty pushes it below baseline. With no tag or
+## role contributions, candidates have equal weights within a slot.
 enum RewardSlot { SPECIES, RUN, PIVOT }
 
 ## Tunable per slot independently; equal is just a starting default.
@@ -26,9 +18,8 @@ const BASE_WEIGHT: Dictionary = {
 	RewardSlot.PIVOT: 5.0,
 }
 
-## Guards against a zero/negative draw weight only (Pivot's penalty term
-## can push a relevance bonus negative) -- NOT the baseline-chance
-## mechanism, that's BASE_WEIGHT's job.
+## Positive floor for the final draw weight, including when Pivot's penalty
+## pushes BASE_WEIGHT + relevance below zero.
 const MIN_SAFETY_WEIGHT: float = 0.1
 
 const TAG_REPEAT_WEIGHT: float = 1.0
@@ -105,7 +96,7 @@ static func _pivot_overlap(candidate, familiar: Familiar, snapshot: BuildSnapsho
 ## BASE_WEIGHT[PIVOT] -- still pickable, doesn't dominate); overlap near
 ## PIVOT_PEAK gives the highest bonus ("a little relevant, a little
 ## strange"); overlap climbing well past that goes negative, pulling a
-## heavily-on-theme candidate's Pivot weight back down toward baseline --
+## heavily-on-theme candidate's Pivot weight down, potentially below baseline --
 ## "just another on-theme pick," not novel.
 static func _pivot_relevance(overlap: float) -> float:
 	return PIVOT_BONUS * min(overlap, PIVOT_PEAK) - PIVOT_PENALTY * max(0.0, overlap - PIVOT_PEAK)

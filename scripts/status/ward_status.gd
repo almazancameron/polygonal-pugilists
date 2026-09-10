@@ -1,10 +1,9 @@
 class_name WardStatus
 extends Status
 
-## Absorbs incoming status effects, preventing them from being applied to the combatant.
-## Ward prevents both negative and beneficial effects, allowing it to be used offensively or
-## defensively. A stack is consumed for each stack of status that would be applied.
-
+## Combatant.add_status() consumes Ward one-for-one against externally
+## applied status stacks, whether beneficial or negative. Self-applications
+## and incoming Ward bypass this interception.
 func status_id() -> StringName:
     return &"ward"
 

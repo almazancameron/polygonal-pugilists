@@ -85,10 +85,9 @@ func _refresh_rows() -> void:
 	]
 
 
-## Mirrors battle_controller.gd's own _populate_fighter_card() -- duplicated
-## here rather than shared, following this codebase's existing convention
-## for this exact read-only card layout (see BuildViewPanel/BeginCombatPanel's
-## identical copies and that function's own docstring).
+## Panel-local read-only fighter card: icon/label/value rows with an HPBar
+## for max HP. BeginCombatPanel, BuildViewPanel and StatUpgradePanel each
+## retain their own helper to keep their layouts owned by the screen.
 func _populate_fighter_card(familiar: Familiar, name_label_ref: Label, portrait_ref: TextureRect, stat_list_ref: VBoxContainer) -> void:
 	name_label_ref.text = familiar.familiar_name
 	portrait_ref.texture = familiar.sprite

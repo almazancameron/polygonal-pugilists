@@ -1,10 +1,9 @@
 class_name BurnStatus
 extends Status
 
-## Duration-based damage-over-time with fixed damage per tick and a fixed duration of
-## 5 turns. Stacks represent turns remaining and refresh to 5 when re-applied.
-## Re-applying Burn to an already-burning target causes a Flare, dealing immediate bonus damage.
-
+## Damage-over-time countdown reduced by stacks_lost_per_tick on upkeep.
+## Reapplication causes an immediate Flare and keeps the greater of the
+## existing and incoming stack counts, rather than refreshing to five.
 var max_stack_count: int = 5
 var damage_per_tick: int = 3
 var flare_damage: int = 3

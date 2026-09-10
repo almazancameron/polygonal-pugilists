@@ -242,7 +242,6 @@ func _options_for(source: SentencePart.OptionSource) -> Array[Dictionary]:
 func is_wrapper() -> bool:
 	return definition != null and definition.body_property != &""
 
-## Nested condition blocks, in display order.
 func body_children() -> Array[ConditionBlock]:
 	var blocks: Array[ConditionBlock] = []
 	for child in body.get_children():

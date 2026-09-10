@@ -2,7 +2,7 @@ class_name StaggerStatus
 extends Status
 
 ## Stacking counter that does nothing per-stack. Once stacks reach
-## MAX_STACKS -- from a single application or from merging onto an existing
+## max_stack_count -- from a single application or from merging onto an existing
 ## Stagger -- it resets to 0 and arms a StunStatus on the target instead.
 
 var max_stack_count: int = 5

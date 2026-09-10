@@ -62,12 +62,9 @@ func _update_header_label() -> void:
 	_header_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 func _draw() -> void:
-	# A zero/near-zero rect (e.g. one frame before a Container first lays out
-	# its children, or a screen that's currently hidden) produces a
-	# self-intersecting notch polygon once CORNER_CUT exceeds half the
-	# rect's own size -- Godot's triangulator rejects that outright
-	# ("Invalid polygon data, triangulation failed"). Skip drawing entirely
-	# rather than draw garbage for one frame.
+	# Skip rectangles with no positive area while layout is pending. Small
+	# positive rectangles still draw: _outline_points() clamps the corner cut
+	# to half the smaller dimension so notch points cannot cross.
 	if size.x <= 0.0 or size.y <= 0.0:
 		return
 

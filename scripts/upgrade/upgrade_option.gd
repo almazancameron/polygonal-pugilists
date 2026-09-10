@@ -9,12 +9,8 @@ extends Resource
 @export var label: String = "Upgrade"
 @export var unique: bool = true  # If true, this upgrade is removed from the upgrade pool after being applied.
 
-## Describes what this upgrade does, for display on the choice screen.
-## Override in subclasses that want a more specific message than the
-## plain label.
 func describe() -> String:
 	return label
 
-## Applies this upgrade's effect to the familiar. Override in subclasses.
 func apply(familiar: Familiar) -> void:
 	pass

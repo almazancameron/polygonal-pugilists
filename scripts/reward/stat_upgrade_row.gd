@@ -42,7 +42,6 @@ func setup(stat_upgrade: ModifyStatUpgrade, starting_value: int) -> void:
 
 	_update_display()
 
-## Called after a successful allocate on THIS row.
 func set_allocated_count(count: int) -> void:
 	_allocated_count = count
 	_update_display()

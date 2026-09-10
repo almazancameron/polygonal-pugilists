@@ -1,10 +1,9 @@
 class_name LifestealStatus
 extends Status
 
-## Heals the owner for their own effective Power whenever they land an
-## attack, then loses a stack -- same on_attack() shape as Hone, healing
-## instead of buffing.
-
+## On attack, heals int(effective Power * heal_percent_of_power), capped by
+## missing HP, then reduces stacks by stacks_lost_per_hit. Healing depends
+## on the configured fraction of Power, not the damage the attack dealt.
 var heal_percent_of_power: float = 0.333
 var stacks_lost_per_hit: int = 1
 

@@ -268,12 +268,6 @@ func run_to_completion(max_turns: int = 1000, track_history: bool = false) -> Di
 		var upkeep_hp_before: int = next_actor.current_hp
 		var upkeep_entries: Array[String] = run_upkeep(next_actor)
 
-		# Upkeep ticks (Poison, Burn, Foretell, ...) deal real damage that never
-		# goes through take_turn() -- without logging it separately here, a
-		# combatant dying to sustained DoT looks identical in the history to one
-		# that was simply never hit, which is exactly backwards for diagnosing
-		# a kit's actual problem. One entry per upkeep phase (not per status),
-		# since it's not attributable to a single technique the way a turn is.
 		if track_history and not upkeep_entries.is_empty():
 			var upkeep_messages: Array[String] = []
 			for message in upkeep_entries:

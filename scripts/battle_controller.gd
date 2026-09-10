@@ -1,12 +1,9 @@
 extends Control
 
-## Drives one 1v1 battle, then a sequence of them across a run: builds both
-## Combatants, lets the player pick a priority build, then alternates turns
-## until one side is defeated -- both sides choose their own technique via
-## Combatant.choose_technique(), with no manual clicking once a fight
-## starts. A non-final win shows an upgrade choice and starts the next
-## round against the bracket's next opponent; the final win or any loss
-## ends the run.
+## Orchestrates character selection, autonomous bracket fights, between-fight
+## rewards and priority editing, then the separate final boss. Both sides
+## choose techniques through Combatant.choose_technique(). Defeating the boss
+## or losing a fight ends the run.
 ##
 ## Manual Inspector wiring required: full_roster, stat_upgrade_pool,
 ## technique_reward_pool, passive_reward_pool. full_roster must hold
@@ -21,28 +18,22 @@ extends Control
 
 enum Phase { PLAYER_TURN, ENEMY_UPKEEP, ENEMY_TURN, PLAYER_UPKEEP, BATTLE_OVER }
 
-## Every familiar _randomize_matchup() can draw from -- exported and authored
-## rather than directory-scanned at runtime, since a runtime scan of
-## resources/familiars/ works from the editor but not from an exported .pck
-## (see _randomize_matchup()'s doc comment).
+## Authored entrants passed to Bracket.generate() by _build_bracket(). The
+## exported roster supports shipped content discovery; see _build_bracket().
 @export var full_roster: Array[Familiar] = []
 
-## The fixed final encounter after the bracket's four rounds. Placeholder
-## content for now -- a real authored "absurd showdown" kit is its own
-## later pass. Kept out of resources/familiars/ deliberately: that folder
-## is directory-scanned by balance_test.gd and bracket_test.gd, and the
-## boss is not a bracket entrant.
+## Authored final encounter after the bracket's four rounds. Kept outside
+## resources/familiars/ because balance/bracket tools scan that folder for
+## bracket entrants; the boss is a separate encounter.
 @export var final_boss: Familiar
 
 ## True once the bracket is won and the boss fight is the active match.
 var facing_boss: bool = false
 
-## Overwritten by _randomize_matchup() every time _ready() runs -- any value
-## authored here in the Inspector is just a fallback for a context that
-## somehow skips _ready() (none currently do).
+## Assigned to the chosen run entrant by _show_character_select().
 @export var player_familiar_data: Familiar
 
-## The 5 mandatory-stat-upgrade offers shown at the start of every reward
+## The 5 mandatory-stat-upgrade offers shown after reward cards in each
 ## sequence (Phase A) -- expected to hold exactly one ModifyStatUpgrade
 ## per Familiar.Stat value.
 @export var stat_upgrade_pool: Array[ModifyStatUpgrade] = []
@@ -258,8 +249,8 @@ func _start_new_run() -> void:
 	await _wait_for_pre_fight_screen(enemy, false)
 	await begin_fight("%s prepares for battle!" % enemy.familiar.familiar_name, CombatLog.Source.ENEMY)
 
-## Builds this run's bracket and puts the player in one of its round-1
-## matches. Bracket.generate() duplicates every entrant, so builds can
+## Builds this run's bracket before character selection.
+## Bracket.generate() duplicates every entrant, so builds can
 ## mutate in place over the run without corrupting the base .tres files.
 ##
 ## full_roster is an authored, exported list rather than a runtime directory
@@ -272,8 +263,7 @@ func _start_new_run() -> void:
 ## loose project; anything that has to work in an exported build (this file)
 ## can't.
 ##
-## The entrant choice is temporary: the character-select screen replaces
-## _auto_pick_entrant() with a real player decision.
+## _show_character_select() then lets the player choose a first-round entrant.
 func _build_bracket() -> void:
 	if full_roster.size() != Bracket.ENTRANT_COUNT:
 		push_error("full_roster must hold exactly %d familiars, holds %d" % [Bracket.ENTRANT_COUNT, full_roster.size()])
@@ -430,15 +420,10 @@ func _on_stat_confirm_pressed(on_confirmed: Callable) -> void:
 ## cadence has a reward to offer at all, so it goes straight to the
 ## (1-point) stat allocation instead.
 ##
-## current_round is 0-indexed and only ever advances via start_next_round()
-## -- start_boss_fight() deliberately leaves it alone (round_display_name()
-## still needs to read "Final" throughout the champion fight), so by the
-## time this runs for the boss's own reward sequence, current_round is
-## still one behind "how many rounds have actually been completed", which
-## is what RewardProgression.kind_for_round() expects. Off by one here
-## silently pulled a TECHNIQUE/PASSIVE round's cadence entry instead of
-## round 4's PASSIVE_TRADE, showing a normal reward screen instead of the
-## sacrifice screen right before the champion.
+## current_round is a zero-based bracket position. After start_next_round()
+## increments it, it also equals the number of completed rounds. The boss
+## transition leaves it at 3, so that transition explicitly requests completed
+## round 4's PASSIVE_TRADE. This reward precedes the boss; none follows it.
 func begin_phase_b() -> void:
 	var rounds_completed: int = current_round + 1 if facing_boss else current_round
 	var kind: RewardProgression.RewardKind = reward_flow.begin_reward_screen(

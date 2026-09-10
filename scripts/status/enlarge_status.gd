@@ -1,8 +1,8 @@
 class_name EnlargeStatus
 extends Status
 
-## Multiplies power for a number of turns equal to the stacks.
-
+## Multiplies Power while active. Stacks form a countdown; upkeep requests
+## a reduction of the configurable stacks_lost_per_tick amount.
 var stack_value: float = 2.0
 var stacks_lost_per_tick: int = 1
 

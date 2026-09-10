@@ -1,8 +1,6 @@
 class_name FortifyStatus
 extends Status
 
-## Adds a flat value to defense for a number of turns based on the stacks.
-
 var stack_value: int = 1
 var stacks_lost_per_tick: int = 2
 

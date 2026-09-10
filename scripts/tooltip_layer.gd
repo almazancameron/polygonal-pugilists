@@ -188,9 +188,8 @@ func _show_pending_tooltip() -> void:
 
 	_active_tooltips.append({"source": source, "panel": panel, "shift_pinned": false, "anchor": anchor})
 
-	# Wait for layout to settle so panel.size reflects the real wrapped
-	# content -- reading it synchronously here would still be the
-	# pre-layout size, breaking the edge-of-screen check below.
+	# Allow wrapped content sizing to update before positioning from the
+	# panel's combined minimum size for the edge-of-screen check.
 	await get_tree().process_frame
 	if is_instance_valid(panel):
 		_position_near_cursor(panel, get_global_mouse_position())

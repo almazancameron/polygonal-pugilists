@@ -22,7 +22,6 @@ var statuses: Array[Status] = []
 var opponent: Combatant = null
 
 var _passive_fire_counts: Dictionary[PassiveEffect, int] = {}
-# var first_act_override: bool = false
 
 ## Stasis redirects a status's reduction into itself at most once per
 ## status per turn (keyed by Status.status_id()) -- guards against a
@@ -246,7 +245,6 @@ func trigger_on_hit(attacker: Combatant) -> String:
 
 	return message
 
-## Fires on_attack() on every active status, mirroring trigger_on_hit().
 func trigger_on_attack() -> String:
 	var message: String = ""
 
@@ -384,9 +382,6 @@ func get_status(effect: Status.StatusEffect) -> Status:
 	return null
 
 func has_first_act_override() -> bool:
-	# if first_act_override:
-	# 	return true
-
 	for status in statuses:
 		if status.grants_first_act_override():
 			return true
@@ -519,11 +514,10 @@ func _passive_limiter_allows(passive: PassiveEffect) -> bool:
 func _record_passive_fire(passive: PassiveEffect) -> void:
 	_passive_fire_counts[passive] = _passive_fire_counts.get(passive, 0) + 1
 
-## Clears ONCE_PER_TURN/ONCE_PER_TECHNIQUE limits at the start of this
-## combatant's own turn -- called from battle_controller.take_turn(). The
-## two limiters behave identically today since a turn is always exactly one
-## technique's execution; they'll only diverge once something makes that
-## no longer true.
+## Clears ONCE_PER_TURN/ONCE_PER_TECHNIQUE limits together. The live
+## controller's advance_turn() and BattleEngine.run_to_completion() call this
+## for the next actor before upkeep. StateProbe.advance_step() calls it for
+## the user before take_turn().
 func reset_turn_passive_limits() -> void:
 	for passive in _passive_fire_counts.keys().duplicate():
 		if passive.limiter == PassiveEffect.Limiter.ONCE_PER_TURN or passive.limiter == PassiveEffect.Limiter.ONCE_PER_TECHNIQUE:

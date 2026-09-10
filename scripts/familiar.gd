@@ -26,7 +26,7 @@ enum Stat { MAX_HP, POWER, DEFENSE, SPEED, FOCUS }
 @export var focus_step_size: int = 5
 
 ## This species' reward-tailoring identity -- weighted tags consulted
-## only by the Species reward slot (scripts/reward/reward_selector.gd),
+## by Species and Pivot reward slots (scripts/reward/reward_selector.gd),
 ## e.g. Ashwing might weight BURN heavily and TARGET_STATUS lightly.
 ## Deliberately never read by the Run slot, which tracks currently-
 ## equipped techniques/passives instead -- see BuildSnapshot.

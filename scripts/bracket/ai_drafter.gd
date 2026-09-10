@@ -26,8 +26,6 @@ const STAT_RANGES: Dictionary = {
 	Familiar.Stat.FOCUS: Vector2(2.0, 20.0),
 }
 
-## One round's worth of growth: always a stat point, plus whatever
-## content this round's cadence calls for.
 static func apply_round_reward(familiar: Familiar, round_completed: int,
 		technique_pool: Array[Technique], passive_pool: Array[PassiveEffect],
 		rng: RandomNumberGenerator) -> void:
@@ -44,8 +42,6 @@ static func apply_round_reward(familiar: Familiar, round_completed: int,
 		RewardProgression.RewardKind.NONE:
 			pass
 
-## Whichever stat sits lowest within its own typical range -- see
-## STAT_RANGES for why this isn't a raw comparison.
 static func lowest_stat(familiar: Familiar) -> Familiar.Stat:
 	var best_stat: Familiar.Stat = Familiar.Stat.MAX_HP
 	var best_fraction: float = 2.0

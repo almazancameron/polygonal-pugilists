@@ -287,12 +287,9 @@ func mismatch_message() -> String:
 func no_match_message() -> String:
 	return _no_match
 
-## Builds the player/dummy rows and playback controls. The probe owns the
-## combatants but not its own layout, so PriorityBuilder hands it a
-## container to fill. Clears first: each row's controls close over the
-## specific Combatant instances live when this runs, so a re-setup() with
-## fresh Combatants needs fresh rows too, not just a second set appended
-## alongside ones still pointing at now-orphaned Combatants.
+## The probe owns its controls; PriorityBuilder supplies the container to
+## fill. Replace previous widgets and refresh stored widget references on
+## setup so reopening the editor does not append duplicate rows.
 func build_controls(into: VBoxContainer, tooltip_layer: TooltipLayer) -> void:
 	_tooltip_layer = tooltip_layer
 
@@ -361,7 +358,6 @@ func _build_side_display(into: VBoxContainer, label_text: String, editable_max_h
 		_user_hp_bar = hp_bar
 		_user_status_row = status_row
 
-## Media-player-style cluster: rewind/next flank Play/Reset in the middle.
 func _build_playback_controls(into: VBoxContainer) -> void:
 	var row := HBoxContainer.new()
 	into.add_child(row)

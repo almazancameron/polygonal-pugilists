@@ -14,9 +14,9 @@ extends RefCounted
 ##
 ## Authoring discipline, not enforced by code: a tag should capture one of
 ## a piece of content's few genuinely meaningful drafting hooks, not an
-## exhaustive checklist of every mechanical property it touches -- every
-## scoring formula in RewardSelector sums across a candidate's tags, so
-## over-tagging silently inflates its score in all three slots.
+## exhaustive checklist of every mechanical property it touches. More tags
+## can increase Species/Run relevance, but Pivot (Wildcard) favors moderate
+## overlap: adding overlap beyond its peak reduces the candidate's weight.
 enum Tag {
 	POISON, BURN, ACID, BLEED, STAGGER, FORETELL, DEFENDING, INFESTATION,
 	HONE, FORTIFY, ENLARGE, RECHARGE, THORNS, WARD, HEX, ABSORPTION, RUIN,

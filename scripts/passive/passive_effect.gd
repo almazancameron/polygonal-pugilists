@@ -71,9 +71,9 @@ enum Limiter {
 ## only matches when the specific status the event concerns is this one, e.g.
 ## "when Recharge is removed, gain Enlarge" rather than "when any status is
 ## removed." NONE means no filter: match regardless of which status, the same
-## behavior every passive had before this field existed. Harmlessly inert on
-## every other trigger, since those have no specific status to compare
-## against -- Combatant._matching_passives() never has one to check there.
+## behavior every passive had before this field existed. A non-NONE filter
+## cannot match an event without a relevant status; it is not ignored on
+## those events.
 @export var status_effect_filter: Status.StatusEffect = Status.StatusEffect.NONE
 
 @export var conditions: Array[Condition] = []
